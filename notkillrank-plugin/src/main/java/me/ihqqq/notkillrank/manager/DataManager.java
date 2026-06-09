@@ -1,0 +1,103 @@
+package me.ihqqq.notkillrank.manager;
+
+import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.storage.DataStorage;
+import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.util.MessageUtil;
+import org.bukkit.entity.Player;
+
+import java.util.*;
+
+public class DataManager {
+
+    private static DataManager instance;
+    private final DataStorage storage;
+    private final Map<String, PlayerData> cache = new HashMap<>();
+
+    public DataManager() {
+        this.storage = new DataStorage();
+        instance = this;
+    }
+
+    public static DataManager getInstance() {
+        return instance;
+    }
+
+    public PlayerData getOrCreate(Player player) {
+        String uuid = player.getUniqueId().toString();
+        if (cache.containsKey(uuid)) {
+            PlayerData data = cache.get(uuid);
+            data.setName(player.getName());
+            return data;
+        }
+        PlayerData loaded = storage.load(uuid);
+        if (loaded != null) {
+            loaded.setName(player.getName());
+            cache.put(uuid, loaded);
+            return loaded;
+        }
+        int startElo = NotKillRank.getInstance().getConfig().getInt("elo.start-elo", 1000);
+        PlayerData fresh = new PlayerData(uuid, player.getName(), startElo);
+        cache.put(uuid, fresh);
+        return fresh;
+    }
+
+    public PlayerData get(String uuid) {
+        if (cache.containsKey(uuid)) return cache.get(uuid);
+        PlayerData loaded = storage.load(uuid);
+        if (loaded != null) {
+            cache.put(uuid, loaded);
+            return loaded;
+        }
+        return null;
+    }
+
+    public PlayerData getByName(String name) {
+        for (PlayerData data : cache.values()) {
+            if (data.getName().equalsIgnoreCase(name)) return data;
+        }
+        List<PlayerData> all = storage.loadAll();
+        for (PlayerData data : all) {
+            if (data.getName().equalsIgnoreCase(name)) {
+                cache.put(data.getUUID(), data);
+                return data;
+            }
+        }
+        return null;
+    }
+
+    public void save(String uuid) {
+        PlayerData data = cache.get(uuid);
+        if (data != null) storage.save(data);
+    }
+
+    public void saveAll() {
+        for (PlayerData data : cache.values()) {
+            storage.save(data);
+        }
+        MessageUtil.log("&aSaved " + cache.size() + " player profiles.");
+    }
+
+    public void unload(String uuid) {
+        PlayerData data = cache.remove(uuid);
+        if (data != null) storage.save(data);
+    }
+
+    public List<PlayerData> getTopPlayers(int limit) {
+        List<PlayerData> allLoaded = storage.loadAll();
+        for (PlayerData d : allLoaded) {
+            cache.putIfAbsent(d.getUUID(), d);
+        }
+        List<PlayerData> sorted = new ArrayList<>(cache.values());
+        sorted.sort((a, b) -> b.getElo() - a.getElo());
+        return sorted.subList(0, Math.min(limit, sorted.size()));
+    }
+
+    public DataStorage getStorage() {
+        return storage;
+    }
+
+    public Map<String, PlayerData> getCache() {
+        return cache;
+    }
+}

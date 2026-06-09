@@ -1,0 +1,35 @@
+name: NotKillRank
+version: '${project.version}'
+main: me.ihqqq.notkillrank.NotKillRank
+api-version: '1.21'
+load: POSTWORLD
+authors: [ihqqq]
+description: Elo rankings, Kill Streaks, Bounty, Anti-Farm for NotMC
+
+softdepend: [PlaceholderAPI]
+
+commands:
+  elo:
+    description: Xem elo cua ban hoac nguoi khac
+    usage: /elo [player]
+  top:
+    description: Bang xep hang top 10
+    usage: /top
+  stats:
+    description: Xem thong ke ca nhan
+    usage: /stats [player]
+  bounty:
+    description: Dat bounty len nguoi choi
+    usage: /bounty <player> <elo>
+  notkillrank:
+    description: Lenh quan tri NotKillRank
+    usage: /notkillrank <reload|reset <player>|setelo <player> <elo>>
+    aliases: [nkr]
+
+permissions:
+  notkillrank.use:
+    description: Cho phep dung lenh co ban
+    default: true
+  notkillrank.admin:
+    description: Cho phep dung lenh admin
+    default: op

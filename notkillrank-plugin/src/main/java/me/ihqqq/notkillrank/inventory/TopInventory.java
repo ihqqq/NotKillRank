@@ -1,5 +1,6 @@
 package me.ihqqq.notkillrank.inventory;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.config.ConfigManager;
 import me.ihqqq.notkillrank.manager.DataManager;
@@ -23,9 +24,20 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class TopInventory implements Listener {
+    private static final Map<String, CachedProfile> skinCache = new HashMap<>();
+    private static final long CACHE_TTL_MS = 5 * 60 * 1000L; // 5 minutes
+
+    private record CachedProfile(PlayerProfile profile, long fetchedAt) {
+        boolean isExpired() {
+            return System.currentTimeMillis() - fetchedAt > CACHE_TTL_MS;
+        }
+    }
 
     public TopInventory() {
         Bukkit.getPluginManager().registerEvents(this, NotKillRank.getInstance());
@@ -34,6 +46,44 @@ public class TopInventory implements Listener {
     public static void open(Player player) {
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.getInstance(), () -> {
             List<PlayerData> top = DataManager.getInstance().getTopPlayers(10);
+
+            Map<String, PlayerProfile> profileMap = new HashMap<>();
+            for (PlayerData data : top) {
+                UUID uuid = UUID.fromString(data.getUUID());
+                Player online = Bukkit.getPlayer(uuid);
+
+                if (online != null) {
+                    PlayerProfile live = online.getPlayerProfile();
+                    profileMap.put(data.getUUID(), live);
+                    skinCache.put(data.getUUID(), new CachedProfile(live, System.currentTimeMillis()));
+                } else {
+                    CachedProfile cached = skinCache.get(data.getUUID());
+                    if (cached != null && !cached.isExpired()) {
+                        profileMap.put(data.getUUID(), cached.profile());
+                        continue;
+                    }
+
+                    try {
+                        PlayerProfile profile = Bukkit.createProfile(uuid, data.getName());
+                        profile.complete(true); // blocking Mojang call, safe here (we're async)
+                        skinCache.put(data.getUUID(), new CachedProfile(profile, System.currentTimeMillis()));
+                        profileMap.put(data.getUUID(), profile);
+                    } catch (Exception e) {
+                        NotKillRank.getInstance().getLogger()
+                                .warning("[TopInventory] Failed to fetch profile for "
+                                        + data.getName() + ": " + e.getMessage());
+                        // Fallback to usercache (possibly stale) — better than Steve
+                        try {
+                            PlayerProfile fallback = Bukkit.createProfile(uuid, data.getName());
+                            fallback.completeFromCache();
+                            profileMap.put(data.getUUID(), fallback);
+                        } catch (Exception ignored) {
+                            profileMap.put(data.getUUID(), null);
+                        }
+                    }
+                }
+            }
+
             Bukkit.getScheduler().runTask(NotKillRank.getInstance(), () -> {
                 FileConfiguration gui = ConfigManager.getInstance().getTopGui();
 
@@ -53,7 +103,8 @@ public class TopInventory implements Listener {
                 for (int i = 0; i < Math.min(top.size(), slots.size()); i++) {
                     int slot = slots.get(i);
                     if (slot >= 0 && slot < size) {
-                        inv.setItem(slot, createSkull(top.get(i), i + 1, gui));
+                        PlayerProfile profile = profileMap.get(top.get(i).getUUID());
+                        inv.setItem(slot, createSkull(top.get(i), i + 1, gui, profile));
                     }
                 }
                 player.openInventory(inv);
@@ -90,16 +141,14 @@ public class TopInventory implements Listener {
         }
     }
 
-    private static ItemStack createSkull(PlayerData data, int pos, FileConfiguration gui) {
+    private static ItemStack createSkull(PlayerData data, int pos, FileConfiguration gui,
+                                         PlayerProfile profile) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         if (meta == null) return skull;
 
-        Player online = Bukkit.getPlayer(java.util.UUID.fromString(data.getUUID()));
-        if (online != null) {
-            meta.setOwningPlayer(online);
-        } else {
-            meta.setOwner(data.getName());
+        if (profile != null) {
+            meta.setPlayerProfile(profile);
         }
 
         String rankTag = RankManager.getInstance().getRankTag(data.getElo());
@@ -111,7 +160,7 @@ public class TopInventory implements Listener {
         String displayName = nameTpl
                 .replace("{medal}", medal)
                 .replace("{player}", data.getName());
-        meta.displayName(MessageUtil.parse(displayName));
+        meta.displayName(MessageUtil.parseLore(displayName));
 
         List<Component> lore = new ArrayList<>();
         List<String> loreTpl = gui.getStringList("player-head.lore");
@@ -140,7 +189,7 @@ public class TopInventory implements Listener {
                     .replace("{highest_streak}", String.valueOf(data.getHighestKillStreak()))
                     .replace("{peak_elo}", String.valueOf(data.getPeakElo()))
                     .replace("{bounty}", String.valueOf(totalBounty));
-            lore.add(MessageUtil.parse(resolved));
+            lore.add(MessageUtil.parseLore(resolved));
         }
 
         if (totalBounty > 0) {
@@ -152,7 +201,7 @@ public class TopInventory implements Listener {
                 if (line.isEmpty()) {
                     lore.add(Component.empty());
                 } else {
-                    lore.add(MessageUtil.parse(line.replace("{bounty}", String.valueOf(totalBounty))));
+                    lore.add(MessageUtil.parseLore(line.replace("{bounty}", String.valueOf(totalBounty))));
                 }
             }
         }

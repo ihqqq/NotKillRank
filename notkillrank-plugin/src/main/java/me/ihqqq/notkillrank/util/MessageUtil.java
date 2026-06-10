@@ -19,6 +19,17 @@ public class MessageUtil {
         return MM.deserialize(text);
     }
 
+    public static Component parseLore(String text) {
+        if (text == null) return Component.empty();
+        if (text.isEmpty()) return Component.empty();
+        String lower = text.toLowerCase();
+        boolean hasExplicitItalic = lower.contains("<italic>") || lower.contains("<italic:true>") || lower.contains("<i>");
+        if (hasExplicitItalic) {
+            return MM.deserialize(text);
+        }
+        return MM.deserialize("<italic:false>" + text);
+    }
+
     public static void sendMessage(Player player, String message) {
         if (player == null || message == null) return;
         player.sendMessage(parse(message));

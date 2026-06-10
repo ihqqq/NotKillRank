@@ -1,6 +1,8 @@
 package me.ihqqq.notkillrank;
 
+import com.tchristofferson.configupdater.ConfigUpdater;
 import me.ihqqq.notkillrank.command.*;
+import me.ihqqq.notkillrank.config.ConfigManager;
 import me.ihqqq.notkillrank.inventory.TopInventory;
 import me.ihqqq.notkillrank.listener.CombatListener;
 import me.ihqqq.notkillrank.listener.PlayerJoinListener;
@@ -13,10 +15,15 @@ import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+
 public final class NotKillRank extends JavaPlugin {
 
     private static NotKillRank instance;
 
+    private ConfigManager configManager;
     private DataManager dataManager;
     private EloManager eloManager;
     private RankManager rankManager;
@@ -28,6 +35,13 @@ public final class NotKillRank extends JavaPlugin {
         instance = this;
 
         saveDefaultConfig();
+        try {
+            ConfigUpdater.update(this, "config.yml", new File(getDataFolder(), "config.yml"), Collections.emptyList());
+        } catch (IOException e) {
+            getLogger().warning("Could not update config.yml: " + e.getMessage());
+        }
+        reloadConfig();
+        configManager = new ConfigManager(this);
 
         dataManager = new DataManager();
         rankManager = new RankManager();
@@ -100,6 +114,7 @@ public final class NotKillRank extends JavaPlugin {
         return instance;
     }
 
+    public ConfigManager getConfigManager() { return configManager; }
     public DataManager getDataManager() { return dataManager; }
     public EloManager getEloManager() { return eloManager; }
     public RankManager getRankManager() { return rankManager; }

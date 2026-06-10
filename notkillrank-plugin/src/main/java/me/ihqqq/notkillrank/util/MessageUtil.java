@@ -1,6 +1,7 @@
 package me.ihqqq.notkillrank.util;
 
 import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.config.ConfigManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -52,18 +53,21 @@ public class MessageUtil {
     }
 
     public static String getMessage(String path) {
+        ConfigManager cm = ConfigManager.getInstance();
+        if (cm != null) return cm.getMessage(path);
         return NotKillRank.getInstance().getConfig().getString("messages." + path, "");
     }
 
-    public static String getPrefix() {
-        return NotKillRank.getInstance().getConfig()
-                .getString("messages.prefix", "<dark_gray>[<gold>NotKillRank<dark_gray>] ");
+    public static String getMessage(String path, String def) {
+        ConfigManager cm = ConfigManager.getInstance();
+        if (cm != null) return cm.getMessage(path, def);
+        return NotKillRank.getInstance().getConfig().getString("messages." + path, def);
     }
 
-    /**
-     * Converts a MiniMessage string to legacy §-format.
-     * Used for contexts that still need a legacy String (e.g. old API calls).
-     */
+    public static String getPrefix() {
+        return getMessage("prefix", "<dark_gray>[<gold>NotKillRank<dark_gray>] ");
+    }
+
     public static String color(String text) {
         if (text == null) return "";
         return LegacyComponentSerializer.legacySection().serialize(MM.deserialize(text));

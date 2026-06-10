@@ -33,8 +33,7 @@ public class EloCommand implements CommandExecutor, TabCompleter {
         } else {
             PlayerData data = DataManager.getInstance().getByName(args[0]);
             if (data == null) {
-                MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                        .getString("messages.player-not-found",
+                MessageUtil.sendMessage(sender, MessageUtil.getMessage("player-not-found",
                                 "<red>Không tìm thấy người chơi <yellow>{player}<red>!")
                         .replace("{player}", args[0]));
                 return true;
@@ -48,8 +47,7 @@ public class EloCommand implements CommandExecutor, TabCompleter {
         String rank = RankManager.getInstance().getRankTag(data.getElo());
         String streakTag = RankManager.getInstance().getStreakTag(data);
         String streakPart = streakTag.isEmpty() ? "" : " " + streakTag;
-        MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                .getString("messages.elo-info",
+        MessageUtil.sendMessage(sender, MessageUtil.getMessage("elo-info",
                         "<gold>{player} <white>— Elo: <green>{elo} <white>| Hạng: {rank}")
                 .replace("{player}", data.getName())
                 .replace("{elo}", String.valueOf(data.getElo()))

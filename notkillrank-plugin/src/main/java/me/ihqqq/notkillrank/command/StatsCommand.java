@@ -34,8 +34,7 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
         } else {
             data = DataManager.getInstance().getByName(args[0]);
             if (data == null) {
-                MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                        .getString("messages.player-not-found",
+                MessageUtil.sendMessage(sender, MessageUtil.getMessage("player-not-found",
                                 "<red>Không tìm thấy người chơi <yellow>{player}<red>!")
                         .replace("{player}", args[0]));
                 return true;
@@ -46,33 +45,30 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
         String streakTag = RankManager.getInstance().getStreakTag(data);
         String streakPart = streakTag.isEmpty() ? "" : " " + streakTag;
 
-        MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                .getString("messages.stats-header",
+        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-header",
                         "<dark_gray><strikethrough>          </strikethrough> <gold>Thống kê của {player} <dark_gray><strikethrough>          </strikethrough>")
                 .replace("{player}", data.getName()));
 
-        MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                .getString("messages.stats-elo", "<white>Elo: <green>{elo} <white>| Hạng: {rank}")
+        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-elo",
+                        "<white>Elo: <green>{elo} <white>| Hạng: {rank}")
                 .replace("{elo}", String.valueOf(data.getElo()))
                 .replace("{rank}", rank + streakPart));
 
         String kd = data.getDeaths() == 0
                 ? String.valueOf(data.getKills())
                 : String.format("%.2f", (double) data.getKills() / data.getDeaths());
-        MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                .getString("messages.stats-kd",
+        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-kd",
                         "<white>K/D: <yellow>{kd} <gray>({kills} kill / {deaths} death)")
                 .replace("{kd}", kd)
                 .replace("{kills}", String.valueOf(data.getKills()))
                 .replace("{deaths}", String.valueOf(data.getDeaths())));
 
-        MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                .getString("messages.stats-streak",
+        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-streak",
                         "<white>Chuỗi kill cao nhất: <red>{streak}")
                 .replace("{streak}", String.valueOf(data.getHighestKillStreak())));
 
-        MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                .getString("messages.stats-peak", "<white>Elo đỉnh mùa: <gold>{peak}")
+        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-peak",
+                        "<white>Elo đỉnh mùa: <gold>{peak}")
                 .replace("{peak}", String.valueOf(data.getPeakElo())));
 
         int totalBounty = data.getBounties().values().stream().mapToInt(Integer::intValue).sum();

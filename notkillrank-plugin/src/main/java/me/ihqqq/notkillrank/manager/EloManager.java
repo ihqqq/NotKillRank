@@ -6,7 +6,6 @@ import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class EloManager {
@@ -39,9 +38,8 @@ public class EloManager {
             victimData.setLastKilledTime(System.currentTimeMillis());
             victimData.setNoDeathStart(System.currentTimeMillis());
 
-            String msg = NotKillRank.getInstance().getConfig()
-                    .getString("messages.kill-no-elo",
-                            "&c[{rank_killer}] &f{killer} &fda choc chet &c[{rank_victim}] &f{victim} &7(bao ve nguoi moi)")
+            String msg = MessageUtil.getMessage("kill-no-elo",
+                            "<reset>{rank_killer} <white>{killer} <white>đã chọc chết {rank_victim} <white>{victim} <gray>(bảo vệ người mới)")
                     .replace("{rank_killer}", RankManager.getInstance().getRankTag(killerData.getElo()))
                     .replace("{killer}", killer.getName())
                     .replace("{rank_victim}", RankManager.getInstance().getRankTag(victimData.getElo()))
@@ -55,9 +53,8 @@ public class EloManager {
 
         if (isAntiFarm(killerData, victim.getUniqueId().toString())) {
             String limit = String.valueOf(NotKillRank.getInstance().getConfig().getInt("anti-farm.limit-kills-per-hour", 3));
-            String anti = NotKillRank.getInstance().getConfig()
-                    .getString("messages.anti-farm",
-                            "&7(Khong nhan elo - Da giet {victim} qua {limit} lan/gio)")
+            String anti = MessageUtil.getMessage("anti-farm",
+                            "<gray>(Không nhận elo — Đã giết {victim} quá {limit} lần/giờ)")
                     .replace("{victim}", victim.getName())
                     .replace("{limit}", limit);
             MessageUtil.sendMessage(killer, anti);
@@ -141,9 +138,8 @@ public class EloManager {
             BountyManager.getInstance().claimBounties(killer, victimData);
         }
 
-        String killMsg = NotKillRank.getInstance().getConfig()
-                .getString("messages.kill-broadcast",
-                        "&c[{rank_killer}] &f{killer} &a(+{elo_gained}) &fda choc chet &c[{rank_victim}] &f{victim} &c(-{elo_lost})")
+        String killMsg = MessageUtil.getMessage("kill-broadcast",
+                        "<reset>{rank_killer} <white>{killer} <green>(+{elo_gained}) <white>đã chọc chết {rank_victim} <white>{victim} <red>(-{elo_lost})")
                 .replace("{rank_killer}", RankManager.getInstance().getRankTag(killerData.getElo()))
                 .replace("{killer}", killer.getName())
                 .replace("{elo_gained}", String.valueOf(eloGained))
@@ -153,18 +149,16 @@ public class EloManager {
         MessageUtil.sendBroadcast(killMsg);
 
         if (isRevenge) {
-            String revengeMsg = NotKillRank.getInstance().getConfig()
-                    .getString("messages.revenge-kill",
-                            "&6[Bao thu] &f{player} &fda tra thu &c{target}&f!")
+            String revengeMsg = MessageUtil.getMessage("revenge-kill",
+                            "<gold>[Báo thù] <white>{player} <white>đã trả thù <red>{target}<white>!")
                     .replace("{player}", killer.getName())
                     .replace("{target}", victim.getName());
             MessageUtil.sendBroadcast(revengeMsg);
         }
 
         if (RankManager.getInstance().isWeak(victimData)) {
-            String weakMsg = NotKillRank.getInstance().getConfig()
-                    .getString("messages.weak-status",
-                            "&c{player} &fmang trang thai &c[Ke yeu]&f!")
+            String weakMsg = MessageUtil.getMessage("weak-status",
+                            "<red>{player} <white>mang trạng thái <red>[Kẻ yếu]<white>!")
                     .replace("{player}", victim.getName());
             MessageUtil.sendBroadcast(weakMsg);
         }
@@ -193,7 +187,7 @@ public class EloManager {
         }
     }
 
-    private boolean isNewbie(PlayerData data) {
+    public boolean isNewbie(PlayerData data) {
         int newbieHours = NotKillRank.getInstance().getConfig().getInt("newbie-protection.newbie-hours", 10);
         int newbieElo = NotKillRank.getInstance().getConfig().getInt("newbie-protection.newbie-protect-elo", 100);
         long onlineMs = System.currentTimeMillis() - data.getFirstJoinTime();

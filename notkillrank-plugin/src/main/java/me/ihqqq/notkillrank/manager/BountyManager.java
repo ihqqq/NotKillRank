@@ -5,8 +5,6 @@ import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
-
 public class BountyManager {
 
     private static BountyManager instance;
@@ -22,13 +20,15 @@ public class BountyManager {
     public boolean placeBounty(Player placer, Player target, int amount) {
         int minAmount = NotKillRank.getInstance().getConfig().getInt("bounty.min-amount", 100);
         if (amount < minAmount) {
-            MessageUtil.sendMessage(placer, "&cSo luong elo bounty toi thieu la &e" + minAmount + "&c!");
+            MessageUtil.sendMessage(placer, "<red>Số lượng elo bounty tối thiểu là <yellow>"
+                    + minAmount + "<red>!");
             return false;
         }
 
         PlayerData placerData = DataManager.getInstance().getOrCreate(placer);
         if (placerData.getElo() < amount) {
-            MessageUtil.sendMessage(placer, "&cBan khong du elo! Elo hien tai: &e" + placerData.getElo());
+            MessageUtil.sendMessage(placer, "<red>Bạn không đủ elo! Elo hiện tại: <yellow>"
+                    + placerData.getElo());
             return false;
         }
 
@@ -45,9 +45,8 @@ public class BountyManager {
         DataManager.getInstance().save(placer.getUniqueId().toString());
         DataManager.getInstance().save(targetUUID);
 
-        String msg = NotKillRank.getInstance().getConfig()
-                .getString("messages.bounty-placed",
-                        "&6[Bounty] &f{placer} &fda dat truy na &a{amount} elo &flen &c{target}&f!")
+        String msg = MessageUtil.getMessage("bounty-placed",
+                        "<gold>[Bounty] <white>{placer} <white>đã đặt truy nã <green>{amount} elo <white>lên đầu <red>{target}<white>!")
                 .replace("{placer}", placer.getName())
                 .replace("{amount}", String.valueOf(amount))
                 .replace("{target}", target.getName());
@@ -76,9 +75,8 @@ public class BountyManager {
         targetData.getBounties().clear();
         DataManager.getInstance().save(claimer.getUniqueId().toString());
 
-        String msg = NotKillRank.getInstance().getConfig()
-                .getString("messages.bounty-claimed",
-                        "&6[Bounty] &f{claimer} &fda nhan thuong &a{amount} elo &ftu truy na &c{target}&f!")
+        String msg = MessageUtil.getMessage("bounty-claimed",
+                        "<gold>[Bounty] <white>{claimer} <white>đã nhận thưởng <green>{amount} elo <white>từ truy nã <red>{target}<white>!")
                 .replace("{claimer}", claimer.getName())
                 .replace("{amount}", String.valueOf(total))
                 .replace("{target}", targetData.getName());

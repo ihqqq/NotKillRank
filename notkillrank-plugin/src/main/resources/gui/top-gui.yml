@@ -1,0 +1,79 @@
+# ============================================================
+# NotKillRank - Cấu hình GUI Bảng Xếp Hạng Top 10
+# Hỗ trợ MiniMessage (https://docs.advntr.dev/minimessage/format.html)
+# ============================================================
+#
+# ── HƯỚNG DẪN CẤU HÌNH ICON ──────────────────────────────
+#
+# Loại icon thông thường (bất kỳ tên Material hợp lệ):
+#   icon:
+#     type: GRAY_STAINED_GLASS_PANE
+#
+# Đầu tùy chỉnh bằng texture base64 (CUSTOM_HEAD hoặc PLAYER_HEAD + texture):
+#   icon:
+#     type: CUSTOM_HEAD
+#     texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvIn19fQ=="
+#
+#   Lấy chuỗi base64 tại: https://minecraft-heads.com
+#   (Vào trang head, chọn tab "Other", copy giá trị "Value")
+#
+# ─────────────────────────────────────────────────────────
+
+# Tên giao diện
+name: "<gold><bold>Top 10 — NotKillRank"
+
+# Số hàng của giao diện (tối đa 6)
+rows: 6
+
+# Tô nền cho Menu
+# Nền sẽ được fill trước tiên, các button khác sẽ được đặt lên nền
+background:
+  icon:
+    type: GRAY_STAINED_GLASS_PANE
+    # Uncomment để dùng custom head texture thay cho glass pane:
+    # type: CUSTOM_HEAD
+    # texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzI5OTdlYTc0ZWJhMjlhMjNmM2YxNmYzMjNlZGQxNDE0NzJlZDc5YjQ0ZWIzYTMzOTQzNzMzZDU1ZjI1YWM4OCJ9fX0="
+  # với button fill, số hàng phải bằng số hàng của giao diện (rows), số cột phải là 9
+  # các vị trí đánh dấu bằng 'x' sẽ được fill
+  fill:
+    - 'xxxxxxxxx'
+    - 'x       x'
+    - 'x       x'
+    - 'x       x'
+    - 'x       x'
+    - 'xxxxxxxxx'
+
+# Vị trí slot cho top 1 → top 10 (theo thứ tự hạng, index từ 0)
+player-slots:
+  - 13
+  - 11
+  - 15
+  - 20
+  - 24
+  - 29
+  - 33
+  - 28
+  - 30
+  - 22
+
+# Hiển thị đầu người chơi trong bảng xếp hạng
+# Placeholder: {medal}, {player}, {rank}, {elo}, {kills}, {deaths}, {kd}, {highest_streak}, {peak_elo}, {bounty}
+player-head:
+  name: "{medal} <white>{player}"
+  lore:
+    - "<gray>Hạng: {rank}"
+    - "<gray>Elo: <green>{elo}"
+    - "<gray>Kill/Death: <yellow>{kills}<gray>/<red>{deaths}"
+    - "<gray>Kill streak cao nhất: <red>{highest_streak}"
+    - "<gray>Peak elo: <gold>{peak_elo}"
+  # Dòng lore bổ sung hiển thị khi người chơi có bounty
+  bounty-lore:
+    - ""
+    - "<gold>Bounty: <red>{bounty} elo"
+
+# Huy hiệu cho từng vị trí xếp hạng (MiniMessage)
+medals:
+  "1": "<gold><bold>#1"
+  "2": "<gray><bold>#2"
+  "3": "<red><bold>#3"
+  default: "<dark_gray>#{pos}"

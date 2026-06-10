@@ -2,6 +2,9 @@ package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.manager.BountyManager;
+import me.ihqqq.notkillrank.manager.DataManager;
+import me.ihqqq.notkillrank.manager.EloManager;
+import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -27,9 +30,8 @@ public class BountyCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         if (!sender.hasPermission("notkillrank.use")) {
-            MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                    .getString("messages.no-permission",
-                            "<red>Bạn không có quyền dùng lệnh này!"));
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("no-permission",
+                    "<red>Bạn không có quyền dùng lệnh này!"));
             return true;
         }
         if (args.length < 2) {
@@ -42,12 +44,19 @@ public class BountyCommand implements CommandExecutor, TabCompleter {
         }
         Player target = Bukkit.getPlayerExact(args[0]);
         if (target == null) {
-            MessageUtil.sendMessage(sender, NotKillRank.getInstance().getConfig()
-                    .getString("messages.player-not-found",
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("player-not-found",
                             "<red>Không tìm thấy người chơi <yellow>{player}<red>!")
                     .replace("{player}", args[0]));
             return true;
         }
+
+        PlayerData targetData = DataManager.getInstance().getOrCreate(target);
+        if (EloManager.getInstance().isNewbie(targetData)) {
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("bounty-target-protected",
+                    "<red>Không thể đặt bounty lên người chơi đang được bảo vệ người mới!"));
+            return true;
+        }
+
         int amount;
         try {
             amount = Integer.parseInt(args[1]);

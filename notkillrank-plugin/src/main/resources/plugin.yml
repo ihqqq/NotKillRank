@@ -10,26 +10,26 @@ softdepend: [PlaceholderAPI]
 
 commands:
   elo:
-    description: Xem elo cua ban hoac nguoi khac
+    description: Xem elo của bạn hoặc người khác
     usage: /elo [player]
   top:
-    description: Bang xep hang top 10
+    description: Bảng xếp hạng top 10 elo
     usage: /top
   stats:
-    description: Xem thong ke ca nhan
+    description: Xem thông kê cá nhân
     usage: /stats [player]
   bounty:
-    description: Dat bounty len nguoi choi
+    description: Đặt truy nã lên người chơi
     usage: /bounty <player> <elo>
   notkillrank:
-    description: Lenh quan tri NotKillRank
+    description: Lệnh quản trị NotKillRank
     usage: /notkillrank <reload|reset <player>|setelo <player> <elo>>
     aliases: [nkr]
 
 permissions:
   notkillrank.use:
-    description: Cho phep dung lenh co ban
+    description: Cho phép dùng lệnh cơ bản
     default: true
   notkillrank.admin:
-    description: Cho phep dung lenh admin
+    description: Cho phép dùng lệnh admin
     default: op

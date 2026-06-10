@@ -104,10 +104,9 @@ public class StreakManager {
     public void broadcastStreakBreak(Player breaker, PlayerData breakerData,
                                      PlayerData victimData, int eloGained) {
         if (victimData.getKillStreak() < 3) return;
-        String msg = NotKillRank.getInstance().getConfig()
-                .getString("messages.streak-break",
-                        "<yellow>{breaker} <white>da cham dut chuoi <red>{streak} kill "
-                                + "<white>cua <yellow>{victim}<white>! <green>(+{elo} elo)")
+        String msg = MessageUtil.getMessage("streak-break",
+                        "<yellow>{breaker} <white>đã chấm dứt chuỗi <red>{streak} kill "
+                                + "<white>của <yellow>{victim}<white>! <green>(+{elo} elo)")
                 .replace("{breaker}", breaker.getName())
                 .replace("{streak}", String.valueOf(victimData.getKillStreak()))
                 .replace("{victim}", victimData.getName())

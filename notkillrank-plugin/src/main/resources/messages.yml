@@ -1,0 +1,57 @@
+# ============================================================
+# NotKillRank - Tin nhắn hệ thống
+# Tất cả đều dùng MiniMessage format
+# https://docs.advntr.dev/minimessage/format.html
+# ============================================================
+
+# Tiền tố hiển thị trước các thông báo của plugin
+prefix: "<dark_gray>[<gold>NotKillRank<dark_gray>] "
+
+# Thông báo khi có kill thông thường (có thay đổi elo)
+# {rank_killer}, {killer}, {elo_gained}, {rank_victim}, {victim}, {elo_lost}
+kill-broadcast: "<reset>{rank_killer} <white>{killer} <green>(+{elo_gained}) <white>đã chọc chết {rank_victim} <white>{victim} <red>(-{elo_lost})"
+
+# Thông báo khi kill nhưng không có thay đổi elo (người mới)
+kill-no-elo: "<reset>{rank_killer} <white>{killer} <white>đã chọc chết {rank_victim} <white>{victim} <gray>(bảo vệ người mới)"
+
+# Thông báo toàn server khi phá chuỗi kill của người khác
+# {breaker}, {streak}, {victim}, {elo}
+streak-break: "<yellow>{breaker} <white>đã chấm dứt chuỗi <red>{streak} kill <white>của <yellow>{victim}<white>! <green>(+{elo} elo)"
+
+# Thông báo khi thực hiện kill báo thù
+revenge-kill: "<gold>[Báo thù] <white>{player} <white>đã trả thù <red>{target}<white>!"
+
+# Thông báo khi người chơi mang trạng thái [Kẻ yếu]
+weak-status: "<red>{player} <white>mang trạng thái <red>[Kẻ yếu]<white>!"
+
+# Thông báo khi đặt bounty — {placer}, {amount}, {target}
+bounty-placed: "<gold>[Bounty] <white>{placer} <white>đã đặt truy nã <green>{amount} elo <white>lên đầu <red>{target}<white>!"
+
+# Thông báo khi nhận thưởng bounty — {claimer}, {amount}, {target}
+bounty-claimed: "<gold>[Bounty] <white>{claimer} <white>đã nhận thưởng <green>{amount} elo <white>từ truy nã <red>{target}<white>!"
+
+# Thông báo khi cố đặt bounty lên người đang được bảo vệ người mới
+bounty-target-protected: "<red>Không thể đặt bounty lên người chơi đang được bảo vệ người mới!"
+
+# Thông báo riêng cho người giết khi bị chặn anti-farm — {victim}, {limit}
+anti-farm: "<gray>(Không nhận elo — Đã giết {victim} quá {limit} lần/giờ)"
+
+# Thông báo không có quyền
+no-permission: "<red>Bạn không có quyền dùng lệnh này!"
+
+# Thông báo không tìm thấy người chơi — {player}
+player-not-found: "<red>Không tìm thấy người chơi <yellow>{player}<red>!"
+
+# Kết quả lệnh /elo — {player}, {elo}, {rank}
+elo-info: "<gold>{player} <white>— Elo: <green>{elo} <white>| Hạng: {rank}"
+
+# Header và các dòng của lệnh /stats
+stats-header: "<dark_gray><strikethrough>          </strikethrough> <gold>Thống kê của {player} <dark_gray><strikethrough>          </strikethrough>"
+stats-elo: "<white>Elo: <green>{elo} <white>| Hạng: {rank}"
+stats-kd: "<white>K/D: <yellow>{kd} <gray>({kills} kill / {deaths} death)"
+stats-streak: "<white>Chuỗi kill cao nhất: <red>{streak}"
+stats-peak: "<white>Elo đỉnh mùa: <gold>{peak}"
+
+# Header và dòng của lệnh /top (dành cho console, GUI được dùng cho player)
+top-header: "<dark_gray><strikethrough>          </strikethrough> <gold>Top 10 Bảng Xếp Hạng <dark_gray><strikethrough>          </strikethrough>"
+top-entry: "<gray>{pos}. {rank} <white>{player} <dark_gray>— <green>Elo: {elo}"

@@ -13,7 +13,7 @@
   <artifactId>notkillrank-plugin</artifactId>
 
   <properties>
-    <java.version>21</java.version>
+    <java.version>19</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -55,6 +55,14 @@
                 <relocation>
                   <pattern>com.tchristofferson.configupdater</pattern>
                   <shadedPattern>me.ihqqq.notkillrank.libs.configupdater</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.google.gson</pattern>
+                  <shadedPattern>me.ihqqq.notkillrank.libs.gson</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.h2</pattern>
+                  <shadedPattern>me.ihqqq.notkillrank.libs.h2</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
@@ -104,6 +112,24 @@
       <groupId>com.tchristofferson</groupId>
       <artifactId>ConfigUpdater</artifactId>
       <version>2.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>3.53.2.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.4.240</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>

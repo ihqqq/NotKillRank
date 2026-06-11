@@ -3,12 +3,14 @@ package me.ihqqq.notkillrank.task;
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.manager.EloManager;
+import me.ihqqq.notkillrank.storage.IDataStorage;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.UUID;
 
 public class EloDecayTask extends BukkitRunnable {
 
@@ -19,16 +21,17 @@ public class EloDecayTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        List<PlayerData> allPlayers = DataManager.getInstance().getStorage().loadAll();
+        IDataStorage storage = DataManager.getInstance().getStorage();
+        List<PlayerData> allPlayers = storage.loadAll();
         int decayed = 0;
         for (PlayerData data : allPlayers) {
-            if (Bukkit.getPlayer(java.util.UUID.fromString(data.getUUID())) != null) {
+            if (Bukkit.getPlayer(UUID.fromString(data.getUUID())) != null) {
                 continue;
             }
             int before = data.getElo();
             EloManager.getInstance().applyEloDecay(data);
             if (data.getElo() < before) {
-                DataManager.getInstance().getStorage().save(data);
+                storage.save(data);
                 decayed++;
             }
         }

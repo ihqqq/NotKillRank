@@ -31,30 +31,30 @@ background:
   icon:
     type: GRAY_STAINED_GLASS_PANE
     # Uncomment để dùng custom head texture thay cho glass pane:
-    # type: CUSTOM_HEAD
-    # texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzI5OTdlYTc0ZWJhMjlhMjNmM2YxNmYzMjNlZGQxNDE0NzJlZDc5YjQ0ZWIzYTMzOTQzNzMzZDU1ZjI1YWM4OCJ9fX0="
-  # với button fill, số hàng phải bằng số hàng của giao diện (rows), số cột phải là 9
-  # các vị trí đánh dấu bằng 'x' sẽ được fill
-  fill:
-    - 'xxxxxxxxx'
-    - 'x       x'
-    - 'x       x'
-    - 'x       x'
-    - 'x       x'
-    - 'xxxxxxxxx'
+    #type: CUSTOM_HEAD
+    #texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTNlYjYzNDNhOGVmNWFlZTdmZjA2YmM2Nzg1MmE2ZTZjYjJiN2UxYzI4MDIwYjkzZTdkMjdjMDRiZjBjYjU3MyJ9fX0="
+    #với button fill, số hàng phải bằng số hàng của giao diện (rows), số cột phải là 9
+    #các vị trí đánh dấu bằng 'x' sẽ được fill
+fill:
+  - 'xxxxxxxxx'
+  - 'x       x'
+  - 'x       x'
+  - 'x       x'
+  - 'x       x'
+  - 'xxxxxxxxx'
 
 # Vị trí slot cho top 1 → top 10 (theo thứ tự hạng, index từ 0)
 player-slots:
   - 13
-  - 11
-  - 15
-  - 20
-  - 24
+  - 21
+  - 23
   - 29
   - 33
-  - 28
-  - 30
-  - 22
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
 
 # Hiển thị đầu người chơi trong bảng xếp hạng
 # Placeholder: {medal}, {player}, {rank}, {elo}, {kills}, {deaths}, {kd}, {highest_streak}, {peak_elo}, {bounty}

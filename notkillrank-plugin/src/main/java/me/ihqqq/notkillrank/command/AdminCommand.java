@@ -1,6 +1,7 @@
 package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.config.ConfigManager;
 import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
@@ -27,7 +28,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("notkillrank.admin")) {
             MessageUtil.sendMessage(sender, MessageUtil.getMessage("no-permission",
-                    "<red>Bạn không có quyền dùng lệnh này!"));
+                    "<red>Bạn không có quyền sử dụng lệnh này!"));
             return true;
         }
         if (args.length == 0) { sendHelp(sender); return true; }
@@ -35,7 +36,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         switch (args[0].toLowerCase()) {
             case "reload" -> {
                 NotKillRank.getInstance().reloadConfig();
-                NotKillRank.getInstance().getConfigManager().load();
+                ConfigManager.getInstance().load();
                 RankManager.getInstance().reload();
                 MessageUtil.sendMessage(sender,
                         MessageUtil.getPrefix() + "<green>Cấu hình đã được tải lại!");
@@ -49,7 +50,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 if (data == null) {
                     MessageUtil.sendMessage(sender, notFound(args[1])); return true;
                 }
-                int startElo = NotKillRank.getInstance().getConfig().getInt("elo.start-elo", 1000);
+                int startElo = ConfigManager.getInstance().getEloConfig().getInt("start-elo", 1000);
                 data.setElo(startElo); data.setKills(0); data.setDeaths(0);
                 data.setKillStreak(0); data.setDeathStreak(0);
                 data.setHighestKillStreak(0); data.setPeakElo(startElo);
@@ -117,13 +118,13 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 try {
                     int amount = Integer.parseInt(args[2]);
                     if (amount <= 0) throw new NumberFormatException();
-                    int minElo = NotKillRank.getInstance().getConfig().getInt("elo.min-elo", 0);
+                    int minElo = ConfigManager.getInstance().getEloConfig().getInt("min-elo", 0);
                     int newElo = Math.max(minElo, takeData.getElo() - amount);
                     int actualTaken = takeData.getElo() - newElo;
                     takeData.setElo(newElo);
                     DataManager.getInstance().save(takeData.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
-                            + "<red>Đã trừ <gold>" + actualTaken + " elo <red>của <yellow>"
+                            + "<red>Đã trừ <gold>" + actualTaken + " elo <red>cua <yellow>"
                             + takeData.getName() + "<red>! (Elo mới: <gold>" + newElo + "<red>)");
                 } catch (NumberFormatException e) {
                     MessageUtil.sendMessage(sender, "<red>Số lượng elo không hợp lệ! Phải là số nguyên dương.");
@@ -147,7 +148,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                         + data.getKills() + "<white>/<red>" + data.getDeaths());
                 MessageUtil.sendMessage(sender, "<white>Kill Streak: <red>" + data.getKillStreak()
                         + " <white>| Death Streak: <dark_red>" + data.getDeathStreak());
-                MessageUtil.sendMessage(sender, "<white>Hạng: "
+                MessageUtil.sendMessage(sender, "<white>Hang: "
                         + RankManager.getInstance().getRankTag(data.getElo()));
             }
             default -> sendHelp(sender);
@@ -157,7 +158,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
 
     private void sendHelp(CommandSender sender) {
         MessageUtil.sendMessage(sender, "<gold>--- NotKillRank Admin ---");
-        MessageUtil.sendMessage(sender, "<yellow>/nkr reload <white>— Tải lại config");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr reload <white>— Tai lai config");
         MessageUtil.sendMessage(sender,
                 "<yellow>/nkr reset <player> <white>— Reset dữ liệu người chơi");
         MessageUtil.sendMessage(sender,
@@ -167,7 +168,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         MessageUtil.sendMessage(sender,
                 "<yellow>/nkr take <player> <elo> <white>— Trừ elo của người chơi");
         MessageUtil.sendMessage(sender,
-                "<yellow>/nkr info <player> <white>— Xem thông tin chi tiết");
+                "<yellow>/nkr info <player> <white>— Xem thong tin chi tiet");
     }
 
     private String notFound(String name) {

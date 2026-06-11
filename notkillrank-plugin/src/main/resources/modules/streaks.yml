@@ -1,0 +1,64 @@
+# ============================================================
+# NotKillRank - Module: Kill Streak & Death Streak
+# ============================================================
+
+# ────────────────────────────────────────────────
+# KILL STREAK — CỘT MỐC CHUỖI GIẾT
+# Có thể thêm các số bất kỳ, mỗi số là 1 cột mốc
+#
+# bonus-percent: % elo bonus nhận thêm khi đạt cột mốc này
+# broadcast:     true → thông báo toàn server qua chat
+# sound:         true → phát âm thanh cho tất cả người chơi
+# show-title:    true → hiển thị title/subtitle toàn server
+#   title-text:    nội dung title (MiniMessage, hỗ trợ {player}, {streak})
+#   subtitle-text: nội dung subtitle (MiniMessage, hỗ trợ {player}, {streak})
+# broadcast-message: nội dung thông báo chat (hỗ trợ {player}, {streak}, {name})
+# ────────────────────────────────────────────────
+kill-streaks:
+  3:
+    name: "Killing Spree"
+    bonus-percent: 5
+    broadcast: false
+    sound: false
+    show-title: false
+    broadcast-message: "<red>{player} <white>đang trong chuỗi <red>Killing Spree <white>({streak} kills)!"
+  5:
+    name: "Rampage"
+    bonus-percent: 10
+    broadcast: true
+    sound: false
+    show-title: false
+    broadcast-message: "<gold>{player} <white>đang <gold>Rampage<white>! ({streak} kills liên tiếp!)"
+  10:
+    name: "Unstoppable"
+    bonus-percent: 20
+    broadcast: true
+    sound: true
+    show-title: false
+    broadcast-message: "<dark_red><bold>{player}</bold> <white>không thể bị dừng! <dark_red>UNSTOPPABLE <white>({streak} kills!)"
+  15:
+    name: "Godlike"
+    bonus-percent: 35
+    broadcast: true
+    sound: false
+    show-title: true
+    broadcast-message: "<dark_purple><bold>{player}</bold> <white>đang như <dark_purple><bold>GODLIKE</bold><white>! ({streak} kills!)"
+    title-text: "<dark_purple><bold>GODLIKE"
+    subtitle-text: "<white>{player} — <yellow>{streak} kills liên tiếp!"
+  20:
+    name: "Beyond Godlike"
+    bonus-percent: 50
+    broadcast: true
+    sound: false
+    show-title: false
+    broadcast-message: "<light_purple><bold>★ BEYOND GODLIKE ★ </bold><reset><white>{player} với <light_purple>{streak} kills <white>liên tiếp! Không thể tin được!"
+
+# ────────────────────────────────────────────────
+# CHUỖI CHẾT (DEATH STREAK)
+# ────────────────────────────────────────────────
+death-streak:
+  # Số lần chết liên tiếp (không giết được ai) để mang trạng thái [Kẻ yếu]
+  threshold: 3
+
+  # Phần trăm elo mất thêm mỗi lần chết khi đang mang [Kẻ yếu]
+  extra-loss-percent: 5

@@ -1,183 +1,22 @@
 # ============================================================
 # NotKillRank - Cấu hình chính
-# Hỗ trợ MiniMessage (https://docs.advntr.dev/minimessage/format.html)
-# Ví dụ màu: <red>, <gold>, <green>, <aqua>, <white>, <gray>
-# Ví dụ style: <bold>, <italic>, <underlined>, <strikethrough>
-# Hex: <color:#FF5500>
-# Reset: <reset>
+# Các cài đặt module được tách riêng vào thư mục modules/
 # ============================================================
 
 # ────────────────────────────────────────────────
-# 1. HỆ THỐNG ELO
+# CẤU HÌNH LƯU TRỮ DỮ LIỆU
 # ────────────────────────────────────────────────
-elo:
-  # Elo bắt đầu khi người chơi lần đầu vào server
-  start-elo: 1000
+storage:
+  # Loại lưu trữ: YAML, SQLITE, H2
+  # YAML  — lưu mỗi người chơi vào 1 file .yml riêng (mặc định)
+  # SQLITE — lưu vào 1 file SQLite (.db) trong thư mục plugin
+  # H2     — lưu vào H2 embedded database trong thư mục plugin
+  type: H2
 
-  # Elo tối thiểu — người chơi không thể rớt xuống dưới mức này
-  min-elo: 0
+  sqlite:
+    # Tên file SQLite (không cần đuôi .db)
+    file: playerdata
 
-  # Phần trăm elo của nạn nhân mà người giết nhận được
-  # Ví dụ: 10 → giết người có 500 elo → nhận 50 elo
-  kill-percent: 10
-
-  # Hệ số khi giết người có elo CAO HƠN mình
-  # 1.5 → nhận thêm 50% elo
-  high-elo-multiplier: 1.5
-
-  # Ngưỡng "elo thấp" (% của elo bản thân)
-  # Nếu elo nạn nhân < low-elo-threshold% elo của bạn → áp hệ số giảm
-  low-elo-threshold: 50
-
-  # Hệ số khi giết người có elo THẤP HƠN ngưỡng trên
-  # 0.5 → chỉ nhận 50% elo thông thường
-  low-elo-multiplier: 0.5
-
-  # Bonus phần trăm khi giết lại người vừa giết mình (Báo thù)
-  # 20 → nhận thêm 20% elo
-  revenge-bonus-percent: 20
-
-  # Cửa sổ thời gian để báo thù (giây)
-  # 300 = 5 phút — phải giết lại trong vòng 5 phút để nhận bonus
-  revenge-window-seconds: 300
-
-# ────────────────────────────────────────────────
-# 2. CHỐNG FARM ELO
-# ────────────────────────────────────────────────
-anti-farm:
-  # Số lần tối đa được giết cùng 1 người trong 1 giờ mà vẫn nhận elo
-  # Vượt quá giới hạn này → kill không nhận elo (nhưng vẫn cộng K/D)
-  limit-kills-per-hour: 3
-
-# ────────────────────────────────────────────────
-# 3. BẢO VỆ NGƯỜI MỚI
-# ────────────────────────────────────────────────
-newbie-protection:
-  # Số giờ online tối thiểu để thoát khỏi bảo vệ người mới
-  # Dưới mức này → cả người giết lẫn nạn nhân đều không thay đổi elo
-  newbie-hours: 10
-
-  # Elo tối thiểu để thoát bảo vệ người mới
-  # Dưới mức này → được bảo vệ (dù đã online đủ giờ)
-  newbie-protect-elo: 100
-
-# ────────────────────────────────────────────────
-# 4. SUY GIẢM ELO (ELO DECAY)
-# ────────────────────────────────────────────────
-elo-decay:
-  # Số ngày offline trước khi bắt đầu bị suy giảm elo
-  offline-days: 7
-
-  # Phần trăm elo mất mỗi ngày sau khi vượt quá offline-days
-  daily-percent: 1
-
-  # Tổng phần trăm elo tối đa có thể mất do suy giảm
-  # 10 → tối đa mất 10% elo (dù offline bao lâu)
-  max-percent: 10
-
-# ────────────────────────────────────────────────
-# 5. BẢNG HẠNG
-# Điểm mốc và tag đều có thể tùy chỉnh
-# tag: dùng MiniMessage format
-# ────────────────────────────────────────────────
-ranks:
-  - min: 0
-    max: 999
-    tag: "<gray>[Óc]"
-  - min: 1000
-    max: 1999
-    tag: "<yellow>[Gà]"
-  - min: 2000
-    max: 3999
-    tag: "<green>[Non]"
-  - min: 4000
-    max: 5999
-    tag: "<aqua>[Biết chút]"
-  - min: 6000
-    max: 9999
-    tag: "<dark_aqua>[Đáng nể]"
-  - min: 10000
-    max: 19999
-    tag: "<red>[Sát thủ]"
-  - min: 20000
-    max: 49999
-    tag: "<dark_red>[Ác thần]"
-  - min: 50000
-    max: 999999999
-    tag: "<light_purple>[Huyền thoại]"
-
-# ────────────────────────────────────────────────
-# 6. KILL STREAK — CỘT MỐC CHUỖI GIẾT
-# Có thể thêm các số bất kỳ, mỗi số là 1 cột mốc
-#
-# bonus-percent: % elo bonus nhận thêm khi đạt cột mốc này
-# broadcast:     true → thông báo toàn server qua chat
-# sound:         true → phát âm thanh cho tất cả người chơi
-# show-title:    true → hiển thị title/subtitle toàn server
-#   title-text:    nội dung title (MiniMessage, hỗ trợ {player}, {streak})
-#   subtitle-text: nội dung subtitle (MiniMessage, hỗ trợ {player}, {streak})
-# broadcast-message: nội dung thông báo chat (hỗ trợ {player}, {streak}, {name})
-# ────────────────────────────────────────────────
-kill-streaks:
-  3:
-    name: "Killing Spree"
-    bonus-percent: 5
-    broadcast: false
-    sound: false
-    show-title: false
-    broadcast-message: "<red>{player} <white>đang trong chuỗi <red>Killing Spree <white>({streak} kills)!"
-  5:
-    name: "Rampage"
-    bonus-percent: 10
-    broadcast: true
-    sound: false
-    show-title: false
-    broadcast-message: "<gold>{player} <white>đang <gold>Rampage<white>! ({streak} kills liên tiếp!)"
-  10:
-    name: "Unstoppable"
-    bonus-percent: 20
-    broadcast: true
-    sound: true
-    show-title: false
-    broadcast-message: "<dark_red><bold>{player}</bold> <white>không thể bị dừng! <dark_red>UNSTOPPABLE <white>({streak} kills!)"
-  15:
-    name: "Godlike"
-    bonus-percent: 35
-    broadcast: true
-    sound: false
-    show-title: true
-    broadcast-message: "<dark_purple><bold>{player}</bold> <white>đang như <dark_purple><bold>GODLIKE</bold><white>! ({streak} kills!)"
-    title-text: "<dark_purple><bold>GODLIKE"
-    subtitle-text: "<white>{player} — <yellow>{streak} kills liên tiếp!"
-  20:
-    name: "Beyond Godlike"
-    bonus-percent: 50
-    broadcast: true
-    sound: false
-    show-title: false
-    broadcast-message: "<light_purple><bold>★ BEYOND GODLIKE ★ </bold><reset><white>{player} với <light_purple>{streak} kills <white>liên tiếp! Không thể tin được!"
-
-# ────────────────────────────────────────────────
-# 7. CHUỖI CHẾT (DEATH STREAK)
-# ────────────────────────────────────────────────
-death-streak:
-  # Số lần chết liên tiếp (không giết được ai) để mang trạng thái [Kẻ yếu]
-  threshold: 3
-
-  # Phần trăm elo mất thêm mỗi lần chết khi đang mang [Kẻ yếu]
-  extra-loss-percent: 5
-
-# ────────────────────────────────────────────────
-# 8. BOUNTY — HỆ THỐNG TRUY NÃ
-# ────────────────────────────────────────────────
-bounty:
-  # Số elo tối thiểu để đặt một bounty
-  min-amount: 100
-
-# ────────────────────────────────────────────────
-# 9. VÔ SONG
-# ────────────────────────────────────────────────
-vosong:
-  # Số ngày liên tiếp giữ vị trí top 1 để đạt tag [Vô song]
-  days-required: 3
-
+  h2:
+    # Tên file H2 (không cần đuôi)
+    file: playerdata

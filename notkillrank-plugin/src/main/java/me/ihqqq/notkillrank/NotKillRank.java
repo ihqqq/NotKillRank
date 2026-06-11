@@ -41,6 +41,7 @@ public final class NotKillRank extends JavaPlugin {
             getLogger().warning("Could not update config.yml: " + e.getMessage());
         }
         reloadConfig();
+
         configManager = new ConfigManager(this);
 
         dataManager = new DataManager();
@@ -65,6 +66,7 @@ public final class NotKillRank extends JavaPlugin {
     public void onDisable() {
         if (dataManager != null) {
             dataManager.saveAll();
+            dataManager.getStorage().close();
         }
         MessageUtil.log("&cNotKillRank disabled. All data saved.");
     }

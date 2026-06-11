@@ -1,6 +1,6 @@
 package me.ihqqq.notkillrank.manager;
 
-import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.config.ConfigManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class RankManager {
 
     public void reload() {
         tiers.clear();
-        List<?> rankList = NotKillRank.getInstance().getConfig().getList("ranks");
+        List<?> rankList = ConfigManager.getInstance().getRanksConfig().getList("ranks");
         if (rankList == null) return;
         for (Object obj : rankList) {
             if (obj instanceof java.util.Map<?, ?> rawMap) {
@@ -37,7 +37,6 @@ public class RankManager {
         }
     }
 
-    /** Returns the raw MiniMessage string for this elo's rank tag. */
     public String getRankTag(int elo) {
         for (int i = tiers.size() - 1; i >= 0; i--) {
             RankTier tier = tiers.get(i);
@@ -46,7 +45,6 @@ public class RankManager {
         return tiers.isEmpty() ? "" : tiers.get(0).tag;
     }
 
-    /** Returns the raw MiniMessage string for any active special streak tag. */
     public String getStreakTag(PlayerData data) {
         if (isVoSong(data)) return "<light_purple>[Vô song]";
         if (data.getKillStreak() >= 10) return "<red>[Sát thần " + data.getKillStreak() + "x]";
@@ -57,7 +55,7 @@ public class RankManager {
 
     public boolean isVoSong(PlayerData data) {
         if (data.getTop1Since() <= 0) return false;
-        int daysRequired = NotKillRank.getInstance().getConfig().getInt("vosong.days-required", 3);
+        int daysRequired = ConfigManager.getInstance().getVoSongConfig().getInt("days-required", 3);
         long msRequired = (long) daysRequired * 24 * 60 * 60 * 1000;
         return (System.currentTimeMillis() - data.getTop1Since()) >= msRequired;
     }
@@ -70,7 +68,7 @@ public class RankManager {
     }
 
     public boolean isWeak(PlayerData data) {
-        int threshold = NotKillRank.getInstance().getConfig()
+        int threshold = ConfigManager.getInstance().getStreaksConfig()
                 .getInt("death-streak.threshold", 3);
         return data.getDeathStreak() >= threshold;
     }

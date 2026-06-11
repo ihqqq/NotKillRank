@@ -1,0 +1,13 @@
+# ============================================================
+# NotKillRank - Module: Suy Giảm Elo (Elo Decay)
+# ============================================================
+
+# Số ngày offline trước khi bắt đầu bị suy giảm elo
+offline-days: 7
+
+# Phần trăm elo mất mỗi ngày sau khi vượt quá offline-days
+daily-percent: 1
+
+# Tổng phần trăm elo tối đa có thể mất do suy giảm
+# 10 → tối đa mất 10% elo (dù offline bao lâu)
+max-percent: 10

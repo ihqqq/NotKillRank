@@ -1,6 +1,6 @@
 package me.ihqqq.notkillrank.manager;
 
-import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.config.ConfigManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.entity.Player;
@@ -18,16 +18,16 @@ public class BountyManager {
     }
 
     public boolean placeBounty(Player placer, Player target, int amount) {
-        int minAmount = NotKillRank.getInstance().getConfig().getInt("bounty.min-amount", 100);
+        int minAmount = ConfigManager.getInstance().getBountyConfig().getInt("min-amount", 100);
         if (amount < minAmount) {
-            MessageUtil.sendMessage(placer, "<red>Số lượng elo bounty tối thiểu là <yellow>"
+            MessageUtil.sendMessage(placer, "<red>So luong elo bounty toi thieu la <yellow>"
                     + minAmount + "<red>!");
             return false;
         }
 
         PlayerData placerData = DataManager.getInstance().getOrCreate(placer);
         if (placerData.getElo() < amount) {
-            MessageUtil.sendMessage(placer, "<red>Bạn không đủ elo! Elo hiện tại: <yellow>"
+            MessageUtil.sendMessage(placer, "<red>Ban khong du elo! Elo hien tai: <yellow>"
                     + placerData.getElo());
             return false;
         }
@@ -35,9 +35,8 @@ public class BountyManager {
         String targetUUID = target.getUniqueId().toString();
         PlayerData targetData = DataManager.getInstance().getOrCreate(target);
 
-        placerData.setElo(Math.max(
-                NotKillRank.getInstance().getConfig().getInt("elo.min-elo", 0),
-                placerData.getElo() - amount));
+        int minElo = ConfigManager.getInstance().getEloConfig().getInt("min-elo", 0);
+        placerData.setElo(Math.max(minElo, placerData.getElo() - amount));
 
         int current = targetData.getBounties().getOrDefault(placer.getUniqueId().toString(), 0);
         targetData.getBounties().put(placer.getUniqueId().toString(), current + amount);
@@ -46,7 +45,7 @@ public class BountyManager {
         DataManager.getInstance().save(targetUUID);
 
         String msg = MessageUtil.getMessage("bounty-placed",
-                        "<gold>[Bounty] <white>{placer} <white>đã đặt truy nã <green>{amount} elo <white>lên đầu <red>{target}<white>!")
+                        "<gold>[Bounty] <white>{placer} <white>da dat truy na <green>{amount} elo <white>len dau <red>{target}<white>!")
                 .replace("{placer}", placer.getName())
                 .replace("{amount}", String.valueOf(amount))
                 .replace("{target}", target.getName());
@@ -76,7 +75,7 @@ public class BountyManager {
         DataManager.getInstance().save(claimer.getUniqueId().toString());
 
         String msg = MessageUtil.getMessage("bounty-claimed",
-                        "<gold>[Bounty] <white>{claimer} <white>đã nhận thưởng <green>{amount} elo <white>từ truy nã <red>{target}<white>!")
+                        "<gold>[Bounty] <white>{claimer} <white>da nhan thuong <green>{amount} elo <white>tu truy na <red>{target}<white>!")
                 .replace("{claimer}", claimer.getName())
                 .replace("{amount}", String.valueOf(total))
                 .replace("{target}", targetData.getName());

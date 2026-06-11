@@ -1,0 +1,31 @@
+# ============================================================
+# NotKillRank - Module: Bảng Hạng
+# Điểm mốc và tag đều có thể tùy chỉnh
+# tag: dùng MiniMessage format
+# ============================================================
+
+ranks:
+  - min: 0
+    max: 999
+    tag: "<gray>[Óc]"
+  - min: 1000
+    max: 1999
+    tag: "<yellow>[Gà]"
+  - min: 2000
+    max: 3999
+    tag: "<green>[Non]"
+  - min: 4000
+    max: 5999
+    tag: "<aqua>[Biết chút]"
+  - min: 6000
+    max: 9999
+    tag: "<dark_aqua>[Đáng nể]"
+  - min: 10000
+    max: 19999
+    tag: "<red>[Sát thủ]"
+  - min: 20000
+    max: 49999
+    tag: "<dark_red>[Ác thần]"
+  - min: 50000
+    max: 999999999
+    tag: "<light_purple>[Huyền thoại]"

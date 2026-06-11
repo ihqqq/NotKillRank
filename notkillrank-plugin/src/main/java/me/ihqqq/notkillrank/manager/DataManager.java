@@ -1,8 +1,9 @@
 package me.ihqqq.notkillrank.manager;
 
-import me.ihqqq.notkillrank.NotKillRank;
-import me.ihqqq.notkillrank.storage.DataStorage;
+import me.ihqqq.notkillrank.config.ConfigManager;
+import me.ihqqq.notkillrank.storage.IDataStorage;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.StorageFactory;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.entity.Player;
 
@@ -11,11 +12,11 @@ import java.util.*;
 public class DataManager {
 
     private static DataManager instance;
-    private final DataStorage storage;
+    private final IDataStorage storage;
     private final Map<String, PlayerData> cache = new HashMap<>();
 
     public DataManager() {
-        this.storage = new DataStorage();
+        this.storage = StorageFactory.create();
         instance = this;
     }
 
@@ -36,7 +37,7 @@ public class DataManager {
             cache.put(uuid, loaded);
             return loaded;
         }
-        int startElo = NotKillRank.getInstance().getConfig().getInt("elo.start-elo", 1000);
+        int startElo = ConfigManager.getInstance().getEloConfig().getInt("start-elo", 1000);
         PlayerData fresh = new PlayerData(uuid, player.getName(), startElo);
         cache.put(uuid, fresh);
         return fresh;
@@ -93,7 +94,7 @@ public class DataManager {
         return sorted.subList(0, Math.min(limit, sorted.size()));
     }
 
-    public DataStorage getStorage() {
+    public IDataStorage getStorage() {
         return storage;
     }
 

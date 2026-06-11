@@ -1,6 +1,7 @@
 package me.ihqqq.notkillrank.storage;
 
 import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.config.ConfigManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class DataStorage {
+public class DataStorage implements IDataStorage {
 
     private final File dataFolder;
 
@@ -21,12 +22,13 @@ public class DataStorage {
         }
     }
 
+    @Override
     public PlayerData load(String uuid) {
         File file = new File(dataFolder, uuid + ".yml");
         if (!file.exists()) return null;
 
         FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-        int startElo = NotKillRank.getInstance().getConfig().getInt("elo.start-elo", 1000);
+        int startElo = ConfigManager.getInstance().getEloConfig().getInt("start-elo", 1000);
 
         String name = cfg.getString("name", "Unknown");
         int elo = cfg.getInt("elo", startElo);
@@ -74,6 +76,7 @@ public class DataStorage {
                 killLog, bounties, top1Since);
     }
 
+    @Override
     public void save(PlayerData data) {
         File file = new File(dataFolder, data.getUUID() + ".yml");
         FileConfiguration cfg = new YamlConfiguration();
@@ -111,6 +114,7 @@ public class DataStorage {
         }
     }
 
+    @Override
     public List<PlayerData> loadAll() {
         List<PlayerData> list = new ArrayList<>();
         File[] files = dataFolder.listFiles((d, n) -> n.endsWith(".yml"));
@@ -121,5 +125,9 @@ public class DataStorage {
             if (data != null) list.add(data);
         }
         return list;
+    }
+
+    @Override
+    public void close() {
     }
 }

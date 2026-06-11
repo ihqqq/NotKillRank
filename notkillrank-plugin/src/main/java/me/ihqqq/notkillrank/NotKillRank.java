@@ -8,6 +8,7 @@ import me.ihqqq.notkillrank.listener.CombatListener;
 import me.ihqqq.notkillrank.listener.PlayerJoinListener;
 import me.ihqqq.notkillrank.listener.PlayerQuitListener;
 import me.ihqqq.notkillrank.manager.*;
+import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.support.PlaceholderAPISupport;
 import me.ihqqq.notkillrank.task.AutoSaveTask;
 import me.ihqqq.notkillrank.task.EloDecayTask;
@@ -18,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 public final class NotKillRank extends JavaPlugin {
 
@@ -90,23 +92,29 @@ public final class NotKillRank extends JavaPlugin {
         new AutoSaveTask();
         new EloDecayTask();
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::updateTop1Status,
+        Bukkit.getScheduler().runTaskTimer(this, this::updateTop1Status,
                 20L * 60 * 5, 20L * 60 * 5);
     }
 
     private void updateTop1Status() {
-        var top = dataManager.getTopPlayers(1);
+        List<PlayerData> top = dataManager.getTopPlayers(1);
         if (top.isEmpty()) return;
-        var top1 = top.get(0);
+        PlayerData top1 = top.get(0);
 
-        for (var data : dataManager.getCache().values()) {
+        for (PlayerData data : dataManager.getCache().values()) {
             if (data.getUUID().equals(top1.getUUID())) {
                 if (top1.getTop1Since() <= 0) {
                     top1.setTop1Since(System.currentTimeMillis());
+                    final String uuid = top1.getUUID();
+                    Bukkit.getScheduler().runTaskAsynchronously(this,
+                            () -> dataManager.save(uuid));
                 }
             } else {
                 if (data.getTop1Since() > 0) {
                     data.setTop1Since(0);
+                    final String uuid = data.getUUID();
+                    Bukkit.getScheduler().runTaskAsynchronously(this,
+                            () -> dataManager.save(uuid));
                 }
             }
         }

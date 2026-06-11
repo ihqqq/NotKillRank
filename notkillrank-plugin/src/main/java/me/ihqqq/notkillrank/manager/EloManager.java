@@ -136,6 +136,8 @@ public class EloManager {
             BountyManager.getInstance().claimBounties(killer, victimData);
         }
 
+        DataManager.getInstance().invalidateTopCache();
+
         String killMsg = MessageUtil.getMessage("kill-broadcast",
                         "<reset>{rank_killer} <white>{killer} <green>(+{elo_gained}) <white>đã chọc chết {rank_victim} <white>{victim} <red>(-{elo_lost})")
                 .replace("{rank_killer}", RankManager.getInstance().getRankTag(killerData.getElo()))

@@ -28,10 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TopInventory implements Listener {
-    private static final Map<String, CachedProfile> skinCache = new HashMap<>();
-    private static final long CACHE_TTL_MS = 5 * 60 * 1000L; // 5 minutes
+
+    private static final Map<String, CachedProfile> skinCache = new ConcurrentHashMap<>();
+    private static final long CACHE_TTL_MS = 5 * 60 * 1000L;
 
     private record CachedProfile(PlayerProfile profile, long fetchedAt) {
         boolean isExpired() {
@@ -65,14 +67,13 @@ public class TopInventory implements Listener {
 
                     try {
                         PlayerProfile profile = Bukkit.createProfile(uuid, data.getName());
-                        profile.complete(true); // blocking Mojang call, safe here (we're async)
+                        profile.complete(true);
                         skinCache.put(data.getUUID(), new CachedProfile(profile, System.currentTimeMillis()));
                         profileMap.put(data.getUUID(), profile);
                     } catch (Exception e) {
                         NotKillRank.getInstance().getLogger()
                                 .warning("[TopInventory] Failed to fetch profile for "
                                         + data.getName() + ": " + e.getMessage());
-                        // Fallback to usercache (possibly stale) — better than Steve
                         try {
                             PlayerProfile fallback = Bukkit.createProfile(uuid, data.getName());
                             fallback.completeFromCache();

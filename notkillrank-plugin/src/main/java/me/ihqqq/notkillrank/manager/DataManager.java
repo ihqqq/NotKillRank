@@ -15,6 +15,11 @@ public class DataManager {
     private final IDataStorage storage;
     private final Map<String, PlayerData> cache = new HashMap<>();
 
+    private List<PlayerData> cachedTopAll = null;
+    private long topCacheBuiltAt = 0;
+
+    private static final long TOP_CACHE_TTL_MS = 30_000L;
+
     public DataManager() {
         this.storage = StorageFactory.create();
         instance = this;
@@ -57,12 +62,10 @@ public class DataManager {
         for (PlayerData data : cache.values()) {
             if (data.getName().equalsIgnoreCase(name)) return data;
         }
-        List<PlayerData> all = storage.loadAll();
-        for (PlayerData data : all) {
-            if (data.getName().equalsIgnoreCase(name)) {
-                cache.put(data.getUUID(), data);
-                return data;
-            }
+        PlayerData loaded = storage.loadByName(name);
+        if (loaded != null) {
+            cache.put(loaded.getUUID(), loaded);
+            return loaded;
         }
         return null;
     }
@@ -84,19 +87,30 @@ public class DataManager {
         if (data != null) storage.save(data);
     }
 
-
     public void evict(String uuid) {
         cache.remove(uuid);
     }
 
     public List<PlayerData> getTopPlayers(int limit) {
-        List<PlayerData> allLoaded = storage.loadAll();
-        for (PlayerData d : allLoaded) {
-            cache.putIfAbsent(d.getUUID(), d);
+        long now = System.currentTimeMillis();
+        boolean cacheExpired = (now - topCacheBuiltAt) > TOP_CACHE_TTL_MS;
+
+        if (cachedTopAll == null || cacheExpired) {
+            List<PlayerData> allLoaded = storage.loadAll();
+            for (PlayerData d : allLoaded) {
+                cache.putIfAbsent(d.getUUID(), d);
+            }
+            cachedTopAll = new ArrayList<>(cache.values());
+            topCacheBuiltAt = now;
         }
+
         List<PlayerData> sorted = new ArrayList<>(cache.values());
         sorted.sort((a, b) -> b.getElo() - a.getElo());
         return sorted.subList(0, Math.min(limit, sorted.size()));
+    }
+
+    public void invalidateTopCache() {
+        topCacheBuiltAt = 0;
     }
 
     public IDataStorage getStorage() {

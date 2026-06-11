@@ -6,6 +6,8 @@ public interface IDataStorage {
 
     PlayerData load(String uuid);
 
+    PlayerData loadByName(String name);
+
     void save(PlayerData data);
 
     List<PlayerData> loadAll();

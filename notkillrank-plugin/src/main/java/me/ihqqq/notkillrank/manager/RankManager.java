@@ -63,7 +63,13 @@ public class RankManager {
     public boolean isSongSot(PlayerData data) {
         long noDeathMs = System.currentTimeMillis() - data.getNoDeathStart();
         boolean notKilledIn24h = noDeathMs >= 24L * 60 * 60 * 1000;
-        boolean onlineEnough = data.getDailyOnlineMs() >= 8L * 60 * 60 * 1000;
+
+        long sessionMs = data.getSessionStart() > 0
+                ? System.currentTimeMillis() - data.getSessionStart()
+                : 0;
+        long effectiveDailyMs = data.getDailyOnlineMs() + sessionMs;
+        boolean onlineEnough = effectiveDailyMs >= 8L * 60 * 60 * 1000;
+
         return notKilledIn24h && onlineEnough;
     }
 

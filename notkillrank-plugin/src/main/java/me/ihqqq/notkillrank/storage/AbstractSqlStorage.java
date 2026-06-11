@@ -43,6 +43,8 @@ public abstract class AbstractSqlStorage implements IDataStorage {
 
     private static final String SELECT_BY_UUID =
             "SELECT * FROM nkr_players WHERE uuid = ?";
+    private static final String SELECT_BY_NAME =
+            "SELECT * FROM nkr_players WHERE LOWER(name) = LOWER(?)";
     private static final String SELECT_ALL =
             "SELECT * FROM nkr_players";
     private static final String DELETE_BY_UUID =
@@ -83,6 +85,19 @@ public abstract class AbstractSqlStorage implements IDataStorage {
             }
         } catch (SQLException e) {
             MessageUtil.warn("[Storage] Failed to load " + uuid + ": " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized PlayerData loadByName(String name) {
+        try (PreparedStatement ps = getConnection().prepareStatement(SELECT_BY_NAME)) {
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return fromRow(rs);
+            }
+        } catch (SQLException e) {
+            MessageUtil.warn("[Storage] Failed to loadByName " + name + ": " + e.getMessage());
         }
         return null;
     }

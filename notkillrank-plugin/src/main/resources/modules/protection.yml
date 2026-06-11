@@ -4,7 +4,7 @@
 
 # Số giờ online tối thiểu để thoát khỏi bảo vệ người mới
 # Dưới mức này → cả người giết lẫn nạn nhân đều không thay đổi elo
-newbie-hours: 10
+newbie-hours: 1
 
 # Elo tối thiểu để thoát bảo vệ người mới
 # Dưới mức này → được bảo vệ (dù đã online đủ giờ)

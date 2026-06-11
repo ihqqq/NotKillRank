@@ -26,54 +26,22 @@ public class DataStorage implements IDataStorage {
     public PlayerData load(String uuid) {
         File file = new File(dataFolder, uuid + ".yml");
         if (!file.exists()) return null;
+        return loadFile(uuid, file);
+    }
 
-        FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-        int startElo = ConfigManager.getInstance().getEloConfig().getInt("start-elo", 1000);
-
-        String name = cfg.getString("name", "Unknown");
-        int elo = cfg.getInt("elo", startElo);
-        int kills = cfg.getInt("kills", 0);
-        int deaths = cfg.getInt("deaths", 0);
-        int killStreak = cfg.getInt("kill-streak", 0);
-        int deathStreak = cfg.getInt("death-streak", 0);
-        int highestKillStreak = cfg.getInt("highest-kill-streak", 0);
-        int peakElo = cfg.getInt("peak-elo", elo);
-        String lastKillerUUID = cfg.getString("last-killer-uuid", null);
-        long lastKilledTime = cfg.getLong("last-killed-time", 0);
-        long lastOnline = cfg.getLong("last-online", System.currentTimeMillis());
-        long firstJoinTime = cfg.getLong("first-join-time", System.currentTimeMillis());
-        long sessionStart = System.currentTimeMillis();
-        long dailyOnlineMs = cfg.getLong("daily-online-ms", 0);
-        String currentDay = cfg.getString("current-day", "");
-        long noDeathStart = cfg.getLong("no-death-start", System.currentTimeMillis());
-        long top1Since = cfg.getLong("top1-since", 0);
-
-        Map<String, List<Long>> killLog = new HashMap<>();
-        ConfigurationSection killLogSection = cfg.getConfigurationSection("kill-log");
-        if (killLogSection != null) {
-            for (String victimUUID : killLogSection.getKeys(false)) {
-                List<Long> timestamps = new ArrayList<>();
-                for (Object obj : killLogSection.getList(victimUUID, new ArrayList<>())) {
-                    if (obj instanceof Long l) timestamps.add(l);
-                    else if (obj instanceof Integer i) timestamps.add((long) i);
-                    else if (obj instanceof Number n) timestamps.add(n.longValue());
-                }
-                killLog.put(victimUUID, timestamps);
+    @Override
+    public PlayerData loadByName(String name) {
+        File[] files = dataFolder.listFiles((d, n) -> n.endsWith(".yml"));
+        if (files == null) return null;
+        for (File file : files) {
+            FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+            String storedName = cfg.getString("name", "");
+            if (storedName.equalsIgnoreCase(name)) {
+                String uuid = file.getName().replace(".yml", "");
+                return loadFile(uuid, cfg);
             }
         }
-
-        Map<String, Integer> bounties = new HashMap<>();
-        ConfigurationSection bountiesSection = cfg.getConfigurationSection("bounties");
-        if (bountiesSection != null) {
-            for (String placerUUID : bountiesSection.getKeys(false)) {
-                bounties.put(placerUUID, bountiesSection.getInt(placerUUID, 0));
-            }
-        }
-
-        return new PlayerData(uuid, name, elo, kills, deaths, killStreak, deathStreak,
-                highestKillStreak, peakElo, lastKillerUUID, lastKilledTime, lastOnline,
-                firstJoinTime, sessionStart, dailyOnlineMs, currentDay, noDeathStart,
-                killLog, bounties, top1Since);
+        return null;
     }
 
     @Override
@@ -129,5 +97,58 @@ public class DataStorage implements IDataStorage {
 
     @Override
     public void close() {
+    }
+
+    private PlayerData loadFile(String uuid, File file) {
+        return loadFile(uuid, YamlConfiguration.loadConfiguration(file));
+    }
+
+    private PlayerData loadFile(String uuid, FileConfiguration cfg) {
+        int startElo = ConfigManager.getInstance().getEloConfig().getInt("start-elo", 1000);
+
+        String name = cfg.getString("name", "Unknown");
+        int elo = cfg.getInt("elo", startElo);
+        int kills = cfg.getInt("kills", 0);
+        int deaths = cfg.getInt("deaths", 0);
+        int killStreak = cfg.getInt("kill-streak", 0);
+        int deathStreak = cfg.getInt("death-streak", 0);
+        int highestKillStreak = cfg.getInt("highest-kill-streak", 0);
+        int peakElo = cfg.getInt("peak-elo", elo);
+        String lastKillerUUID = cfg.getString("last-killer-uuid", null);
+        long lastKilledTime = cfg.getLong("last-killed-time", 0);
+        long lastOnline = cfg.getLong("last-online", System.currentTimeMillis());
+        long firstJoinTime = cfg.getLong("first-join-time", System.currentTimeMillis());
+        long sessionStart = System.currentTimeMillis();
+        long dailyOnlineMs = cfg.getLong("daily-online-ms", 0);
+        String currentDay = cfg.getString("current-day", "");
+        long noDeathStart = cfg.getLong("no-death-start", System.currentTimeMillis());
+        long top1Since = cfg.getLong("top1-since", 0);
+
+        Map<String, List<Long>> killLog = new HashMap<>();
+        ConfigurationSection killLogSection = cfg.getConfigurationSection("kill-log");
+        if (killLogSection != null) {
+            for (String victimUUID : killLogSection.getKeys(false)) {
+                List<Long> timestamps = new ArrayList<>();
+                for (Object obj : killLogSection.getList(victimUUID, new ArrayList<>())) {
+                    if (obj instanceof Long l) timestamps.add(l);
+                    else if (obj instanceof Integer i) timestamps.add((long) i);
+                    else if (obj instanceof Number n) timestamps.add(n.longValue());
+                }
+                killLog.put(victimUUID, timestamps);
+            }
+        }
+
+        Map<String, Integer> bounties = new HashMap<>();
+        ConfigurationSection bountiesSection = cfg.getConfigurationSection("bounties");
+        if (bountiesSection != null) {
+            for (String placerUUID : bountiesSection.getKeys(false)) {
+                bounties.put(placerUUID, bountiesSection.getInt(placerUUID, 0));
+            }
+        }
+
+        return new PlayerData(uuid, name, elo, kills, deaths, killStreak, deathStreak,
+                highestKillStreak, peakElo, lastKillerUUID, lastKilledTime, lastOnline,
+                firstJoinTime, sessionStart, dailyOnlineMs, currentDay, noDeathStart,
+                killLog, bounties, top1Since);
     }
 }

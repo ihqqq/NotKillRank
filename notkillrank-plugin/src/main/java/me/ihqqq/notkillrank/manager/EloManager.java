@@ -6,7 +6,6 @@ import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class EloManager {
@@ -201,16 +200,14 @@ public class EloManager {
         long now = System.currentTimeMillis();
         long oneHour = 60L * 60 * 1000;
 
-        List<Long> timestamps = killerData.getKillLog().getOrDefault(victimUUID, new ArrayList<>());
+        List<Long> timestamps = killerData.getOrCreateKillTimestamps(victimUUID);
         timestamps.removeIf(t -> (now - t) > oneHour);
-        killerData.getKillLog().put(victimUUID, timestamps);
 
         return timestamps.size() >= limit;
     }
 
     private void logKill(PlayerData killerData, String victimUUID) {
-        List<Long> timestamps = killerData.getKillLog().computeIfAbsent(victimUUID, k -> new ArrayList<>());
-        timestamps.add(System.currentTimeMillis());
+        killerData.getOrCreateKillTimestamps(victimUUID).add(System.currentTimeMillis());
     }
 
     private boolean isRevenge(Player killer, PlayerData victimData) {

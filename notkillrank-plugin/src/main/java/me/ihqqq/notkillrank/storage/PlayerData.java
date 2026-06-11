@@ -3,29 +3,33 @@ package me.ihqqq.notkillrank.storage;
 import me.ihqqq.notkillrank.api.IPlayerData;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PlayerData implements IPlayerData {
 
     private final String uuid;
-    private String name;
-    private int elo;
-    private int kills;
-    private int deaths;
-    private int killStreak;
-    private int deathStreak;
-    private int highestKillStreak;
-    private int peakElo;
-    private String lastKillerUUID;
-    private long lastKilledTime;
-    private long lastOnline;
+    private volatile String name;
+    private volatile int elo;
+    private volatile int kills;
+    private volatile int deaths;
+    private volatile int killStreak;
+    private volatile int deathStreak;
+    private volatile int highestKillStreak;
+    private volatile int peakElo;
+    private volatile String lastKillerUUID;
+    private volatile long lastKilledTime;
+    private volatile long lastOnline;
     private final long firstJoinTime;
-    private long sessionStart;
-    private long dailyOnlineMs;
-    private String currentDay;
-    private long noDeathStart;
-    private Map<String, List<Long>> killLog;
-    private Map<String, Integer> bounties;
-    private long top1Since;
+    private volatile long sessionStart;
+    private volatile long dailyOnlineMs;
+    private volatile String currentDay;
+    private volatile long noDeathStart;
+
+    private final Map<String, List<Long>> killLog;
+    private final Map<String, Integer> bounties;
+
+    private volatile long top1Since;
 
     public PlayerData(String uuid, String name, int startElo) {
         this.uuid = uuid;
@@ -45,8 +49,8 @@ public class PlayerData implements IPlayerData {
         this.dailyOnlineMs = 0;
         this.currentDay = "";
         this.noDeathStart = System.currentTimeMillis();
-        this.killLog = new HashMap<>();
-        this.bounties = new HashMap<>();
+        this.killLog = new ConcurrentHashMap<>();
+        this.bounties = new ConcurrentHashMap<>();
         this.top1Since = 0;
     }
 
@@ -74,10 +78,36 @@ public class PlayerData implements IPlayerData {
         this.dailyOnlineMs = dailyOnlineMs;
         this.currentDay = currentDay;
         this.noDeathStart = noDeathStart;
-        this.killLog = killLog != null ? killLog : new HashMap<>();
-        this.bounties = bounties != null ? bounties : new HashMap<>();
         this.top1Since = top1Since;
+
+        this.killLog = new ConcurrentHashMap<>();
+        if (killLog != null) {
+            for (Map.Entry<String, List<Long>> e : killLog.entrySet()) {
+                this.killLog.put(e.getKey(), new CopyOnWriteArrayList<>(e.getValue()));
+            }
+        }
+        this.bounties = new ConcurrentHashMap<>(bounties != null ? bounties : Collections.emptyMap());
     }
+
+
+    public PlayerData snapshot() {
+        Map<String, List<Long>> killLogCopy = new HashMap<>();
+        for (Map.Entry<String, List<Long>> e : killLog.entrySet()) {
+            killLogCopy.put(e.getKey(), new ArrayList<>(e.getValue()));
+        }
+        Map<String, Integer> bountiesCopy = new HashMap<>(bounties);
+
+        return new PlayerData(
+                uuid, name, elo, kills, deaths,
+                killStreak, deathStreak, highestKillStreak, peakElo,
+                lastKillerUUID, lastKilledTime, lastOnline,
+                firstJoinTime, sessionStart, dailyOnlineMs,
+                currentDay, noDeathStart,
+                killLogCopy, bountiesCopy,
+                top1Since
+        );
+    }
+
 
     @Override public String getUUID() { return uuid; }
     @Override public String getName() { return name; }
@@ -111,8 +141,15 @@ public class PlayerData implements IPlayerData {
     @Override public void setCurrentDay(String day) { this.currentDay = day; }
     @Override public long getNoDeathStart() { return noDeathStart; }
     @Override public void setNoDeathStart(long time) { this.noDeathStart = time; }
+
+
     @Override public Map<String, List<Long>> getKillLog() { return killLog; }
     @Override public Map<String, Integer> getBounties() { return bounties; }
     @Override public long getTop1Since() { return top1Since; }
     @Override public void setTop1Since(long time) { this.top1Since = time; }
+
+
+    public List<Long> getOrCreateKillTimestamps(String victimUUID) {
+        return killLog.computeIfAbsent(victimUUID, k -> new CopyOnWriteArrayList<>());
+    }
 }

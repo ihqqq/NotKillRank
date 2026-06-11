@@ -1,0 +1,33 @@
+# ============================================================
+# NotKillRank - Module: Hệ thống ELO
+# ============================================================
+
+# Elo bắt đầu khi người chơi lần đầu vào server
+start-elo: 1000
+
+# Elo tối thiểu — người chơi không thể rớt xuống dưới mức này
+min-elo: 0
+
+# Phần trăm elo của nạn nhân mà người giết nhận được
+# Ví dụ: 10 → giết người có 500 elo → nhận 50 elo
+kill-percent: 10
+
+# Hệ số khi giết người có elo CAO HƠN mình
+# 1.5 → nhận thêm 50% elo
+high-elo-multiplier: 1.5
+
+# Ngưỡng "elo thấp" (% của elo bản thân)
+# Nếu elo nạn nhân < low-elo-threshold% elo của bạn → áp hệ số giảm
+low-elo-threshold: 50
+
+# Hệ số khi giết người có elo THẤP HƠN ngưỡng trên
+# 0.5 → chỉ nhận 50% elo thông thường
+low-elo-multiplier: 0.5
+
+# Bonus phần trăm khi giết lại người vừa giết mình (Báo thù)
+# 20 → nhận thêm 20% elo
+revenge-bonus-percent: 20
+
+# Cửa sổ thời gian để báo thù (giây)
+# 300 = 5 phút — phải giết lại trong vòng 5 phút để nhận bonus
+revenge-window-seconds: 300

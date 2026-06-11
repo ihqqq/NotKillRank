@@ -84,6 +84,11 @@ public class DataManager {
         if (data != null) storage.save(data);
     }
 
+
+    public void evict(String uuid) {
+        cache.remove(uuid);
+    }
+
     public List<PlayerData> getTopPlayers(int limit) {
         List<PlayerData> allLoaded = storage.loadAll();
         for (PlayerData d : allLoaded) {

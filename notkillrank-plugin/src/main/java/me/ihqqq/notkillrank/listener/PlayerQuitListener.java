@@ -27,8 +27,11 @@ public class PlayerQuitListener implements Listener {
         data.setDailyOnlineMs(data.getDailyOnlineMs() + sessionMs);
         data.setLastOnline(System.currentTimeMillis());
 
+        PlayerData snapshot = data.snapshot();
+
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.getInstance(), () -> {
-            DataManager.getInstance().unload(uuid);
+            DataManager.getInstance().getStorage().save(snapshot);
+            DataManager.getInstance().evict(uuid);
         });
     }
 }

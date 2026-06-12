@@ -9,7 +9,6 @@ import java.util.List;
 public class RankManager {
 
     private static RankManager instance;
-
     private final List<RankTier> tiers = new ArrayList<>();
 
     public RankManager() {
@@ -17,9 +16,7 @@ public class RankManager {
         reload();
     }
 
-    public static RankManager getInstance() {
-        return instance;
-    }
+    public static RankManager getInstance() { return instance; }
 
     public void reload() {
         tiers.clear();
@@ -46,14 +43,19 @@ public class RankManager {
     }
 
     public String getStreakTag(PlayerData data) {
-        if (isVoSong(data)) return "<light_purple>[Vô song]";
-        if (data.getKillStreak() >= 10) return "<red>[Sát thần " + data.getKillStreak() + "x]";
-        if (isSongSot(data)) return "<green>[Kẻ sống sót]";
-        if (isWeak(data)) return "<red>[Kẻ yếu]";
+        if (ModuleManager.getInstance().isEnabled(ModuleManager.Module.VOSONG)
+                && isVoSong(data)) return "<light_purple>[Vô song]";
+
+        if (ModuleManager.getInstance().isEnabled(ModuleManager.Module.STREAKS)) {
+            if (data.getKillStreak() >= 10) return "<red>[Sát thần " + data.getKillStreak() + "x]";
+            if (isSongSot(data)) return "<green>[Kẻ sống sót]";
+            if (isWeak(data)) return "<red>[Kẻ yếu]";
+        }
         return "";
     }
 
     public boolean isVoSong(PlayerData data) {
+        if (!ModuleManager.getInstance().isEnabled(ModuleManager.Module.VOSONG)) return false;
         if (data.getTop1Since() <= 0) return false;
         int daysRequired = ConfigManager.getInstance().getVoSongConfig().getInt("days-required", 3);
         long msRequired = (long) daysRequired * 24 * 60 * 60 * 1000;
@@ -63,35 +65,27 @@ public class RankManager {
     public boolean isSongSot(PlayerData data) {
         long noDeathMs = System.currentTimeMillis() - data.getNoDeathStart();
         boolean notKilledIn24h = noDeathMs >= 24L * 60 * 60 * 1000;
-
         long sessionMs = data.getSessionStart() > 0
-                ? System.currentTimeMillis() - data.getSessionStart()
-                : 0;
+                ? System.currentTimeMillis() - data.getSessionStart() : 0;
         long effectiveDailyMs = data.getDailyOnlineMs() + sessionMs;
         boolean onlineEnough = effectiveDailyMs >= 8L * 60 * 60 * 1000;
-
         return notKilledIn24h && onlineEnough;
     }
 
     public boolean isWeak(PlayerData data) {
+        if (!ModuleManager.getInstance().isEnabled(ModuleManager.Module.STREAKS)) return false;
         int threshold = ConfigManager.getInstance().getStreaksConfig()
                 .getInt("death-streak.threshold", 3);
         return data.getDeathStreak() >= threshold;
     }
 
-    public List<RankTier> getTiers() {
-        return tiers;
-    }
+    public List<RankTier> getTiers() { return tiers; }
 
     public static class RankTier {
-        public final int min;
-        public final int max;
+        public final int min, max;
         public final String tag;
-
         public RankTier(int min, int max, String tag) {
-            this.min = min;
-            this.max = max;
-            this.tag = tag;
+            this.min = min; this.max = max; this.tag = tag;
         }
     }
 

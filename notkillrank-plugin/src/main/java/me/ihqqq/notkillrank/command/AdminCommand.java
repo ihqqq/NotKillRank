@@ -3,6 +3,7 @@ package me.ihqqq.notkillrank.command;
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.config.ConfigManager;
 import me.ihqqq.notkillrank.manager.DataManager;
+import me.ihqqq.notkillrank.manager.ModuleManager;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
@@ -37,19 +38,19 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
             case "reload" -> {
                 NotKillRank.getInstance().reloadConfig();
                 ConfigManager.getInstance().load();
+                ModuleManager.getInstance().reload();
                 RankManager.getInstance().reload();
                 MessageUtil.sendMessage(sender,
-                        MessageUtil.getPrefix() + "<green>Cấu hình đã được tải lại!");
+                        MessageUtil.getPrefix() + "<green>Cấu hình và trạng thái module đã được tải lại!");
             }
+            case "modules" -> showModuleStatus(sender);
             case "reset" -> {
                 if (args.length < 2) {
                     MessageUtil.sendMessage(sender, "<yellow>Cách dùng: <white>/nkr reset <player>");
                     return true;
                 }
                 PlayerData data = DataManager.getInstance().getByName(args[1]);
-                if (data == null) {
-                    MessageUtil.sendMessage(sender, notFound(args[1])); return true;
-                }
+                if (data == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 int startElo = ConfigManager.getInstance().getEloConfig().getInt("start-elo", 1000);
                 data.setElo(startElo); data.setKills(0); data.setDeaths(0);
                 data.setKillStreak(0); data.setDeathStreak(0);
@@ -65,9 +66,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 PlayerData data = DataManager.getInstance().getByName(args[1]);
-                if (data == null) {
-                    MessageUtil.sendMessage(sender, notFound(args[1])); return true;
-                }
+                if (data == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 try {
                     int elo = Integer.parseInt(args[2]);
                     if (elo < 0) throw new NumberFormatException();
@@ -88,9 +87,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 PlayerData giveData = DataManager.getInstance().getByName(args[1]);
-                if (giveData == null) {
-                    MessageUtil.sendMessage(sender, notFound(args[1])); return true;
-                }
+                if (giveData == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 try {
                     int amount = Integer.parseInt(args[2]);
                     if (amount <= 0) throw new NumberFormatException();
@@ -112,9 +109,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 PlayerData takeData = DataManager.getInstance().getByName(args[1]);
-                if (takeData == null) {
-                    MessageUtil.sendMessage(sender, notFound(args[1])); return true;
-                }
+                if (takeData == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 try {
                     int amount = Integer.parseInt(args[2]);
                     if (amount <= 0) throw new NumberFormatException();
@@ -124,7 +119,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     takeData.setElo(newElo);
                     DataManager.getInstance().save(takeData.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
-                            + "<red>Đã trừ <gold>" + actualTaken + " elo <red>cua <yellow>"
+                            + "<red>Đã trừ <gold>" + actualTaken + " elo <red>của <yellow>"
                             + takeData.getName() + "<red>! (Elo mới: <gold>" + newElo + "<red>)");
                 } catch (NumberFormatException e) {
                     MessageUtil.sendMessage(sender, "<red>Số lượng elo không hợp lệ! Phải là số nguyên dương.");
@@ -137,9 +132,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 PlayerData data = DataManager.getInstance().getByName(args[1]);
-                if (data == null) {
-                    MessageUtil.sendMessage(sender, notFound(args[1])); return true;
-                }
+                if (data == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 MessageUtil.sendMessage(sender, "<gold>--- " + data.getName() + " ---");
                 MessageUtil.sendMessage(sender, "<white>UUID: <gray>" + data.getUUID());
                 MessageUtil.sendMessage(sender, "<white>Elo: <green>" + data.getElo()
@@ -148,7 +141,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                         + data.getKills() + "<white>/<red>" + data.getDeaths());
                 MessageUtil.sendMessage(sender, "<white>Kill Streak: <red>" + data.getKillStreak()
                         + " <white>| Death Streak: <dark_red>" + data.getDeathStreak());
-                MessageUtil.sendMessage(sender, "<white>Hang: "
+                MessageUtil.sendMessage(sender, "<white>Hạng: "
                         + RankManager.getInstance().getRankTag(data.getElo()));
             }
             default -> sendHelp(sender);
@@ -156,9 +149,21 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private void showModuleStatus(CommandSender sender) {
+        MessageUtil.sendMessage(sender, "<gold>--- Trạng thái Module ---");
+        for (ModuleManager.Module m : ModuleManager.Module.values()) {
+            boolean on = ModuleManager.getInstance().isEnabled(m);
+            String status = on ? "<green>BẬT" : "<red>TẮT";
+            MessageUtil.sendMessage(sender, "  <white>" + m.key + ": " + status);
+        }
+        MessageUtil.sendMessage(sender,
+                "<gray>Thay đổi trong <white>config.yml <gray>→ <white>/nkr reload");
+    }
+
     private void sendHelp(CommandSender sender) {
         MessageUtil.sendMessage(sender, "<gold>--- NotKillRank Admin ---");
-        MessageUtil.sendMessage(sender, "<yellow>/nkr reload <white>— Tai lai config");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr reload <white>— Tải lại config & module");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr modules <white>— Xem trạng thái các module");
         MessageUtil.sendMessage(sender,
                 "<yellow>/nkr reset <player> <white>— Reset dữ liệu người chơi");
         MessageUtil.sendMessage(sender,
@@ -168,7 +173,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         MessageUtil.sendMessage(sender,
                 "<yellow>/nkr take <player> <elo> <white>— Trừ elo của người chơi");
         MessageUtil.sendMessage(sender,
-                "<yellow>/nkr info <player> <white>— Xem thong tin chi tiet");
+                "<yellow>/nkr info <player> <white>— Xem thông tin chi tiết");
     }
 
     private String notFound(String name) {
@@ -180,8 +185,10 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("notkillrank.admin")) return new ArrayList<>();
-        if (args.length == 1) return Arrays.asList("reload", "reset", "setelo", "give", "take", "info");
-        if (args.length == 2 && !args[0].equalsIgnoreCase("reload")) {
+        if (args.length == 1)
+            return Arrays.asList("reload", "modules", "reset", "setelo", "give", "take", "info");
+        if (args.length == 2 && !args[0].equalsIgnoreCase("reload")
+                && !args[0].equalsIgnoreCase("modules")) {
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.getName().toLowerCase().startsWith(args[1].toLowerCase()))

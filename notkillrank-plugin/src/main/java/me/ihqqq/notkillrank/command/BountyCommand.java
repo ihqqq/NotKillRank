@@ -4,6 +4,7 @@ import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.manager.BountyManager;
 import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.manager.EloManager;
+import me.ihqqq.notkillrank.manager.ModuleManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
@@ -26,7 +27,11 @@ public class BountyCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Only players can use /bounty.");
+            sender.sendMessage("Chỉ có người chơi mới dùng được lệnh /bounty");
+            return true;
+        }
+        if (!ModuleManager.getInstance().isEnabled(ModuleManager.Module.BOUNTY)) {
+            MessageUtil.sendMessage(sender, "<red>Hệ thống Bounty hiện đang bị tắt!");
             return true;
         }
         if (!sender.hasPermission("notkillrank.use")) {
@@ -49,14 +54,12 @@ public class BountyCommand implements CommandExecutor, TabCompleter {
                     .replace("{player}", args[0]));
             return true;
         }
-
         PlayerData targetData = DataManager.getInstance().getOrCreate(target);
         if (EloManager.getInstance().isNewbie(targetData)) {
             MessageUtil.sendMessage(sender, MessageUtil.getMessage("bounty-target-protected",
                     "<red>Không thể đặt bounty lên người chơi đang được bảo vệ người mới!"));
             return true;
         }
-
         int amount;
         try {
             amount = Integer.parseInt(args[1]);

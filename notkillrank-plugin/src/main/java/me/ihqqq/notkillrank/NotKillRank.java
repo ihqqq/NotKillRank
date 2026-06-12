@@ -12,6 +12,7 @@ import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.support.PlaceholderAPISupport;
 import me.ihqqq.notkillrank.task.AutoSaveTask;
 import me.ihqqq.notkillrank.task.EloDecayTask;
+import me.ihqqq.notkillrank.task.NewbieProtectionTask;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,6 +27,7 @@ public final class NotKillRank extends JavaPlugin {
     private static NotKillRank instance;
 
     private ConfigManager configManager;
+    private ModuleManager moduleManager;
     private DataManager dataManager;
     private EloManager eloManager;
     private RankManager rankManager;
@@ -38,13 +40,17 @@ public final class NotKillRank extends JavaPlugin {
 
         saveDefaultConfig();
         try {
-            ConfigUpdater.update(this, "config.yml", new File(getDataFolder(), "config.yml"), Collections.emptyList());
+            ConfigUpdater.update(this, "config.yml", new File(getDataFolder(), "config.yml"),
+                    Collections.emptyList());
         } catch (IOException e) {
             getLogger().warning("Could not update config.yml: " + e.getMessage());
         }
         reloadConfig();
 
+        // ConfigManager phải khởi tạo trước ModuleManager
         configManager = new ConfigManager(this);
+        // ModuleManager đọc từ config.yml (đã reload xong)
+        moduleManager = new ModuleManager();
 
         dataManager = new DataManager();
         rankManager = new RankManager();
@@ -56,7 +62,8 @@ public final class NotKillRank extends JavaPlugin {
         registerCommands();
         registerTasks();
 
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        if (moduleManager.isEnabled(ModuleManager.Module.PLACEHOLDERAPI)
+                && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholderAPISupport().register();
             MessageUtil.log("&aPlaceholderAPI detected — expansion registered.");
         }
@@ -91,12 +98,15 @@ public final class NotKillRank extends JavaPlugin {
     private void registerTasks() {
         new AutoSaveTask();
         new EloDecayTask();
+        new NewbieProtectionTask();
 
         Bukkit.getScheduler().runTaskTimer(this, this::updateTop1Status,
                 20L * 60 * 5, 20L * 60 * 5);
     }
 
     private void updateTop1Status() {
+        if (!moduleManager.isEnabled(ModuleManager.Module.VOSONG)) return;
+
         List<PlayerData> top = dataManager.getTopPlayers(1);
         if (top.isEmpty()) return;
         PlayerData top1 = top.get(0);
@@ -120,14 +130,13 @@ public final class NotKillRank extends JavaPlugin {
         }
     }
 
-    public static NotKillRank getInstance() {
-        return instance;
-    }
+    public static NotKillRank getInstance() { return instance; }
 
-    public ConfigManager getConfigManager() { return configManager; }
-    public DataManager getDataManager() { return dataManager; }
-    public EloManager getEloManager() { return eloManager; }
-    public RankManager getRankManager() { return rankManager; }
-    public StreakManager getStreakManager() { return streakManager; }
-    public BountyManager getBountyManager() { return bountyManager; }
+    public ConfigManager getConfigManager()   { return configManager; }
+    public ModuleManager getModuleManager()   { return moduleManager; }
+    public DataManager getDataManager()       { return dataManager; }
+    public EloManager getEloManager()         { return eloManager; }
+    public RankManager getRankManager()       { return rankManager; }
+    public StreakManager getStreakManager()   { return streakManager; }
+    public BountyManager getBountyManager()   { return bountyManager; }
 }

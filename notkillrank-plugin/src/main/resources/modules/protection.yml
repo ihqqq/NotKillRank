@@ -3,9 +3,29 @@
 # ============================================================
 
 # Số giờ online tối thiểu để thoát khỏi bảo vệ người mới
-# Dưới mức này → cả người giết lẫn nạn nhân đều không thay đổi elo
 newbie-hours: 1
 
 # Elo tối thiểu để thoát bảo vệ người mới
-# Dưới mức này → được bảo vệ (dù đã online đủ giờ)
 newbie-protect-elo: 100
+
+# ────────────────────────────────────────────────
+# ACTION BAR COUNTDOWN
+# Hiển thị thanh thông tin bên dưới màn hình mỗi giây
+# cho người chơi đang trong thời gian bảo vệ.
+#
+# Placeholder:
+#   {time_left}   — thời gian còn lại (vd: "2h 15p 30s")
+#   {elo}         — elo hiện tại của người chơi
+#   {needed_elo}  — elo cần đạt để thoát bảo vệ (newbie-protect-elo)
+#
+# Hỗ trợ MiniMessage: https://docs.advntr.dev/minimessage/format.html
+# ────────────────────────────────────────────────
+actionbar:
+  # Hiển thị khi đang bị bảo vệ bởi CẢ HAI điều kiện (thời gian VÀ elo)
+  format-both: "<green>⛉ Bảo vệ người mới <dark_gray>| <white>Thời gian: <aqua>{time_left} <dark_gray>| <white>Elo: <yellow>{elo}<white>/<gold>{needed_elo}"
+
+  # Hiển thị khi chỉ còn bảo vệ bởi thời gian (elo đã đủ)
+  format-time-only: "<green>⛉ Bảo vệ người mới <dark_gray>| <white>Còn: <aqua>{time_left}"
+
+  # Hiển thị khi chỉ còn bảo vệ bởi elo (đã online đủ giờ)
+  format-elo-only: "<green>⛉ Bảo vệ người mới <dark_gray>| <white>Elo: <yellow>{elo}<white>/<gold>{needed_elo}"

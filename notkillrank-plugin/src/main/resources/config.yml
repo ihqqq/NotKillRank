@@ -1,6 +1,6 @@
 # ============================================================
 # NotKillRank - Cấu hình chính
-# Các cài đặt module được tách riêng vào thư mục modules/
+# Các cài đặt chi tiết của từng module nằm trong modules/
 # ============================================================
 
 # ────────────────────────────────────────────────
@@ -8,15 +8,36 @@
 # ────────────────────────────────────────────────
 storage:
   # Loại lưu trữ: YAML, SQLITE, H2
-  # YAML  — lưu mỗi người chơi vào 1 file .yml riêng (mặc định)
-  # SQLITE — lưu vào 1 file SQLite (.db) trong thư mục plugin
-  # H2     — lưu vào H2 embedded database trong thư mục plugin
   type: H2
-
   sqlite:
-    # Tên file SQLite (không cần đuôi .db)
+    file: playerdata
+  h2:
     file: playerdata
 
-  h2:
-    # Tên file H2 (không cần đuôi)
-    file: playerdata
+# ────────────────────────────────────────────────
+# BẬT / TẮT MODULE
+# true = bật  |  false = tắt
+# Sau khi thay đổi, dùng /nkr reload để áp dụng
+# ────────────────────────────────────────────────
+modules:
+  enabled:
+    # Chống farm elo (giới hạn số lần giết cùng người / giờ)
+    anti-farm: true
+
+    # Hệ thống truy nã (bounty)
+    bounty: true
+
+    # Suy giảm elo khi offline lâu
+    decay: true
+
+    # Bảo vệ người mới (newbie protection)
+    protection: true
+
+    # Kill streak, death streak, [Kẻ yếu], [Kẻ sống sót], milestone
+    streaks: true
+
+    # Tag [Vô song] cho người giữ top 1 liên tiếp
+    vosong: true
+
+    # PlaceholderAPI expansion (tắt nếu không dùng PAPI)
+    placeholderapi: true

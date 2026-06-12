@@ -3,6 +3,7 @@ package me.ihqqq.notkillrank.task;
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.manager.EloManager;
+import me.ihqqq.notkillrank.manager.ModuleManager;
 import me.ihqqq.notkillrank.storage.IDataStorage;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
@@ -21,6 +22,8 @@ public class EloDecayTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        if (!ModuleManager.getInstance().isEnabled(ModuleManager.Module.DECAY)) return;
+
         IDataStorage storage = DataManager.getInstance().getStorage();
         List<PlayerData> allFromDisk = storage.loadAll();
         int decayed = 0;

@@ -1,9 +1,9 @@
 package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
-import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -18,8 +18,8 @@ import java.util.List;
 public class StatsCommand implements CommandExecutor, TabCompleter {
 
     public StatsCommand() {
-        NotKillRank.getInstance().getCommand("stats").setExecutor(this);
-        NotKillRank.getInstance().getCommand("stats").setTabCompleter(this);
+        NotKillRank.plugin.getCommand("stats").setExecutor(this);
+        NotKillRank.plugin.getCommand("stats").setTabCompleter(this);
     }
 
     @Override
@@ -30,9 +30,9 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("Usage: /stats <player>");
                 return true;
             }
-            data = DataManager.getInstance().getOrCreate(player);
+            data = PluginDataManager.getOrCreate(player);
         } else {
-            data = DataManager.getInstance().getByName(args[0]);
+            data = PluginDataManager.getPlayerDatabaseByName(args[0]);
             if (data == null) {
                 MessageUtil.sendMessage(sender, MessageUtil.getMessage("player-not-found",
                                 "<red>Không tìm thấy người chơi <yellow>{player}<red>!")
@@ -41,10 +41,9 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        String rank = RankManager.getInstance().getRankTag(data.getElo());
+        String rank     = RankManager.getInstance().getRankTag(data.getElo());
         String streakTag = RankManager.getInstance().getStreakTag(data);
         String streakPart = streakTag.isEmpty() ? "" : " " + streakTag;
-
         String kd = data.getDeaths() == 0
                 ? String.valueOf(data.getKills())
                 : String.format("%.2f", (double) data.getKills() / data.getDeaths());
@@ -69,7 +68,6 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
         if (totalBounty > 0) {
             MessageUtil.sendMessage(sender, "<white>Bounty trên đầu: <red>" + totalBounty + " elo");
         }
-
         return true;
     }
 

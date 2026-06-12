@@ -12,7 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 public class CombatListener implements Listener {
 
     public CombatListener() {
-        Bukkit.getPluginManager().registerEvents(this, NotKillRank.getInstance());
+        Bukkit.getPluginManager().registerEvents(this, NotKillRank.plugin);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

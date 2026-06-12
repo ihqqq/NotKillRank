@@ -41,3 +41,12 @@ modules:
 
     # PlaceholderAPI expansion (tắt nếu không dùng PAPI)
     placeholderapi: true
+
+# ────────────────────────────────────────────────
+# TỰ ĐỘNG LƯU DỮ LIỆU
+# ────────────────────────────────────────────────
+auto-save:
+  # Bật/tắt tự động lưu định kỳ
+  enabled: true
+  # Chu kỳ lưu (giây) — mặc định 300 = 5 phút
+  interval-seconds: 300

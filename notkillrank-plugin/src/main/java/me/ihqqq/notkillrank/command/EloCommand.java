@@ -1,9 +1,9 @@
 package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
-import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -18,8 +18,8 @@ import java.util.List;
 public class EloCommand implements CommandExecutor, TabCompleter {
 
     public EloCommand() {
-        NotKillRank.getInstance().getCommand("elo").setExecutor(this);
-        NotKillRank.getInstance().getCommand("elo").setTabCompleter(this);
+        NotKillRank.plugin.getCommand("elo").setExecutor(this);
+        NotKillRank.plugin.getCommand("elo").setTabCompleter(this);
     }
 
     @Override
@@ -29,9 +29,9 @@ public class EloCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("Usage: /elo <player>");
                 return true;
             }
-            showElo(sender, DataManager.getInstance().getOrCreate(player));
+            showElo(sender, PluginDataManager.getOrCreate(player));
         } else {
-            PlayerData data = DataManager.getInstance().getByName(args[0]);
+            PlayerData data = PluginDataManager.getPlayerDatabaseByName(args[0]);
             if (data == null) {
                 MessageUtil.sendMessage(sender, MessageUtil.getMessage("player-not-found",
                                 "<red>Không tìm thấy người chơi <yellow>{player}<red>!")
@@ -44,7 +44,7 @@ public class EloCommand implements CommandExecutor, TabCompleter {
     }
 
     private void showElo(CommandSender sender, PlayerData data) {
-        String rank = RankManager.getInstance().getRankTag(data.getElo());
+        String rank     = RankManager.getInstance().getRankTag(data.getElo());
         String streakTag = RankManager.getInstance().getStreakTag(data);
         String streakPart = streakTag.isEmpty() ? "" : " " + streakTag;
         MessageUtil.sendMessage(sender, MessageUtil.getMessage("elo-info",

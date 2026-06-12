@@ -2,10 +2,10 @@ package me.ihqqq.notkillrank.inventory;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import me.ihqqq.notkillrank.NotKillRank;
-import me.ihqqq.notkillrank.config.ConfigManager;
-import me.ihqqq.notkillrank.manager.DataManager;
+import me.ihqqq.notkillrank.file.module.TopGuiFile;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.ItemBuilder;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import net.kyori.adventure.text.Component;
@@ -16,21 +16,16 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TopInventory implements Listener {
+public class TopInventory implements NotKillRankInventoryBase {
 
     private static final Map<String, CachedProfile> skinCache = new ConcurrentHashMap<>();
     private static final long CACHE_TTL_MS = 5 * 60 * 1000L;
@@ -42,12 +37,12 @@ public class TopInventory implements Listener {
     }
 
     public TopInventory() {
-        Bukkit.getPluginManager().registerEvents(this, NotKillRank.getInstance());
+        Bukkit.getPluginManager().registerEvents(this, NotKillRank.plugin);
     }
 
     public static void open(Player player) {
-        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.getInstance(), () -> {
-            List<PlayerData> top = DataManager.getInstance().getTopPlayers(10);
+        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+            List<PlayerData> top = PluginDataManager.getTopPlayers(10);
 
             Map<String, PlayerProfile> profileMap = new HashMap<>();
             for (PlayerData data : top) {
@@ -64,15 +59,14 @@ public class TopInventory implements Listener {
                         profileMap.put(data.getUUID(), cached.profile());
                         continue;
                     }
-
                     try {
                         PlayerProfile profile = Bukkit.createProfile(uuid, data.getName());
                         profile.complete(true);
                         skinCache.put(data.getUUID(), new CachedProfile(profile, System.currentTimeMillis()));
                         profileMap.put(data.getUUID(), profile);
                     } catch (Exception e) {
-                        NotKillRank.getInstance().getLogger()
-                                .warning("[TopInventory] Failed to fetch profile for "
+                        NotKillRank.plugin.getLogger()
+                                .warning("[TopInventory] Không thể tải profile cho "
                                         + data.getName() + ": " + e.getMessage());
                         try {
                             PlayerProfile fallback = Bukkit.createProfile(uuid, data.getName());
@@ -85,9 +79,8 @@ public class TopInventory implements Listener {
                 }
             }
 
-            Bukkit.getScheduler().runTask(NotKillRank.getInstance(), () -> {
-                FileConfiguration gui = ConfigManager.getInstance().getTopGui();
-
+            Bukkit.getScheduler().runTask(NotKillRank.plugin, () -> {
+                FileConfiguration gui = TopGuiFile.get();
                 String titleMM = gui.getString("name", "<gold><bold>Top 10 — NotKillRank");
                 Component titleComponent = MessageUtil.parse(titleMM);
                 int rows = Math.max(1, Math.min(6, gui.getInt("rows", 6)));
@@ -104,8 +97,8 @@ public class TopInventory implements Listener {
                 for (int i = 0; i < Math.min(top.size(), slots.size()); i++) {
                     int slot = slots.get(i);
                     if (slot >= 0 && slot < size) {
-                        PlayerProfile profile = profileMap.get(top.get(i).getUUID());
-                        inv.setItem(slot, createSkull(top.get(i), i + 1, gui, profile));
+                        inv.setItem(slot, createSkull(top.get(i), i + 1, gui,
+                                profileMap.get(top.get(i).getUUID())));
                     }
                 }
                 player.openInventory(inv);
@@ -148,19 +141,15 @@ public class TopInventory implements Listener {
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         if (meta == null) return skull;
 
-        if (profile != null) {
-            meta.setPlayerProfile(profile);
-        }
+        if (profile != null) meta.setPlayerProfile(profile);
 
-        String rankTag = RankManager.getInstance().getRankTag(data.getElo());
+        String rankTag  = RankManager.getInstance().getRankTag(data.getElo());
         String streakTag = RankManager.getInstance().getStreakTag(data);
         String streakPart = streakTag.isEmpty() ? "" : " " + streakTag;
-        String medal = getMedal(pos, gui);
+        String medal    = getMedal(pos, gui);
 
         String nameTpl = gui.getString("player-head.name", "{medal} <white>{player}");
-        String displayName = nameTpl
-                .replace("{medal}", medal)
-                .replace("{player}", data.getName());
+        String displayName = nameTpl.replace("{medal}", medal).replace("{player}", data.getName());
         meta.displayName(MessageUtil.parseLore(displayName));
 
         List<Component> lore = new ArrayList<>();
@@ -199,11 +188,8 @@ public class TopInventory implements Listener {
                 bountyLoreTpl = List.of("", "<gold>Bounty: <red>{bounty} elo");
             }
             for (String line : bountyLoreTpl) {
-                if (line.isEmpty()) {
-                    lore.add(Component.empty());
-                } else {
-                    lore.add(MessageUtil.parseLore(line.replace("{bounty}", String.valueOf(totalBounty))));
-                }
+                if (line.isEmpty()) lore.add(Component.empty());
+                else lore.add(MessageUtil.parseLore(line.replace("{bounty}", String.valueOf(totalBounty))));
             }
         }
 
@@ -214,16 +200,14 @@ public class TopInventory implements Listener {
 
     private static String getMedal(int pos, FileConfiguration gui) {
         String key = "medals." + pos;
-        if (gui.contains(key)) {
-            return gui.getString(key, "#" + pos);
-        }
+        if (gui.contains(key)) return gui.getString(key, "#" + pos);
         String def = gui.getString("medals.default", "<dark_gray>#{pos}");
         return def.replace("{pos}", String.valueOf(pos));
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        FileConfiguration gui = ConfigManager.getInstance().getTopGui();
+        FileConfiguration gui = TopGuiFile.get();
         String titleMM = gui.getString("name", "<gold><bold>Top 10 — NotKillRank");
         String titlePlain = MessageUtil.stripTags(titleMM);
         String viewPlain = PlainTextComponentSerializer.plainText()
@@ -232,4 +216,6 @@ public class TopInventory implements Listener {
             event.setCancelled(true);
         }
     }
+
+    private record ProfileData(PlayerProfile profile) {}
 }

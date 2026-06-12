@@ -4,11 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class SqliteStorage extends AbstractSqlStorage {
+public class PluginDataSQLiteStorage extends PluginDataAbstractSql {
 
     private final String filePath;
 
-    public SqliteStorage(String filePath) {
+    public PluginDataSQLiteStorage(String filePath) {
         this.filePath = filePath;
     }
 
@@ -17,7 +17,7 @@ public class SqliteStorage extends AbstractSqlStorage {
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
-            throw new SQLException("SQLite JDBC driver not found", e);
+            throw new SQLException("SQLite JDBC driver không tìm thấy", e);
         }
         Connection conn = DriverManager.getConnection("jdbc:sqlite:" + filePath);
         try (var stmt = conn.createStatement()) {

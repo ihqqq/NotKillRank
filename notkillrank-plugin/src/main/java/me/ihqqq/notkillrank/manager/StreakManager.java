@@ -1,6 +1,6 @@
 package me.ihqqq.notkillrank.manager;
 
-import me.ihqqq.notkillrank.config.ConfigManager;
+import me.ihqqq.notkillrank.file.module.StreaksFile;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import net.kyori.adventure.title.Title;
@@ -28,7 +28,7 @@ public class StreakManager {
     public int getStreakBonusPercent(int streak) {
         Set<Integer> milestones = getMilestones();
         int bestBonus = 0;
-        FileConfiguration cfg = ConfigManager.getInstance().getStreaksConfig();
+        FileConfiguration cfg = StreaksFile.get();
         for (int m : milestones) {
             if (streak >= m) {
                 int bonus = cfg.getInt("kill-streaks." + m + ".bonus-percent", 0);
@@ -41,18 +41,18 @@ public class StreakManager {
     public void checkMilestone(Player killer, PlayerData killerData) {
         int streak = killerData.getKillStreak();
         Set<Integer> milestones = getMilestones();
-        FileConfiguration cfg = ConfigManager.getInstance().getStreaksConfig();
+        FileConfiguration cfg = StreaksFile.get();
 
         for (int m : milestones) {
             if (streak == m) {
                 String broadcastMsg = cfg.getString("kill-streaks." + m + ".broadcast-message", "");
                 boolean doBroadcast = cfg.getBoolean("kill-streaks." + m + ".broadcast", false);
-                boolean doSound = cfg.getBoolean("kill-streaks." + m + ".sound", false);
-                boolean doTitle = cfg.getBoolean("kill-streaks." + m + ".show-title", false);
+                boolean doSound     = cfg.getBoolean("kill-streaks." + m + ".sound", false);
+                boolean doTitle     = cfg.getBoolean("kill-streaks." + m + ".show-title", false);
 
                 if (doBroadcast && !broadcastMsg.isEmpty()) {
                     String name = cfg.getString("kill-streaks." + m + ".name", "");
-                    String msg = broadcastMsg
+                    String msg  = broadcastMsg
                             .replace("{player}", killer.getName())
                             .replace("{streak}", String.valueOf(streak))
                             .replace("{name}", name);
@@ -67,15 +67,13 @@ public class StreakManager {
                 }
 
                 if (doTitle) {
-                    String titleText = cfg.getString("kill-streaks." + m + ".title-text",
+                    String titleText    = cfg.getString("kill-streaks." + m + ".title-text",
                             "<red><bold>KILL STREAK");
                     String subtitleText = cfg.getString("kill-streaks." + m + ".subtitle-text", "");
 
-                    String titleStr = titleText
-                            .replace("{player}", killer.getName())
+                    String titleStr    = titleText.replace("{player}", killer.getName())
                             .replace("{streak}", String.valueOf(streak));
-                    String subtitleStr = subtitleText
-                            .replace("{player}", killer.getName())
+                    String subtitleStr = subtitleText.replace("{player}", killer.getName())
                             .replace("{streak}", String.valueOf(streak));
 
                     Title adventureTitle = Title.title(
@@ -101,7 +99,7 @@ public class StreakManager {
         if (victimData.getKillStreak() < 3) return;
         String msg = MessageUtil.getMessage("streak-break",
                         "<yellow>{breaker} <white>đã chấm dứt chuỗi <red>{streak} kill "
-                                + "<white>cua <yellow>{victim}<white>! <green>(+{elo} elo)")
+                                + "<white>của <yellow>{victim}<white>! <green>(+{elo} elo)")
                 .replace("{breaker}", breaker.getName())
                 .replace("{streak}", String.valueOf(victimData.getKillStreak()))
                 .replace("{victim}", victimData.getName())
@@ -111,13 +109,11 @@ public class StreakManager {
 
     public TreeSet<Integer> getMilestones() {
         TreeSet<Integer> milestones = new TreeSet<>();
-        var section = ConfigManager.getInstance().getStreaksConfig()
-                .getConfigurationSection("kill-streaks");
+        var section = StreaksFile.get().getConfigurationSection("kill-streaks");
         if (section != null) {
             for (String key : section.getKeys(false)) {
-                try {
-                    milestones.add(Integer.parseInt(key));
-                } catch (NumberFormatException ignored) {}
+                try { milestones.add(Integer.parseInt(key)); }
+                catch (NumberFormatException ignored) {}
             }
         }
         return milestones;

@@ -2,13 +2,17 @@ package me.ihqqq.notkillrank;
 
 import com.tchristofferson.configupdater.ConfigUpdater;
 import me.ihqqq.notkillrank.command.*;
-import me.ihqqq.notkillrank.config.ConfigManager;
+import me.ihqqq.notkillrank.file.module.MessagesFile;
+import me.ihqqq.notkillrank.file.module.TopGuiFile;
+import me.ihqqq.notkillrank.file.module.*;
 import me.ihqqq.notkillrank.inventory.TopInventory;
+import me.ihqqq.notkillrank.language.Messages;
 import me.ihqqq.notkillrank.listener.CombatListener;
 import me.ihqqq.notkillrank.listener.PlayerJoinListener;
 import me.ihqqq.notkillrank.listener.PlayerQuitListener;
 import me.ihqqq.notkillrank.manager.*;
-import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
+import me.ihqqq.notkillrank.storage.PluginDataStorage;
 import me.ihqqq.notkillrank.support.PlaceholderAPISupport;
 import me.ihqqq.notkillrank.task.AutoSaveTask;
 import me.ihqqq.notkillrank.task.EloDecayTask;
@@ -20,23 +24,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 
 public final class NotKillRank extends JavaPlugin {
 
-    private static NotKillRank instance;
-
-    private ConfigManager configManager;
-    private ModuleManager moduleManager;
-    private DataManager dataManager;
-    private EloManager eloManager;
-    private RankManager rankManager;
-    private StreakManager streakManager;
-    private BountyManager bountyManager;
+    public static NotKillRank plugin;
 
     @Override
     public void onEnable() {
-        instance = this;
+        plugin = this;
 
         saveDefaultConfig();
         try {
@@ -47,37 +42,60 @@ public final class NotKillRank extends JavaPlugin {
         }
         reloadConfig();
 
-        // ConfigManager phải khởi tạo trước ModuleManager
-        configManager = new ConfigManager(this);
-        // ModuleManager đọc từ config.yml (đã reload xong)
-        moduleManager = new ModuleManager();
+        initFileClasses();
+        Settings.setupValue();
+        Messages.setupValue();
 
-        dataManager = new DataManager();
-        rankManager = new RankManager();
-        eloManager = new EloManager();
-        streakManager = new StreakManager();
-        bountyManager = new BountyManager();
+        PluginDataStorage.init(Settings.STORAGE_TYPE);
+        PluginDataManager.loadAllDatabase();
+
+        new ModuleManager();
+        new EloManager();
+        new RankManager();
+        new StreakManager();
+        new BountyManager();
 
         registerListeners();
         registerCommands();
         registerTasks();
 
-        if (moduleManager.isEnabled(ModuleManager.Module.PLACEHOLDERAPI)
+        if (Settings.MODULE_PLACEHOLDERAPI
                 && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholderAPISupport().register();
-            MessageUtil.log("&aPlaceholderAPI detected — expansion registered.");
+            MessageUtil.log("PlaceholderAPI detected — expansion registered.");
         }
 
-        MessageUtil.log("&aNotKillRank &fv" + getDescription().getVersion() + " &aloaded successfully!");
+        MessageUtil.log("NotKillRank v" + getDescription().getVersion() + " loaded successfully!");
     }
 
     @Override
     public void onDisable() {
-        if (dataManager != null) {
-            dataManager.saveAll();
-            dataManager.getStorage().close();
-        }
-        MessageUtil.log("&cNotKillRank disabled. All data saved.");
+        PluginDataManager.saveAllDatabase();
+        PluginDataStorage.close();
+        MessageUtil.log("NotKillRank disabled. All data saved.");
+    }
+
+    public static void reload() {
+        plugin.reloadConfig();
+        initFileClasses();
+        Settings.setupValue();
+        Messages.setupValue();
+        ModuleManager.reload();
+        RankManager.reload();
+        MessageUtil.log("NotKillRank config reloaded.");
+    }
+
+    private static void initFileClasses() {
+        MessagesFile.init();
+        TopGuiFile.init();
+        EloFile.init();
+        AntiFarmFile.init();
+        BountyFile.init();
+        DecayFile.init();
+        ProtectionFile.init();
+        RanksFile.init();
+        StreaksFile.init();
+        VoSongFile.init();
     }
 
     private void registerListeners() {
@@ -100,43 +118,7 @@ public final class NotKillRank extends JavaPlugin {
         new EloDecayTask();
         new NewbieProtectionTask();
 
-        Bukkit.getScheduler().runTaskTimer(this, this::updateTop1Status,
-                20L * 60 * 5, 20L * 60 * 5);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this,
+                PluginDataManager::updateTop1Status, 20L * 60 * 5, 20L * 60 * 5);
     }
-
-    private void updateTop1Status() {
-        if (!moduleManager.isEnabled(ModuleManager.Module.VOSONG)) return;
-
-        List<PlayerData> top = dataManager.getTopPlayers(1);
-        if (top.isEmpty()) return;
-        PlayerData top1 = top.get(0);
-
-        for (PlayerData data : dataManager.getCache().values()) {
-            if (data.getUUID().equals(top1.getUUID())) {
-                if (top1.getTop1Since() <= 0) {
-                    top1.setTop1Since(System.currentTimeMillis());
-                    final String uuid = top1.getUUID();
-                    Bukkit.getScheduler().runTaskAsynchronously(this,
-                            () -> dataManager.save(uuid));
-                }
-            } else {
-                if (data.getTop1Since() > 0) {
-                    data.setTop1Since(0);
-                    final String uuid = data.getUUID();
-                    Bukkit.getScheduler().runTaskAsynchronously(this,
-                            () -> dataManager.save(uuid));
-                }
-            }
-        }
-    }
-
-    public static NotKillRank getInstance() { return instance; }
-
-    public ConfigManager getConfigManager()   { return configManager; }
-    public ModuleManager getModuleManager()   { return moduleManager; }
-    public DataManager getDataManager()       { return dataManager; }
-    public EloManager getEloManager()         { return eloManager; }
-    public RankManager getRankManager()       { return rankManager; }
-    public StreakManager getStreakManager()   { return streakManager; }
-    public BountyManager getBountyManager()   { return bountyManager; }
 }

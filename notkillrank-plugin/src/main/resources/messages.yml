@@ -13,6 +13,9 @@
 # Tiền tố hiển thị trước các thông báo của plugin
 prefix: '<gray>[<gradient:#FFD700:#FFA500>ɴᴏᴛᴋɪʟʟʀᴀɴᴋ</gradient>]<gray> '
 
+# Thông báo chào mừng khi người chơi vào server — {prefix}, {player}, {rank}, {streak}, {elo}
+welcome: '{prefix}<white>Chào mừng <yellow>{player} <white>| Hạng: {rank}{streak} <white>| Elo: <green>{elo}'
+
 # Thông báo khi có kill thông thường (có thay đổi elo)
 # {rank_killer}, {killer}, {elo_gained}, {rank_victim}, {victim}, {elo_lost}
 kill-broadcast: '<gray>{rank_killer} <white>{killer} <green>+{elo_gained_detail} <dark_gray>→ <white>đã hạ {rank_victim} <white>{victim} <red>-{elo_lost_detail}'
@@ -64,3 +67,5 @@ stats:
 top:
   - '<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
   - '<gray>{pos}. {rank} <white>{player} <dark_gray>─ <green>{elo} elo'
+
+

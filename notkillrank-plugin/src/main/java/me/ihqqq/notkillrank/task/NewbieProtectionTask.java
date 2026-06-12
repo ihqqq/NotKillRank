@@ -1,11 +1,11 @@
 package me.ihqqq.notkillrank.task;
 
 import me.ihqqq.notkillrank.NotKillRank;
-import me.ihqqq.notkillrank.config.ConfigManager;
-import me.ihqqq.notkillrank.manager.DataManager;
+import me.ihqqq.notkillrank.Settings;
+import me.ihqqq.notkillrank.file.module.ProtectionFile;
 import me.ihqqq.notkillrank.manager.EloManager;
-import me.ihqqq.notkillrank.manager.ModuleManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -16,16 +16,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class NewbieProtectionTask extends BukkitRunnable {
 
     public NewbieProtectionTask() {
-        runTaskTimer(NotKillRank.getInstance(), 20L, 20L);
+        runTaskTimer(NotKillRank.plugin, 20L, 20L);
     }
 
     @Override
     public void run() {
-        if (!ModuleManager.getInstance().isEnabled(ModuleManager.Module.PROTECTION)) return;
+        if (!Settings.MODULE_PROTECTION) return;
 
-        FileConfiguration prot = ConfigManager.getInstance().getProtectionConfig();
-        int newbieHours = prot.getInt("newbie-hours", 10);
-        int newbieElo   = prot.getInt("newbie-protect-elo", 100);
+        FileConfiguration prot = ProtectionFile.get();
+        int newbieHours = Settings.PROTECTION_NEWBIE_HOURS;
+        int newbieElo   = Settings.PROTECTION_NEWBIE_ELO;
 
         String formatBoth = prot.getString("actionbar.format-both",
                 "<green>⛉ Bảo vệ người mới <dark_gray>| <white>Thời gian: <aqua>{time_left} "
@@ -36,7 +36,7 @@ public class NewbieProtectionTask extends BukkitRunnable {
                 "<green>⛉ Bảo vệ người mới <dark_gray>| <white>Elo: <yellow>{elo}<white>/<gold>{needed_elo}");
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerData data = DataManager.getInstance().get(player.getUniqueId().toString());
+            PlayerData data = PluginDataManager.getPlayerDatabase(player.getUniqueId().toString());
             if (data == null) continue;
             if (!EloManager.getInstance().isNewbie(data)) continue;
 
@@ -46,19 +46,15 @@ public class NewbieProtectionTask extends BukkitRunnable {
             boolean eloProtected  = data.getElo() < newbieElo;
 
             String message;
-
             if (timeProtected && eloProtected) {
-                long remainMs   = (newbieHours * 60L * 60 * 1000) - onlineMs;
+                long remainMs = (newbieHours * 60L * 60 * 1000) - onlineMs;
                 message = formatBoth
                         .replace("{time_left}", formatDuration(remainMs))
                         .replace("{elo}", String.valueOf(data.getElo()))
                         .replace("{needed_elo}", String.valueOf(newbieElo));
-
             } else if (timeProtected) {
-                long remainMs   = (newbieHours * 60L * 60 * 1000) - onlineMs;
-                message = formatTimeOnly
-                        .replace("{time_left}", formatDuration(remainMs));
-
+                long remainMs = (newbieHours * 60L * 60 * 1000) - onlineMs;
+                message = formatTimeOnly.replace("{time_left}", formatDuration(remainMs));
             } else {
                 message = formatEloOnly
                         .replace("{elo}", String.valueOf(data.getElo()))

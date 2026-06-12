@@ -1,8 +1,9 @@
 package me.ihqqq.notkillrank.listener;
 
 import me.ihqqq.notkillrank.NotKillRank;
-import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
+import me.ihqqq.notkillrank.storage.PluginDataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,7 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class PlayerQuitListener implements Listener {
 
     public PlayerQuitListener() {
-        Bukkit.getPluginManager().registerEvents(this, NotKillRank.getInstance());
+        Bukkit.getPluginManager().registerEvents(this, NotKillRank.plugin);
     }
 
     @EventHandler
@@ -20,7 +21,7 @@ public class PlayerQuitListener implements Listener {
         Player player = event.getPlayer();
         String uuid = player.getUniqueId().toString();
 
-        PlayerData data = DataManager.getInstance().get(uuid);
+        PlayerData data = PluginDataManager.getPlayerDatabase(uuid);
         if (data == null) return;
 
         long sessionMs = System.currentTimeMillis() - data.getSessionStart();
@@ -29,9 +30,9 @@ public class PlayerQuitListener implements Listener {
 
         PlayerData snapshot = data.snapshot();
 
-        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.getInstance(), () -> {
-            DataManager.getInstance().getStorage().save(snapshot);
-            DataManager.getInstance().evict(uuid);
+        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+            PluginDataStorage.savePlayerData(snapshot.getUUID(), snapshot);
+            PluginDataManager.evictPlayerDatabase(uuid);
         });
     }
 }

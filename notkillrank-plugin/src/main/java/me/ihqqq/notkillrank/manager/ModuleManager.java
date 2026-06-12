@@ -1,57 +1,55 @@
 package me.ihqqq.notkillrank.manager;
 
-import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.util.MessageUtil;
-import org.bukkit.configuration.file.FileConfiguration;
 
 public class ModuleManager {
 
     private static ModuleManager instance;
 
     public enum Module {
-        ANTI_FARM("anti-farm"),
-        BOUNTY("bounty"),
-        DECAY("decay"),
-        PROTECTION("protection"),
-        STREAKS("streaks"),
-        VOSONG("vosong"),
-        PLACEHOLDERAPI("placeholderapi");
+        ANTI_FARM,
+        BOUNTY,
+        DECAY,
+        PROTECTION,
+        STREAKS,
+        VOSONG,
+        PLACEHOLDERAPI;
 
-        public final String key;
-
-        Module(String key) {
-            this.key = key;
+        public boolean isEnabled() {
+            return switch (this) {
+                case ANTI_FARM      -> Settings.MODULE_ANTI_FARM;
+                case BOUNTY         -> Settings.MODULE_BOUNTY;
+                case DECAY          -> Settings.MODULE_DECAY;
+                case PROTECTION     -> Settings.MODULE_PROTECTION;
+                case STREAKS        -> Settings.MODULE_STREAKS;
+                case VOSONG         -> Settings.MODULE_VOSONG;
+                case PLACEHOLDERAPI -> Settings.MODULE_PLACEHOLDERAPI;
+            };
         }
     }
 
-    private final boolean[] states = new boolean[Module.values().length];
-
     public ModuleManager() {
         instance = this;
-        reload();
     }
 
     public static ModuleManager getInstance() {
         return instance;
     }
 
-    public void reload() {
-        FileConfiguration cfg = NotKillRank.getInstance().getConfig();
-        for (Module m : Module.values()) {
-            boolean enabled = cfg.getBoolean("modules.enabled." + m.key, true);
-            states[m.ordinal()] = enabled;
-        }
+    public boolean isEnabled(Module module) {
+        return module.isEnabled();
+    }
+
+    public static void reload() {
+        Settings.setupValue();
         logStatus();
     }
 
-    public boolean isEnabled(Module module) {
-        return states[module.ordinal()];
-    }
-
-    private void logStatus() {
+    private static void logStatus() {
         StringBuilder sb = new StringBuilder("[ModuleManager] Trạng thái module: ");
         for (Module m : Module.values()) {
-            sb.append(m.key).append("=").append(states[m.ordinal()] ? "ON" : "OFF").append(" ");
+            sb.append(m.name().toLowerCase()).append("=").append(m.isEnabled() ? "ON" : "OFF").append(" ");
         }
         MessageUtil.log(sb.toString().trim());
     }

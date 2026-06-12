@@ -2,7 +2,7 @@ package me.ihqqq.notkillrank.storage;
 
 import java.util.List;
 
-public interface IDataStorage {
+public interface PluginStorage {
 
     PlayerData load(String uuid);
 

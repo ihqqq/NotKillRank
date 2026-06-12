@@ -1,11 +1,11 @@
 package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
-import me.ihqqq.notkillrank.config.ConfigManager;
-import me.ihqqq.notkillrank.manager.DataManager;
+import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.manager.ModuleManager;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -21,8 +21,8 @@ import java.util.List;
 public class AdminCommand implements CommandExecutor, TabCompleter {
 
     public AdminCommand() {
-        NotKillRank.getInstance().getCommand("notkillrank").setExecutor(this);
-        NotKillRank.getInstance().getCommand("notkillrank").setTabCompleter(this);
+        NotKillRank.plugin.getCommand("notkillrank").setExecutor(this);
+        NotKillRank.plugin.getCommand("notkillrank").setTabCompleter(this);
     }
 
     @Override
@@ -36,10 +36,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
 
         switch (args[0].toLowerCase()) {
             case "reload" -> {
-                NotKillRank.getInstance().reloadConfig();
-                ConfigManager.getInstance().load();
-                ModuleManager.getInstance().reload();
-                RankManager.getInstance().reload();
+                NotKillRank.reload();
                 MessageUtil.sendMessage(sender,
                         MessageUtil.getPrefix() + "<green>Cấu hình và trạng thái module đã được tải lại!");
             }
@@ -49,30 +46,29 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     MessageUtil.sendMessage(sender, "<yellow>Cách dùng: <white>/nkr reset <player>");
                     return true;
                 }
-                PlayerData data = DataManager.getInstance().getByName(args[1]);
+                PlayerData data = PluginDataManager.getPlayerDatabaseByName(args[1]);
                 if (data == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
-                int startElo = ConfigManager.getInstance().getEloConfig().getInt("start-elo", 1000);
-                data.setElo(startElo); data.setKills(0); data.setDeaths(0);
+                data.setElo(Settings.ELO_START);
+                data.setKills(0); data.setDeaths(0);
                 data.setKillStreak(0); data.setDeathStreak(0);
-                data.setHighestKillStreak(0); data.setPeakElo(startElo);
-                DataManager.getInstance().save(data.getUUID());
+                data.setHighestKillStreak(0); data.setPeakElo(Settings.ELO_START);
+                PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
                 MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                         + "<green>Đã reset dữ liệu của <yellow>" + data.getName() + "<green>!");
             }
             case "setelo" -> {
                 if (args.length < 3) {
-                    MessageUtil.sendMessage(sender,
-                            "<yellow>Cách dùng: <white>/nkr setelo <player> <elo>");
+                    MessageUtil.sendMessage(sender, "<yellow>Cách dùng: <white>/nkr setelo <player> <elo>");
                     return true;
                 }
-                PlayerData data = DataManager.getInstance().getByName(args[1]);
+                PlayerData data = PluginDataManager.getPlayerDatabaseByName(args[1]);
                 if (data == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 try {
                     int elo = Integer.parseInt(args[2]);
                     if (elo < 0) throw new NumberFormatException();
                     data.setElo(elo);
                     if (elo > data.getPeakElo()) data.setPeakElo(elo);
-                    DataManager.getInstance().save(data.getUUID());
+                    PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + "<green>Đã set elo của <yellow>" + data.getName()
                             + " <green>thành <gold>" + elo + "<green>!");
@@ -82,56 +78,52 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
             }
             case "give" -> {
                 if (args.length < 3) {
-                    MessageUtil.sendMessage(sender,
-                            "<yellow>Cách dùng: <white>/nkr give <player> <elo>");
+                    MessageUtil.sendMessage(sender, "<yellow>Cách dùng: <white>/nkr give <player> <elo>");
                     return true;
                 }
-                PlayerData giveData = DataManager.getInstance().getByName(args[1]);
-                if (giveData == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
+                PlayerData data = PluginDataManager.getPlayerDatabaseByName(args[1]);
+                if (data == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 try {
                     int amount = Integer.parseInt(args[2]);
                     if (amount <= 0) throw new NumberFormatException();
-                    int newElo = giveData.getElo() + amount;
-                    giveData.setElo(newElo);
-                    if (newElo > giveData.getPeakElo()) giveData.setPeakElo(newElo);
-                    DataManager.getInstance().save(giveData.getUUID());
+                    int newElo = data.getElo() + amount;
+                    data.setElo(newElo);
+                    if (newElo > data.getPeakElo()) data.setPeakElo(newElo);
+                    PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + "<green>Đã cộng <gold>" + amount + " elo <green>cho <yellow>"
-                            + giveData.getName() + "<green>! (Elo mới: <gold>" + newElo + "<green>)");
+                            + data.getName() + "<green>! (Elo mới: <gold>" + newElo + "<green>)");
                 } catch (NumberFormatException e) {
                     MessageUtil.sendMessage(sender, "<red>Số lượng elo không hợp lệ! Phải là số nguyên dương.");
                 }
             }
             case "take" -> {
                 if (args.length < 3) {
-                    MessageUtil.sendMessage(sender,
-                            "<yellow>Cách dùng: <white>/nkr take <player> <elo>");
+                    MessageUtil.sendMessage(sender, "<yellow>Cách dùng: <white>/nkr take <player> <elo>");
                     return true;
                 }
-                PlayerData takeData = DataManager.getInstance().getByName(args[1]);
-                if (takeData == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
+                PlayerData data = PluginDataManager.getPlayerDatabaseByName(args[1]);
+                if (data == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 try {
                     int amount = Integer.parseInt(args[2]);
                     if (amount <= 0) throw new NumberFormatException();
-                    int minElo = ConfigManager.getInstance().getEloConfig().getInt("min-elo", 0);
-                    int newElo = Math.max(minElo, takeData.getElo() - amount);
-                    int actualTaken = takeData.getElo() - newElo;
-                    takeData.setElo(newElo);
-                    DataManager.getInstance().save(takeData.getUUID());
+                    int newElo = Math.max(Settings.ELO_MIN, data.getElo() - amount);
+                    int actualTaken = data.getElo() - newElo;
+                    data.setElo(newElo);
+                    PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + "<red>Đã trừ <gold>" + actualTaken + " elo <red>của <yellow>"
-                            + takeData.getName() + "<red>! (Elo mới: <gold>" + newElo + "<red>)");
+                            + data.getName() + "<red>! (Elo mới: <gold>" + newElo + "<red>)");
                 } catch (NumberFormatException e) {
                     MessageUtil.sendMessage(sender, "<red>Số lượng elo không hợp lệ! Phải là số nguyên dương.");
                 }
             }
             case "info" -> {
                 if (args.length < 2) {
-                    MessageUtil.sendMessage(sender,
-                            "<yellow>Cách dùng: <white>/nkr info <player>");
+                    MessageUtil.sendMessage(sender, "<yellow>Cách dùng: <white>/nkr info <player>");
                     return true;
                 }
-                PlayerData data = DataManager.getInstance().getByName(args[1]);
+                PlayerData data = PluginDataManager.getPlayerDatabaseByName(args[1]);
                 if (data == null) { MessageUtil.sendMessage(sender, notFound(args[1])); return true; }
                 MessageUtil.sendMessage(sender, "<gold>--- " + data.getName() + " ---");
                 MessageUtil.sendMessage(sender, "<white>UUID: <gray>" + data.getUUID());
@@ -152,28 +144,22 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
     private void showModuleStatus(CommandSender sender) {
         MessageUtil.sendMessage(sender, "<gold>--- Trạng thái Module ---");
         for (ModuleManager.Module m : ModuleManager.Module.values()) {
-            boolean on = ModuleManager.getInstance().isEnabled(m);
+            boolean on = m.isEnabled();
             String status = on ? "<green>BẬT" : "<red>TẮT";
-            MessageUtil.sendMessage(sender, "  <white>" + m.key + ": " + status);
+            MessageUtil.sendMessage(sender, "  <white>" + m.name().toLowerCase() + ": " + status);
         }
-        MessageUtil.sendMessage(sender,
-                "<gray>Thay đổi trong <white>config.yml <gray>→ <white>/nkr reload");
+        MessageUtil.sendMessage(sender, "<gray>Thay đổi trong <white>config.yml <gray>→ <white>/nkr reload");
     }
 
     private void sendHelp(CommandSender sender) {
         MessageUtil.sendMessage(sender, "<gold>--- NotKillRank Admin ---");
         MessageUtil.sendMessage(sender, "<yellow>/nkr reload <white>— Tải lại config & module");
         MessageUtil.sendMessage(sender, "<yellow>/nkr modules <white>— Xem trạng thái các module");
-        MessageUtil.sendMessage(sender,
-                "<yellow>/nkr reset <player> <white>— Reset dữ liệu người chơi");
-        MessageUtil.sendMessage(sender,
-                "<yellow>/nkr setelo <player> <elo> <white>— Set elo chính xác");
-        MessageUtil.sendMessage(sender,
-                "<yellow>/nkr give <player> <elo> <white>— Cộng elo cho người chơi");
-        MessageUtil.sendMessage(sender,
-                "<yellow>/nkr take <player> <elo> <white>— Trừ elo của người chơi");
-        MessageUtil.sendMessage(sender,
-                "<yellow>/nkr info <player> <white>— Xem thông tin chi tiết");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr reset <player> <white>— Reset dữ liệu người chơi");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr setelo <player> <elo> <white>— Set elo chính xác");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr give <player> <elo> <white>— Cộng elo cho người chơi");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr take <player> <elo> <white>— Trừ elo của người chơi");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr info <player> <white>— Xem thông tin chi tiết");
     }
 
     private String notFound(String name) {

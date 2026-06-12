@@ -1,11 +1,11 @@
 package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.manager.BountyManager;
-import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.manager.EloManager;
-import me.ihqqq.notkillrank.manager.ModuleManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -20,8 +20,8 @@ import java.util.List;
 public class BountyCommand implements CommandExecutor, TabCompleter {
 
     public BountyCommand() {
-        NotKillRank.getInstance().getCommand("bounty").setExecutor(this);
-        NotKillRank.getInstance().getCommand("bounty").setTabCompleter(this);
+        NotKillRank.plugin.getCommand("bounty").setExecutor(this);
+        NotKillRank.plugin.getCommand("bounty").setTabCompleter(this);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class BountyCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("Chỉ có người chơi mới dùng được lệnh /bounty");
             return true;
         }
-        if (!ModuleManager.getInstance().isEnabled(ModuleManager.Module.BOUNTY)) {
+        if (!Settings.MODULE_BOUNTY) {
             MessageUtil.sendMessage(sender, "<red>Hệ thống Bounty hiện đang bị tắt!");
             return true;
         }
@@ -54,7 +54,7 @@ public class BountyCommand implements CommandExecutor, TabCompleter {
                     .replace("{player}", args[0]));
             return true;
         }
-        PlayerData targetData = DataManager.getInstance().getOrCreate(target);
+        PlayerData targetData = PluginDataManager.getOrCreate(target);
         if (EloManager.getInstance().isNewbie(targetData)) {
             MessageUtil.sendMessage(sender, MessageUtil.getMessage("bounty-target-protected",
                     "<red>Không thể đặt bounty lên người chơi đang được bảo vệ người mới!"));

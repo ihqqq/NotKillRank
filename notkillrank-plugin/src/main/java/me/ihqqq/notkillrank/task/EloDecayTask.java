@@ -1,11 +1,11 @@
 package me.ihqqq.notkillrank.task;
 
 import me.ihqqq.notkillrank.NotKillRank;
-import me.ihqqq.notkillrank.manager.DataManager;
+import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.manager.EloManager;
-import me.ihqqq.notkillrank.manager.ModuleManager;
-import me.ihqqq.notkillrank.storage.IDataStorage;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
+import me.ihqqq.notkillrank.storage.PluginDataStorage;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,15 +17,14 @@ public class EloDecayTask extends BukkitRunnable {
 
     public EloDecayTask() {
         long intervalTicks = 20L * 60 * 60 * 12;
-        runTaskTimerAsynchronously(NotKillRank.getInstance(), intervalTicks, intervalTicks);
+        runTaskTimerAsynchronously(NotKillRank.plugin, intervalTicks, intervalTicks);
     }
 
     @Override
     public void run() {
-        if (!ModuleManager.getInstance().isEnabled(ModuleManager.Module.DECAY)) return;
+        if (!Settings.MODULE_DECAY) return;
 
-        IDataStorage storage = DataManager.getInstance().getStorage();
-        List<PlayerData> allFromDisk = storage.loadAll();
+        List<PlayerData> allFromDisk = PluginDataStorage.getAllPlayerData();
         int decayed = 0;
 
         for (PlayerData diskData : allFromDisk) {
@@ -37,7 +36,7 @@ public class EloDecayTask extends BukkitRunnable {
             }
 
             if (Bukkit.getPlayer(uuid) != null) {
-                PlayerData cacheData = DataManager.getInstance().get(diskData.getUUID());
+                PlayerData cacheData = PluginDataManager.getPlayerDatabase(diskData.getUUID());
                 if (cacheData != null) {
                     int before = cacheData.getElo();
                     EloManager.getInstance().applyEloDecay(cacheData);
@@ -49,13 +48,13 @@ public class EloDecayTask extends BukkitRunnable {
             int before = diskData.getElo();
             EloManager.getInstance().applyEloDecay(diskData);
             if (diskData.getElo() < before) {
-                storage.save(diskData);
+                PluginDataStorage.savePlayerData(diskData.getUUID(), diskData);
                 decayed++;
             }
         }
 
         if (decayed > 0) {
-            MessageUtil.log("&7[EloDecay] Applied decay to " + decayed + " player(s).");
+            MessageUtil.log("[EloDecay] Applied decay to " + decayed + " player(s).");
         }
     }
 }

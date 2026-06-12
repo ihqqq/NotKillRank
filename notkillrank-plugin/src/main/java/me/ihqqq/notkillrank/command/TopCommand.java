@@ -2,9 +2,9 @@ package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.inventory.TopInventory;
-import me.ihqqq.notkillrank.manager.DataManager;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,7 +16,7 @@ import java.util.List;
 public class TopCommand implements CommandExecutor {
 
     public TopCommand() {
-        NotKillRank.getInstance().getCommand("top").setExecutor(this);
+        NotKillRank.plugin.getCommand("top").setExecutor(this);
     }
 
     @Override
@@ -34,12 +34,12 @@ public class TopCommand implements CommandExecutor {
                 "<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
                         + "<gray>{pos}. {rank} <white>{player} <dark_gray>─ <green>{elo} elo");
         String[] topLines = topMsg.split("\n", 2);
-        String header      = topLines[0];
-        String entryTpl    = topLines.length > 1 ? topLines[1] : "{pos}. {rank} {player} - {elo}";
+        String header   = topLines[0];
+        String entryTpl = topLines.length > 1 ? topLines[1] : "{pos}. {rank} {player} - {elo}";
 
         MessageUtil.sendMessage(sender, header);
 
-        List<PlayerData> top = DataManager.getInstance().getTopPlayers(10);
+        List<PlayerData> top = PluginDataManager.getTopPlayers(10);
         for (int i = 0; i < top.size(); i++) {
             PlayerData data = top.get(i);
             String rank = RankManager.getInstance().getRankTag(data.getElo());

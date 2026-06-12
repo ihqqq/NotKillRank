@@ -2,6 +2,12 @@
 # NotKillRank - Tin nhắn hệ thống
 # Tất cả đều dùng MiniMessage format
 # https://docs.advntr.dev/minimessage/format.html
+#
+# Mỗi key có thể là:
+#   - Một dòng đơn:  key: '<gray>Nội dung'
+#   - Nhiều dòng:    key:
+#                      - '<gray>Dòng 1'
+#                      - '<gray>Dòng 2'
 # ============================================================
 
 # Tiền tố hiển thị trước các thông báo của plugin
@@ -43,16 +49,18 @@ no-permission: '<red>⚠ Bạn không có quyền sử dụng lệnh này'
 player-not-found: '<red>⚠ Không tìm thấy người chơi <white>{player}'
 
 # Kết quả lệnh /elo — {player}, {elo}, {rank}
-elo-info: '<white>{player} <dark_gray>│ <gray>Elo: <green>{elo} <dark_gray>│ <gray>Hạng:
-  {rank}'
+elo-info: '<white>{player} <dark_gray>│ <gray>Elo: <green>{elo} <dark_gray>│ <gray>Hạng: {rank}'
 
-# Header và các dòng của lệnh /stats
-stats-header: '<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-stats-elo: '<gray>├ <white>Elo: <green>{elo} <dark_gray>│ <gray>Hạng: {rank}'
-stats-kd: '<gray>├ <white>K/D: <yellow>{kd} <dark_gray>│ <gray>Kill: <white>{kills} <dark_gray>│ <gray>Chết: <white>{deaths}'
-stats-streak: '<gray>├ <white>Chuỗi kill cao nhất: <red>{streak}'
-stats-peak: '<gray>└ <white>Elo đỉnh: <gold>{peak}'
+# Toàn bộ khối /stats — {player}, {elo}, {rank}, {kd}, {kills}, {deaths}, {streak}, {peak}
+stats:
+  - '<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+  - '<gray>├ <white>Elo: <green>{elo} <dark_gray>│ <gray>Hạng: {rank}'
+  - '<gray>├ <white>K/D: <yellow>{kd} <dark_gray>│ <gray>Kill: <white>{kills} <dark_gray>│ <gray>Chết: <white>{deaths}'
+  - '<gray>├ <white>Chuỗi kill cao nhất: <red>{streak}'
+  - '<gray>└ <white>Elo đỉnh: <gold>{peak}'
 
-# Header và dòng của lệnh /top (dành cho console, GUI được dùng cho player)
-top-header: '<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-top-entry: '<gray>{pos}. {rank} <white>{player} <dark_gray>─ <green>{elo} elo'
+# Khối /top dành cho console — dòng đầu là header, dòng 2 là template mỗi entry
+# Placeholders entry: {pos}, {rank}, {player}, {elo}
+top:
+  - '<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+  - '<gray>{pos}. {rank} <white>{player} <dark_gray>─ <green>{elo} elo'

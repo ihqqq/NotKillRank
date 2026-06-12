@@ -80,10 +80,19 @@ public class ConfigManager {
     public FileConfiguration getVoSongConfig() { return voSongConfig; }
 
     public String getMessage(String path) {
-        return messagesConfig.getString(path, "");
+        return resolveMessage(messagesConfig, path, "");
     }
 
     public String getMessage(String path, String def) {
-        return messagesConfig.getString(path, def);
+        return resolveMessage(messagesConfig, path, def);
+    }
+
+    private String resolveMessage(FileConfiguration config, String path, String def) {
+        if (config.isList(path)) {
+            java.util.List<String> lines = config.getStringList(path);
+            if (lines.isEmpty()) return def;
+            return String.join("\n", lines);
+        }
+        return config.getString(path, def);
     }
 }

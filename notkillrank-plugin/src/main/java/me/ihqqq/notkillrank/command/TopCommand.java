@@ -30,19 +30,24 @@ public class TopCommand implements CommandExecutor {
     }
 
     private void showTopText(CommandSender sender) {
-        MessageUtil.sendMessage(sender, MessageUtil.getMessage("top-header",
-                "<dark_gray><strikethrough>          </strikethrough> <gold>Top 10 Bảng Xếp Hạng <dark_gray><strikethrough>          </strikethrough>"));
+        String topMsg = MessageUtil.getMessage("top",
+                "<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                        + "<gray>{pos}. {rank} <white>{player} <dark_gray>─ <green>{elo} elo");
+        String[] topLines = topMsg.split("\n", 2);
+        String header      = topLines[0];
+        String entryTpl    = topLines.length > 1 ? topLines[1] : "{pos}. {rank} {player} - {elo}";
+
+        MessageUtil.sendMessage(sender, header);
 
         List<PlayerData> top = DataManager.getInstance().getTopPlayers(10);
         for (int i = 0; i < top.size(); i++) {
             PlayerData data = top.get(i);
             String rank = RankManager.getInstance().getRankTag(data.getElo());
-            String line = MessageUtil.getMessage("top-entry",
-                            "<gray>{pos}. {rank} <white>{player} <dark_gray>— <green>Elo: {elo}")
-                    .replace("{pos}", String.valueOf(i + 1))
-                    .replace("{rank}", rank)
+            String line = entryTpl
+                    .replace("{pos}",    String.valueOf(i + 1))
+                    .replace("{rank}",   rank)
                     .replace("{player}", data.getName())
-                    .replace("{elo}", String.valueOf(data.getElo()));
+                    .replace("{elo}",    String.valueOf(data.getElo()));
             MessageUtil.sendMessage(sender, line);
         }
     }

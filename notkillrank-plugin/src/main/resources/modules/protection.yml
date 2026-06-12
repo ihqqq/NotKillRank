@@ -22,10 +22,14 @@ newbie-protect-elo: 100
 # ────────────────────────────────────────────────
 actionbar:
   # Hiển thị khi đang bị bảo vệ bởi CẢ HAI điều kiện (thời gian VÀ elo)
-  format-both: "<green>⛉ Bảo vệ người mới <dark_gray>| <white>Thời gian: <aqua>{time_left} <dark_gray>| <white>Elo: <yellow>{elo}<white>/<gold>{needed_elo}"
+  format-both: '<white><sprite:"minecraft:items":item/netherite_chestplate> <green>Bảo
+    vệ người mới <dark_gray>| <white>Thời gian: <aqua>{time_left} <dark_gray>| <white>Elo:
+    <yellow>{elo}<white>/<gold>{needed_elo}'
 
   # Hiển thị khi chỉ còn bảo vệ bởi thời gian (elo đã đủ)
-  format-time-only: "<green>⛉ Bảo vệ người mới <dark_gray>| <white>Còn: <aqua>{time_left}"
+  format-time-only: '<white><sprite:"minecraft:items":item/netherite_chestplate> <green>Bảo
+    vệ người mới <dark_gray>| <white>Còn: <aqua>{time_left}'
 
   # Hiển thị khi chỉ còn bảo vệ bởi elo (đã online đủ giờ)
-  format-elo-only: "<green>⛉ Bảo vệ người mới <dark_gray>| <white>Elo: <yellow>{elo}<white>/<gold>{needed_elo}"
+  format-elo-only: '<white><sprite:"minecraft:items":item/netherite_chestplate> <green>Bảo
+    vệ người mới <dark_gray>| <white>Elo: <yellow>{elo}<white>/<gold>{needed_elo}'

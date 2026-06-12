@@ -45,31 +45,25 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
         String streakTag = RankManager.getInstance().getStreakTag(data);
         String streakPart = streakTag.isEmpty() ? "" : " " + streakTag;
 
-        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-header",
-                        "<dark_gray><strikethrough>          </strikethrough> <gold>Thống kê của {player} <dark_gray><strikethrough>          </strikethrough>")
-                .replace("{player}", data.getName()));
-
-        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-elo",
-                        "<white>Elo: <green>{elo} <white>| Hạng: {rank}")
-                .replace("{elo}", String.valueOf(data.getElo()))
-                .replace("{rank}", rank + streakPart));
-
         String kd = data.getDeaths() == 0
                 ? String.valueOf(data.getKills())
                 : String.format("%.2f", (double) data.getKills() / data.getDeaths());
-        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-kd",
-                        "<white>K/D: <yellow>{kd} <gray>({kills} kill / {deaths} death)")
+
+        String statsMsg = MessageUtil.getMessage("stats",
+                        "<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                                + "<white>Elo: <green>{elo} | Hạng: {rank}\n"
+                                + "<white>K/D: <yellow>{kd} ({kills}/{deaths})\n"
+                                + "<white>Streak cao nhất: <red>{streak}\n"
+                                + "<white>Elo đỉnh: <gold>{peak}")
+                .replace("{elo}", String.valueOf(data.getElo()))
+                .replace("{rank}", rank + streakPart)
                 .replace("{kd}", kd)
                 .replace("{kills}", String.valueOf(data.getKills()))
-                .replace("{deaths}", String.valueOf(data.getDeaths())));
+                .replace("{deaths}", String.valueOf(data.getDeaths()))
+                .replace("{streak}", String.valueOf(data.getHighestKillStreak()))
+                .replace("{peak}", String.valueOf(data.getPeakElo()));
 
-        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-streak",
-                        "<white>Chuỗi kill cao nhất: <red>{streak}")
-                .replace("{streak}", String.valueOf(data.getHighestKillStreak())));
-
-        MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-peak",
-                        "<white>Elo đỉnh mùa: <gold>{peak}")
-                .replace("{peak}", String.valueOf(data.getPeakElo())));
+        MessageUtil.sendMessage(sender, statsMsg);
 
         int totalBounty = data.getBounties().values().stream().mapToInt(Integer::intValue).sum();
         if (totalBounty > 0) {

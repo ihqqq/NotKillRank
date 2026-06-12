@@ -20,7 +20,7 @@
 # ─────────────────────────────────────────────────────────
 
 # Tên giao diện
-name: "<gold><bold>Top 10 — NotKillRank"
+name: <white><sprite:"minecraft:items":item/copper_sword> <dark_gray>ᴛᴏᴘ ᴇʟᴏ
 
 # Số hàng của giao diện (tối đa 6)
 rows: 6
@@ -30,18 +30,18 @@ rows: 6
 background:
   icon:
     type: GRAY_STAINED_GLASS_PANE
-    # Uncomment để dùng custom head texture thay cho glass pane:
-    #type: CUSTOM_HEAD
-    #texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTNlYjYzNDNhOGVmNWFlZTdmZjA2YmM2Nzg1MmE2ZTZjYjJiN2UxYzI4MDIwYjkzZTdkMjdjMDRiZjBjYjU3MyJ9fX0="
-    #với button fill, số hàng phải bằng số hàng của giao diện (rows), số cột phải là 9
-    #các vị trí đánh dấu bằng 'x' sẽ được fill
+# Uncomment để dùng custom head texture thay cho glass pane:
+#type: CUSTOM_HEAD
+#texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTNlYjYzNDNhOGVmNWFlZTdmZjA2YmM2Nzg1MmE2ZTZjYjJiN2UxYzI4MDIwYjkzZTdkMjdjMDRiZjBjYjU3MyJ9fX0="
+#với button fill, số hàng phải bằng số hàng của giao diện (rows), số cột phải là 9
+#các vị trí đánh dấu bằng 'x' sẽ được fill
 fill:
-  - 'xxxxxxxxx'
-  - 'x       x'
-  - 'x       x'
-  - 'x       x'
-  - 'x       x'
-  - 'xxxxxxxxx'
+  - xxxxxxxxx
+  - x       x
+  - x       x
+  - x       x
+  - x       x
+  - xxxxxxxxx
 
 # Vị trí slot cho top 1 → top 10 (theo thứ tự hạng, index từ 0)
 player-slots:
@@ -59,21 +59,24 @@ player-slots:
 # Hiển thị đầu người chơi trong bảng xếp hạng
 # Placeholder: {medal}, {player}, {rank}, {elo}, {kills}, {deaths}, {kd}, {highest_streak}, {peak_elo}, {bounty}
 player-head:
-  name: "{medal} <white>{player}"
+  name: '{medal} <white>{player}'
   lore:
-    - "<gray>Hạng: {rank}"
-    - "<gray>Elo: <green>{elo}"
-    - "<gray>Kill/Death: <yellow>{kills}<gray>/<red>{deaths}"
-    - "<gray>Kill streak cao nhất: <red>{highest_streak}"
-    - "<gray>Peak elo: <gold>{peak_elo}"
+    - ''
+    - ' <white><sprite:"minecraft:items":item/totem_of_undying> <gray>Hạng: {rank}'
+    - ' <white><sprite:"minecraft:items":item/amethyst_shard> <gray>Elo: <green>{elo}'
+    - ' <white><sprite:"minecraft:items":item/diamond_sword> <gray>Kill/Death: <yellow>{kills}<gray>/<red>{deaths}'
+    - ' <white><sprite:"minecraft:items":item/creeper_banner_pattern> <gray>Kill streak
+    cao nhất: <red>{highest_streak}'
+    - ' <white><sprite:"minecraft:items":item/lime_candle> <gray>Peak elo: <gold>{peak_elo}'
+    - ''
   # Dòng lore bổ sung hiển thị khi người chơi có bounty
   bounty-lore:
-    - ""
-    - "<gold>Bounty: <red>{bounty} elo"
+    - ''
+    - '<gold>Bounty: <red>{bounty} elo'
 
 # Huy hiệu cho từng vị trí xếp hạng (MiniMessage)
 medals:
-  "1": "<gold><bold>#1"
-  "2": "<gray><bold>#2"
-  "3": "<red><bold>#3"
-  default: "<dark_gray>#{pos}"
+  '1': <dark_gray>[<gold>#1<dark_gray>]
+  '2': <dark_gray>[<blue>#2<dark_gray>]
+  '3': <dark_gray>[<red>#3<dark_gray>]
+  default: <dark_gray>[<gray>#{pos}<dark_gray>]

@@ -32,17 +32,23 @@ public class MessageUtil {
 
     public static void sendMessage(Player player, String message) {
         if (player == null || message == null) return;
-        player.sendMessage(parse(message));
+        for (String line : message.split("\n", -1)) {
+            player.sendMessage(parse(line));
+        }
     }
 
     public static void sendMessage(CommandSender sender, String message) {
         if (sender == null || message == null) return;
-        sender.sendMessage(parse(message));
+        for (String line : message.split("\n", -1)) {
+            sender.sendMessage(parse(line));
+        }
     }
 
     public static void sendBroadcast(String message) {
         if (message == null || message.isEmpty()) return;
-        Bukkit.broadcast(parse(message));
+        for (String line : message.split("\n", -1)) {
+            Bukkit.broadcast(parse(line));
+        }
     }
 
     public static String stripTags(String text) {

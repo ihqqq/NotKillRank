@@ -68,9 +68,11 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 try {
                     int elo = Integer.parseInt(args[2]);
                     if (elo < 0) throw new NumberFormatException();
+                    int oldElo = data.getElo();
                     data.setElo(elo);
                     if (elo > data.getPeakElo()) data.setPeakElo(elo);
                     saveAsync(data.getUUID());
+                    triggerRankUpIfOnline(data, oldElo, elo);
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + "<green>Đã set elo của <yellow>" + data.getName()
                             + " <green>thành <gold>" + elo + "<green>!");
@@ -88,10 +90,12 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 try {
                     int amount = Integer.parseInt(args[2]);
                     if (amount <= 0) throw new NumberFormatException();
-                    int newElo = (int) Math.min((long) data.getElo() + amount, Integer.MAX_VALUE);
+                    int oldElo = data.getElo();
+                    int newElo = (int) Math.min((long) oldElo + amount, Integer.MAX_VALUE);
                     data.setElo(newElo);
                     if (newElo > data.getPeakElo()) data.setPeakElo(newElo);
                     saveAsync(data.getUUID());
+                    triggerRankUpIfOnline(data, oldElo, newElo);
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + "<green>Đã cộng <gold>" + amount + " elo <green>cho <yellow>"
                             + data.getName() + "<green>! (Elo mới: <gold>" + newElo + "<green>)");
@@ -167,6 +171,12 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
     private void saveAsync(String uuid) {
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin,
                 () -> PluginDataManager.savePlayerDatabaseToStorage(uuid));
+    }
+
+    private void triggerRankUpIfOnline(PlayerData data, int oldElo, int newElo) {
+        Player target = Bukkit.getPlayer(java.util.UUID.fromString(data.getUUID()));
+        if (target == null || !target.isOnline()) return;
+        RankManager.getInstance().checkRankUp(target, data, oldElo, newElo);
     }
 
     private String notFound(String name) {

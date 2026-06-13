@@ -84,12 +84,15 @@ public class EloManager {
                     breakdown.eloGained);
         }
 
-        int newKillerElo = killerData.getElo() + breakdown.eloGained;
+        int oldKillerElo = killerData.getElo();
+        int newKillerElo = oldKillerElo + breakdown.eloGained;
         int newVictimElo = Math.max(Settings.ELO_MIN, victimData.getElo() - breakdown.totalVictimLoss);
 
         killerData.setElo(newKillerElo);
         if (newKillerElo > killerData.getPeakElo()) killerData.setPeakElo(newKillerElo);
         victimData.setElo(newVictimElo);
+
+        RankManager.getInstance().checkRankUp(killer, killerData, oldKillerElo, newKillerElo);
 
         killerData.setKills(killerData.getKills() + 1);
         killerData.setKillStreak(killerData.getKillStreak() + 1);

@@ -2,30 +2,104 @@
 # NotKillRank - Module: Bảng Hạng
 # Điểm mốc và tag đều có thể tùy chỉnh
 # tag: dùng MiniMessage format
+#
+# Placeholders thông báo lên hạng:
+#   {player}    - tên người chơi
+#   {rank}      - tag hạng mới (vd: [Sát thủ])
+#   {old_rank}  - tag hạng cũ
+#   {elo}       - elo hiện tại
 # ============================================================
 
+# -------------------------------------------------------
+# Cài đặt mặc định cho thông báo lên hạng
+# (Áp dụng cho tất cả hạng trừ khi override riêng)
+# -------------------------------------------------------
+rankup-defaults:
+  # --- Chat message gửi cho người chơi ---
+  message-enabled: true
+  message-text: "<gold>✦ <white>Chúc mừng <yellow>{player}<white>! Bạn vừa lên hạng {rank}<white>!"
+
+  # --- Actionbar hiển thị trên màn hình ---
+  actionbar-enabled: true
+  actionbar-text: "<gold><bold>✦ LÊN HẠNG: <reset>{rank} <gold><bold>✦"
+
+  # --- Title hiển thị giữa màn hình ---
+  title-enabled: true
+  title-text: "<gold><bold>LÊN HẠNG!"
+  subtitle-text: "<white>Hạng mới: {rank}"
+  title-fade-in-ms: 500
+  title-stay-ms: 3000
+  title-fade-out-ms: 1000
+
+  # --- Broadcast toàn server ---
+  broadcast-enabled: false
+  broadcast-text: "<gold>✦ <yellow>{player} <white>vừa đạt hạng {rank}<white>!"
+
+  # --- Âm thanh phát cho người chơi khi lên hạng ---
+  sound-enabled: true
+  sound-name: ENTITY_PLAYER_LEVELUP
+  sound-volume: 1.0
+  sound-pitch: 1.0
+
+# -------------------------------------------------------
+# Danh sách hạng
+# rankup.sound-name: tên Sound Bukkit (viết hoa, dùng dấu _)
+#   Xem danh sách: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+# -------------------------------------------------------
 ranks:
   - min: 0
     max: 999
     tag: "<gray>[Óc]"
+    # Hạng thấp nhất — không có thông báo lên hạng
+
   - min: 1000
     max: 1999
     tag: "<yellow>[Gà]"
+    rankup:
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.0
+
   - min: 2000
     max: 3999
     tag: "<green>[Non]"
+    rankup:
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.1
+
   - min: 4000
     max: 5999
     tag: "<aqua>[Biết chút]"
+    rankup:
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.2
+
   - min: 6000
     max: 9999
     tag: "<dark_aqua>[Đáng nể]"
+    rankup:
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.3
+
   - min: 10000
     max: 19999
     tag: "<red>[Sát thủ]"
+    rankup:
+      sound-name: UI_TOAST_CHALLENGE_COMPLETE
+      sound-volume: 1.0
+      sound-pitch: 1.0
+
   - min: 20000
     max: 49999
     tag: "<dark_red>[Ác thần]"
+    rankup:
+      sound-name: UI_TOAST_CHALLENGE_COMPLETE
+      sound-volume: 1.0
+      sound-pitch: 0.9
+
   - min: 50000
     max: 999999999
     tag: "<light_purple>[Huyền thoại]"
+    rankup:
+      sound-name: UI_TOAST_CHALLENGE_COMPLETE
+      sound-volume: 1.0
+      sound-pitch: 0.8

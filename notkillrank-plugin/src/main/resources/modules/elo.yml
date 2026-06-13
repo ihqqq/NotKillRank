@@ -1,10 +1,10 @@
 # NotKillRank - Module: Hệ thống ELO
 
 # Elo khởi đầu khi người chơi lần đầu vào server
-start-elo: 1000
+start-elo: 500
 
 # Elo tối thiểu — người chơi không thể rớt xuống dưới mức này
-min-elo: 0
+min-elo: 100
 
 # Phần trăm elo của nạn nhân mà người giết nhận được
 # Ví dụ: 10 → giết người có 500 elo → nhận 50 elo

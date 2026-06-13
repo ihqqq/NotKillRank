@@ -37,7 +37,7 @@ rankup-defaults:
 # Thứ tự từ thấp lên cao: Unranked → LT4 → LT3 → LT2 → LT1 → HT4 → HT3 → HT2 → HT1
 ranks:
 
-  - min: 0
+  - min: 100
     max: 999
     tag: "<dark_gray>[Unranked]"
 

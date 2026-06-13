@@ -73,18 +73,16 @@ public class BountyManager {
         return getTotalBounty(data) > 0;
     }
 
-    public void claimBounties(Player claimer, PlayerData targetData) {
+    public void claimBounties(Player claimer, PlayerData killerData, PlayerData targetData) {
         int total = getTotalBounty(targetData);
         if (total <= 0) return;
 
-        PlayerData claimerData = PluginDataManager.getOrCreate(claimer);
-        claimerData.setElo(claimerData.getElo() + total);
-        if (claimerData.getElo() > claimerData.getPeakElo()) {
-            claimerData.setPeakElo(claimerData.getElo());
+        killerData.setElo(killerData.getElo() + total);
+        if (killerData.getElo() > killerData.getPeakElo()) {
+            killerData.setPeakElo(killerData.getElo());
         }
 
         targetData.getBounties().clear();
-        PluginDataManager.savePlayerDatabaseToStorage(claimer.getUniqueId().toString());
 
         String msg = MessageUtil.getMessage("bounty-claimed",
                         "<gold>[Bounty] <white>{claimer} <white>đã nhận thưởng <green>{amount} elo "

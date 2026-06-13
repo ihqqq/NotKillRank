@@ -52,6 +52,8 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 data.setKills(0); data.setDeaths(0);
                 data.setKillStreak(0); data.setDeathStreak(0);
                 data.setHighestKillStreak(0); data.setPeakElo(Settings.ELO_START);
+                data.getKillLog().clear();
+                data.getBounties().clear();
                 PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
                 MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                         + "<green>Đã reset dữ liệu của <yellow>" + data.getName() + "<green>!");
@@ -155,7 +157,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         MessageUtil.sendMessage(sender, "<gold>--- NotKillRank Admin ---");
         MessageUtil.sendMessage(sender, "<yellow>/nkr reload <white>— Tải lại config & module");
         MessageUtil.sendMessage(sender, "<yellow>/nkr modules <white>— Xem trạng thái các module");
-        MessageUtil.sendMessage(sender, "<yellow>/nkr reset <player> <white>— Reset dữ liệu người chơi");
+        MessageUtil.sendMessage(sender, "<yellow>/nkr reset <player> <white>— Reset toàn bộ dữ liệu người chơi");
         MessageUtil.sendMessage(sender, "<yellow>/nkr setelo <player> <elo> <white>— Set elo chính xác");
         MessageUtil.sendMessage(sender, "<yellow>/nkr give <player> <elo> <white>— Cộng elo cho người chơi");
         MessageUtil.sendMessage(sender, "<yellow>/nkr take <player> <elo> <white>— Trừ elo của người chơi");

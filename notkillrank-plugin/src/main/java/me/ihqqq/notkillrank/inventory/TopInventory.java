@@ -30,6 +30,8 @@ public class TopInventory implements NotKillRankInventoryBase {
     private static final Map<String, CachedProfile> skinCache = new ConcurrentHashMap<>();
     private static final long CACHE_TTL_MS = 5 * 60 * 1000L;
 
+    private static volatile String cachedInventoryTitlePlain = null;
+
     private record CachedProfile(PlayerProfile profile, long fetchedAt) {
         boolean isExpired() {
             return System.currentTimeMillis() - fetchedAt > CACHE_TTL_MS;
@@ -38,6 +40,10 @@ public class TopInventory implements NotKillRankInventoryBase {
 
     public TopInventory() {
         Bukkit.getPluginManager().registerEvents(this, NotKillRank.plugin);
+    }
+
+    public static void invalidateTitleCache() {
+        cachedInventoryTitlePlain = null;
     }
 
     public static void open(Player player) {
@@ -85,6 +91,8 @@ public class TopInventory implements NotKillRankInventoryBase {
                 Component titleComponent = MessageUtil.parse(titleMM);
                 int rows = Math.max(1, Math.min(6, gui.getInt("rows", 6)));
                 int size = rows * 9;
+
+                cachedInventoryTitlePlain = MessageUtil.stripTags(titleMM);
 
                 Inventory inv = Bukkit.createInventory(null, size, titleComponent);
                 fillBackground(inv, gui, rows);
@@ -207,9 +215,13 @@ public class TopInventory implements NotKillRankInventoryBase {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        FileConfiguration gui = TopGuiFile.get();
-        String titleMM = gui.getString("name", "<gold><bold>Top 10 — NotKillRank");
-        String titlePlain = MessageUtil.stripTags(titleMM);
+        String titlePlain = cachedInventoryTitlePlain;
+        if (titlePlain == null) {
+            FileConfiguration gui = TopGuiFile.get();
+            String titleMM = gui.getString("name", "<gold><bold>Top 10 — NotKillRank");
+            titlePlain = MessageUtil.stripTags(titleMM);
+            cachedInventoryTitlePlain = titlePlain;
+        }
         String viewPlain = PlainTextComponentSerializer.plainText()
                 .serialize(event.getView().title());
         if (viewPlain.equals(titlePlain)) {

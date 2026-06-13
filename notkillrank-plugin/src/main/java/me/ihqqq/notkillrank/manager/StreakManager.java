@@ -10,12 +10,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
-import java.util.Set;
 import java.util.TreeSet;
 
 public class StreakManager {
 
     private static StreakManager instance;
+
+    private TreeSet<Integer> cachedMilestones = null;
 
     public StreakManager() {
         instance = this;
@@ -25,8 +26,12 @@ public class StreakManager {
         return instance;
     }
 
+    public void invalidateMilestoneCache() {
+        cachedMilestones = null;
+    }
+
     public int getStreakBonusPercent(int streak) {
-        Set<Integer> milestones = getMilestones();
+        TreeSet<Integer> milestones = getMilestones();
         int bestBonus = 0;
         FileConfiguration cfg = StreaksFile.get();
         for (int m : milestones) {
@@ -40,7 +45,7 @@ public class StreakManager {
 
     public void checkMilestone(Player killer, PlayerData killerData) {
         int streak = killerData.getKillStreak();
-        Set<Integer> milestones = getMilestones();
+        TreeSet<Integer> milestones = getMilestones();
         FileConfiguration cfg = StreaksFile.get();
 
         for (int m : milestones) {
@@ -108,6 +113,7 @@ public class StreakManager {
     }
 
     public TreeSet<Integer> getMilestones() {
+        if (cachedMilestones != null) return cachedMilestones;
         TreeSet<Integer> milestones = new TreeSet<>();
         var section = StreaksFile.get().getConfigurationSection("kill-streaks");
         if (section != null) {
@@ -116,6 +122,7 @@ public class StreakManager {
                 catch (NumberFormatException ignored) {}
             }
         }
+        cachedMilestones = milestones;
         return milestones;
     }
 }

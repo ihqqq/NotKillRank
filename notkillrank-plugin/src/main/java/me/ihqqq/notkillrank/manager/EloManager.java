@@ -1,11 +1,13 @@
 package me.ihqqq.notkillrank.manager;
 
+import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.file.module.EloFile;
 import me.ihqqq.notkillrank.file.module.StreaksFile;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -45,8 +47,12 @@ public class EloManager {
                     .replace("{victim}", victim.getName());
             MessageUtil.sendBroadcast(msg);
 
-            PluginDataManager.savePlayerDatabaseToStorage(killer.getUniqueId().toString());
-            PluginDataManager.savePlayerDatabaseToStorage(victim.getUniqueId().toString());
+            final String killerUuid = killer.getUniqueId().toString();
+            final String victimUuid = victim.getUniqueId().toString();
+            Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+                PluginDataManager.savePlayerDatabaseToStorage(killerUuid);
+                PluginDataManager.savePlayerDatabaseToStorage(victimUuid);
+            });
             return;
         }
 
@@ -60,8 +66,13 @@ public class EloManager {
 
             killerData.setKills(killerData.getKills() + 1);
             victimData.setDeaths(victimData.getDeaths() + 1);
-            PluginDataManager.savePlayerDatabaseToStorage(killer.getUniqueId().toString());
-            PluginDataManager.savePlayerDatabaseToStorage(victim.getUniqueId().toString());
+
+            final String killerUuid = killer.getUniqueId().toString();
+            final String victimUuid = victim.getUniqueId().toString();
+            Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+                PluginDataManager.savePlayerDatabaseToStorage(killerUuid);
+                PluginDataManager.savePlayerDatabaseToStorage(victimUuid);
+            });
             return;
         }
 
@@ -99,7 +110,7 @@ public class EloManager {
         if (streakModuleEnabled) StreakManager.getInstance().checkMilestone(killer, killerData);
 
         if (Settings.MODULE_BOUNTY && BountyManager.getInstance().hasBounty(victimData)) {
-            BountyManager.getInstance().claimBounties(killer, victimData);
+            BountyManager.getInstance().claimBounties(killer, killerData, victimData);
         }
 
         PluginDataManager.invalidateTopCache();
@@ -121,8 +132,12 @@ public class EloManager {
             MessageUtil.sendBroadcast(weakMsg);
         }
 
-        PluginDataManager.savePlayerDatabaseToStorage(killer.getUniqueId().toString());
-        PluginDataManager.savePlayerDatabaseToStorage(victim.getUniqueId().toString());
+        final String killerUuid = killer.getUniqueId().toString();
+        final String victimUuid = victim.getUniqueId().toString();
+        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+            PluginDataManager.savePlayerDatabaseToStorage(killerUuid);
+            PluginDataManager.savePlayerDatabaseToStorage(victimUuid);
+        });
     }
 
     public KillEloBreakdown calculateBreakdown(Player killer, PlayerData killerData,
@@ -205,7 +220,10 @@ public class EloManager {
             double totalDecayPct = Math.min(decayDays * Settings.DECAY_DAILY_PERCENT, Settings.DECAY_MAX_PERCENT) / 100.0;
             int lostElo = (int) Math.round(data.getElo() * totalDecayPct);
             int newElo = Math.max(Settings.ELO_MIN, data.getElo() - lostElo);
-            if (lostElo > 0) data.setElo(newElo);
+            if (lostElo > 0) {
+                data.setElo(newElo);
+                data.setLastOnline(System.currentTimeMillis());
+            }
         }
     }
 

@@ -1,13 +1,10 @@
 package me.ihqqq.notkillrank.file.module;
 
-import com.tchristofferson.configupdater.ConfigUpdater;
 import me.ihqqq.notkillrank.NotKillRank;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
 
 public class TopGuiFile {
 
@@ -26,11 +23,6 @@ public class TopGuiFile {
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             NotKillRank.plugin.saveResource(name, false);
-        }
-        try {
-            ConfigUpdater.update(NotKillRank.plugin, name, file, Collections.emptyList());
-        } catch (IOException e) {
-            NotKillRank.plugin.getLogger().warning("[TopGuiFile] Không thể cập nhật " + name + ": " + e.getMessage());
         }
         return YamlConfiguration.loadConfiguration(file);
     }

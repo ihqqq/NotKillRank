@@ -30,9 +30,9 @@ public class PlayerQuitListener implements Listener {
 
         PlayerData snapshot = data.snapshot();
 
-        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
-            PluginDataStorage.savePlayerData(snapshot.getUUID(), snapshot);
-            PluginDataManager.evictPlayerDatabase(uuid);
-        });
+        PluginDataManager.evictPlayerDatabase(uuid);
+
+        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () ->
+                PluginDataStorage.savePlayerData(snapshot.getUUID(), snapshot));
     }
 }

@@ -6,13 +6,14 @@ import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PluginDataManager {
 
-    public static HashMap<String, PlayerData> playerDatabase = new HashMap<>();
+    public static final ConcurrentHashMap<String, PlayerData> playerDatabase = new ConcurrentHashMap<>();
 
-    private static List<PlayerData> cachedTop = null;
-    private static long topCacheBuiltAt = 0;
+    private static volatile List<PlayerData> cachedTop = null;
+    private static volatile long topCacheBuiltAt = 0;
     private static final long TOP_CACHE_TTL_MS = 30_000L;
 
     public static void loadAllDatabase() {
@@ -20,36 +21,38 @@ public class PluginDataManager {
     }
 
     public static void saveAllDatabase() {
-        for (PlayerData data : playerDatabase.values()) {
+        List<PlayerData> snapshot = new ArrayList<>(playerDatabase.values());
+        for (PlayerData data : snapshot) {
             PluginDataStorage.savePlayerData(data.getUUID(), data);
         }
-        MessageUtil.log("&a[PluginDataManager] Đã lưu " + playerDatabase.size() + " hồ sơ người chơi.");
+        MessageUtil.log("&a[PluginDataManager] Đã lưu " + snapshot.size() + " hồ sơ người chơi.");
     }
 
     public static PlayerData getOrCreate(Player player) {
         String uuid = player.getUniqueId().toString();
-        if (playerDatabase.containsKey(uuid)) {
-            PlayerData data = playerDatabase.get(uuid);
-            data.setName(player.getName());
-            return data;
+        PlayerData existing = playerDatabase.get(uuid);
+        if (existing != null) {
+            existing.setName(player.getName());
+            return existing;
         }
         PlayerData loaded = PluginDataStorage.getPlayerData(uuid);
         if (loaded != null) {
             loaded.setName(player.getName());
-            playerDatabase.put(uuid, loaded);
-            return loaded;
+            PlayerData prev = playerDatabase.putIfAbsent(uuid, loaded);
+            return prev != null ? prev : loaded;
         }
         PlayerData fresh = new PlayerData(uuid, player.getName(), Settings.ELO_START);
-        playerDatabase.put(uuid, fresh);
-        return fresh;
+        PlayerData prev = playerDatabase.putIfAbsent(uuid, fresh);
+        return prev != null ? prev : fresh;
     }
 
     public static PlayerData getPlayerDatabase(String uuid) {
-        if (playerDatabase.containsKey(uuid)) return playerDatabase.get(uuid);
+        PlayerData cached = playerDatabase.get(uuid);
+        if (cached != null) return cached;
         PlayerData loaded = PluginDataStorage.getPlayerData(uuid);
         if (loaded != null) {
-            playerDatabase.put(uuid, loaded);
-            return loaded;
+            playerDatabase.putIfAbsent(uuid, loaded);
+            return playerDatabase.get(uuid);
         }
         return null;
     }
@@ -60,8 +63,8 @@ public class PluginDataManager {
         }
         PlayerData loaded = PluginDataStorage.getPlayerDataByName(name);
         if (loaded != null) {
-            playerDatabase.put(loaded.getUUID(), loaded);
-            return loaded;
+            playerDatabase.putIfAbsent(loaded.getUUID(), loaded);
+            return playerDatabase.get(loaded.getUUID());
         }
         return null;
     }
@@ -95,12 +98,13 @@ public class PluginDataManager {
             for (PlayerData d : allFromDisk) {
                 playerDatabase.putIfAbsent(d.getUUID(), d);
             }
-            cachedTop = new ArrayList<>(playerDatabase.values());
+            List<PlayerData> sorted = new ArrayList<>(playerDatabase.values());
+            sorted.sort((a, b) -> b.getElo() - a.getElo());
+            cachedTop = sorted;
             topCacheBuiltAt = now;
         }
-        List<PlayerData> sorted = new ArrayList<>(playerDatabase.values());
-        sorted.sort((a, b) -> b.getElo() - a.getElo());
-        return sorted.subList(0, Math.min(limit, sorted.size()));
+        List<PlayerData> result = cachedTop;
+        return new ArrayList<>(result.subList(0, Math.min(limit, result.size())));
     }
 
     public static void invalidateTopCache() {

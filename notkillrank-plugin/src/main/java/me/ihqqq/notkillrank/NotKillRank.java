@@ -82,6 +82,9 @@ public final class NotKillRank extends JavaPlugin {
         Messages.setupValue();
         ModuleManager.reload();
         RankManager.reload();
+        if (StreakManager.getInstance() != null) StreakManager.getInstance().invalidateMilestoneCache();
+        TopInventory.invalidateTitleCache();
+        PluginDataManager.invalidateTopCache();
         MessageUtil.log("NotKillRank config reloaded.");
     }
 

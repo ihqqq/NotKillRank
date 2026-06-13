@@ -14,7 +14,8 @@ public class ModuleManager {
         PROTECTION,
         STREAKS,
         VOSONG,
-        PLACEHOLDERAPI;
+        PLACEHOLDERAPI,
+        WEBHOOK;
 
         public boolean isEnabled() {
             return switch (this) {
@@ -25,6 +26,7 @@ public class ModuleManager {
                 case STREAKS        -> Settings.MODULE_STREAKS;
                 case VOSONG         -> Settings.MODULE_VOSONG;
                 case PLACEHOLDERAPI -> Settings.MODULE_PLACEHOLDERAPI;
+                case WEBHOOK        -> Settings.MODULE_WEBHOOK;
             };
         }
     }

@@ -2,9 +2,9 @@ package me.ihqqq.notkillrank;
 
 import com.tchristofferson.configupdater.ConfigUpdater;
 import me.ihqqq.notkillrank.command.*;
-import me.ihqqq.notkillrank.file.module.MessagesFile;
-import me.ihqqq.notkillrank.file.module.TopGuiFile;
 import me.ihqqq.notkillrank.file.module.*;
+import me.ihqqq.notkillrank.webhook.SkinUtil;
+import me.ihqqq.notkillrank.webhook.WebhookManager;
 import me.ihqqq.notkillrank.inventory.TopInventory;
 import me.ihqqq.notkillrank.language.Messages;
 import me.ihqqq.notkillrank.listener.CombatListener;
@@ -55,6 +55,8 @@ public final class NotKillRank extends JavaPlugin {
         new RankManager();
         new StreakManager();
         new BountyManager();
+        new WebhookManager();
+        SkinUtil.init();
 
         registerListeners();
         registerCommands();
@@ -115,7 +117,7 @@ public final class NotKillRank extends JavaPlugin {
 
         for (ModuleManager.Module m : ModuleManager.Module.values()) {
             String label  = formatModuleName(m.name());
-            String status = m.isEnabled() ? "&a BẬT" : "& TẮT";
+            String status = m.isEnabled() ? "&a BẬT" : "&c TẮT";
             MessageUtil.log("&r     &7" + label + " &8— " + status);
         }
 
@@ -158,6 +160,7 @@ public final class NotKillRank extends JavaPlugin {
             case "STREAKS"      -> "Kill Streaks   ";
             case "VOSONG"       -> "Vô Song        ";
             case "PLACEHOLDERAPI" -> "PlaceholderAPI ";
+            case "WEBHOOK"      -> "Webhook        ";
             default             -> enumName;
         };
     }
@@ -173,6 +176,7 @@ public final class NotKillRank extends JavaPlugin {
         RanksFile.init();
         StreaksFile.init();
         VoSongFile.init();
+        WebhookFile.init();
     }
 
     private void registerListeners() {

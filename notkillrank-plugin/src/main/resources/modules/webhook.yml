@@ -1,0 +1,51 @@
+# NotKillRank — Cấu hình Webhook
+# Gửi thông tin lên Discord khi người chơi dùng /stats
+
+# Avatar — tự động chọn service phù hợp:
+#   Placeholder hỗ trợ: {name}, {uuid}, {texture_url}, {texture_hash}
+avatar:
+  # Dùng khi không có SkinsRestorer
+  renderer: "https://mc-heads.net/avatar/{name}/64"
+  # Dùng khi SkinsRestorer có mặt (hỗ trợ skin tùy chỉnh, offline-mode)
+  skinsrestorer-renderer: "https://visage.surgeplay.com/face/64/{texture_hash}"
+
+# Webhook /stats
+stats:
+  enabled: false
+  url: "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"
+
+  # Placeholder: {player} {elo} {rank} {kd} {kills} {deaths}
+  #              {streak} {peak} {bounty} {requester}
+  #              {avatar_url} {texture_url} {texture_hash}
+  payload:
+    username: "NotKillRank Stats"
+    avatar_url: "{avatar_url}"
+    embeds:
+      - title: "📊 Thống kê của {player}"
+        color: 3447003
+        description: "Thống kê chiến đấu của người chơi."
+        thumbnail:
+          url: "{avatar_url}"
+        image:
+          url: ""
+        fields:
+          - name: "⚡ Elo"
+            value: "**{elo}** elo"
+            inline: true
+          - name: "🏆 Hạng"
+            value: "{rank}"
+            inline: true
+          - name: "🗡️ K/D"
+            value: "**{kd}** ({kills}/{deaths})"
+            inline: true
+          - name: "🔥 Streak cao nhất"
+            value: "**{streak}** kill"
+            inline: true
+          - name: "📈 Elo đỉnh"
+            value: "**{peak}** elo"
+            inline: true
+          - name: "💰 Bounty"
+            value: "**{bounty}** elo"
+            inline: true
+        footer:
+          text: "Yêu cầu bởi {requester}"

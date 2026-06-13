@@ -66,11 +66,9 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(CREATE_TABLE);
         }
-        // Migration: add bounty_timestamps column to existing databases
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute("ALTER TABLE nkr_players ADD COLUMN bounty_timestamps TEXT DEFAULT '{}'");
+            stmt.execute("ALTER TABLE nkr_players ADD COLUMN IF NOT EXISTS bounty_timestamps TEXT DEFAULT '{}'");
         } catch (SQLException ignored) {
-            // Column already exists — safe to ignore
         }
     }
 

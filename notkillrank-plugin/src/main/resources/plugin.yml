@@ -6,7 +6,7 @@ load: POSTWORLD
 authors: [ihqqq]
 description: Elo rankings, Kill Streaks, Bounty, Anti-Farm for NotMC
 
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI, SkinsRestorer]
 
 commands:
   elo:

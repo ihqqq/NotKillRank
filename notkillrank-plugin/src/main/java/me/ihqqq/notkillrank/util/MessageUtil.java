@@ -61,11 +61,18 @@ public class MessageUtil {
     }
 
     public static void log(String message) {
-        NotKillRank.plugin.getLogger().info(stripTags(message));
+        if (message == null) return;
+        NotKillRank.plugin.getComponentLogger().info(consoleComponent(message));
     }
 
     public static void warn(String message) {
-        NotKillRank.plugin.getLogger().warning(stripTags(message));
+        if (message == null) return;
+        NotKillRank.plugin.getComponentLogger().warn(consoleComponent(message));
+    }
+
+    private static Component consoleComponent(String text) {
+        if (text == null) return Component.empty();
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(text);
     }
 
     public static String getMessage(String path) {

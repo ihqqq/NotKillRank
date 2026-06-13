@@ -9,7 +9,6 @@ import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.ItemBuilder;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -30,7 +29,10 @@ public class TopInventory implements NotKillRankInventoryBase {
     private static final Map<String, CachedProfile> skinCache = new ConcurrentHashMap<>();
     private static final long CACHE_TTL_MS = 5 * 60 * 1000L;
 
-    private static volatile String cachedInventoryTitlePlain = null;
+    public static final class Holder implements org.bukkit.inventory.InventoryHolder {
+        @Override
+        public Inventory getInventory() { return null; }
+    }
 
     private record CachedProfile(PlayerProfile profile, long fetchedAt) {
         boolean isExpired() {
@@ -43,7 +45,6 @@ public class TopInventory implements NotKillRankInventoryBase {
     }
 
     public static void invalidateTitleCache() {
-        cachedInventoryTitlePlain = null;
     }
 
     public static void open(Player player) {
@@ -92,9 +93,7 @@ public class TopInventory implements NotKillRankInventoryBase {
                 int rows = Math.max(1, Math.min(6, gui.getInt("rows", 6)));
                 int size = rows * 9;
 
-                cachedInventoryTitlePlain = MessageUtil.stripTags(titleMM);
-
-                Inventory inv = Bukkit.createInventory(null, size, titleComponent);
+                Inventory inv = Bukkit.createInventory(new Holder(), size, titleComponent);
                 fillBackground(inv, gui, rows);
 
                 List<Integer> slots = gui.getIntegerList("player-slots");
@@ -215,16 +214,7 @@ public class TopInventory implements NotKillRankInventoryBase {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        String titlePlain = cachedInventoryTitlePlain;
-        if (titlePlain == null) {
-            FileConfiguration gui = TopGuiFile.get();
-            String titleMM = gui.getString("name", "<gold><bold>Top 10 — NotKillRank");
-            titlePlain = MessageUtil.stripTags(titleMM);
-            cachedInventoryTitlePlain = titlePlain;
-        }
-        String viewPlain = PlainTextComponentSerializer.plainText()
-                .serialize(event.getView().title());
-        if (viewPlain.equals(titlePlain)) {
+        if (event.getInventory().getHolder() instanceof Holder) {
             event.setCancelled(true);
         }
     }

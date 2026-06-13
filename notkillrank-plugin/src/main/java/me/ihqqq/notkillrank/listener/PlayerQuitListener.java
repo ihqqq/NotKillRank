@@ -24,7 +24,8 @@ public class PlayerQuitListener implements Listener {
         PlayerData data = PluginDataManager.getPlayerDatabase(uuid);
         if (data == null) return;
 
-        long sessionMs = System.currentTimeMillis() - data.getSessionStart();
+        long sessionStart = data.getSessionStart();
+        long sessionMs = sessionStart > 0 ? System.currentTimeMillis() - sessionStart : 0;
         data.setDailyOnlineMs(data.getDailyOnlineMs() + sessionMs);
         data.setLastOnline(System.currentTimeMillis());
 

@@ -54,7 +54,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 data.setHighestKillStreak(0); data.setPeakElo(Settings.ELO_START);
                 data.getKillLog().clear();
                 data.getBounties().clear();
-                PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
+                saveAsync(data.getUUID());
                 MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                         + "<green>Đã reset dữ liệu của <yellow>" + data.getName() + "<green>!");
             }
@@ -70,7 +70,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     if (elo < 0) throw new NumberFormatException();
                     data.setElo(elo);
                     if (elo > data.getPeakElo()) data.setPeakElo(elo);
-                    PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
+                    saveAsync(data.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + "<green>Đã set elo của <yellow>" + data.getName()
                             + " <green>thành <gold>" + elo + "<green>!");
@@ -88,10 +88,10 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 try {
                     int amount = Integer.parseInt(args[2]);
                     if (amount <= 0) throw new NumberFormatException();
-                    int newElo = data.getElo() + amount;
+                    int newElo = (int) Math.min((long) data.getElo() + amount, Integer.MAX_VALUE);
                     data.setElo(newElo);
                     if (newElo > data.getPeakElo()) data.setPeakElo(newElo);
-                    PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
+                    saveAsync(data.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + "<green>Đã cộng <gold>" + amount + " elo <green>cho <yellow>"
                             + data.getName() + "<green>! (Elo mới: <gold>" + newElo + "<green>)");
@@ -112,7 +112,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     int newElo = Math.max(Settings.ELO_MIN, data.getElo() - amount);
                     int actualTaken = data.getElo() - newElo;
                     data.setElo(newElo);
-                    PluginDataManager.savePlayerDatabaseToStorage(data.getUUID());
+                    saveAsync(data.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + "<red>Đã trừ <gold>" + actualTaken + " elo <red>của <yellow>"
                             + data.getName() + "<red>! (Elo mới: <gold>" + newElo + "<red>)");
@@ -162,6 +162,11 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         MessageUtil.sendMessage(sender, "<yellow>/nkr give <player> <elo> <white>— Cộng elo cho người chơi");
         MessageUtil.sendMessage(sender, "<yellow>/nkr take <player> <elo> <white>— Trừ elo của người chơi");
         MessageUtil.sendMessage(sender, "<yellow>/nkr info <player> <white>— Xem thông tin chi tiết");
+    }
+
+    private void saveAsync(String uuid) {
+        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin,
+                () -> PluginDataManager.savePlayerDatabaseToStorage(uuid));
     }
 
     private String notFound(String name) {

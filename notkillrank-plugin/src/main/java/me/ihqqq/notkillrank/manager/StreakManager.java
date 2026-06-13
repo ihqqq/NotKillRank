@@ -16,7 +16,7 @@ public class StreakManager {
 
     private static StreakManager instance;
 
-    private TreeSet<Integer> cachedMilestones = null;
+    private volatile TreeSet<Integer> cachedMilestones = null;
 
     public StreakManager() {
         instance = this;

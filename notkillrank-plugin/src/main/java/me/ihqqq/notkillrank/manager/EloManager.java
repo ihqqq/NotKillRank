@@ -235,11 +235,8 @@ public class EloManager {
     }
 
     private void applyKillStats(PlayerData killerData, PlayerData victimData) {
-        killerData.setKillStreak(killerData.getKillStreak() + 1);
         killerData.setKills(killerData.getKills() + 1);
-        if (killerData.getKillStreak() > killerData.getHighestKillStreak()) {
-            killerData.setHighestKillStreak(killerData.getKillStreak());
-        }
+        killerData.setDeathStreak(0);
         victimData.setDeaths(victimData.getDeaths() + 1);
         victimData.setKillStreak(0);
     }
@@ -249,6 +246,9 @@ public class EloManager {
         long oneHour = 60L * 60 * 1000;
         List<Long> timestamps = killerData.getOrCreateKillTimestamps(victimUUID);
         timestamps.removeIf(t -> (now - t) > oneHour);
+        if (timestamps.isEmpty()) {
+            killerData.getKillLog().remove(victimUUID);
+        }
         return timestamps.size() >= Settings.ANTI_FARM_LIMIT_KILLS_PER_HOUR;
     }
 

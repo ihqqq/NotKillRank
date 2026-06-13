@@ -95,10 +95,14 @@ public class PluginDataManager {
         long now = System.currentTimeMillis();
         if (cachedTop == null || (now - topCacheBuiltAt) > TOP_CACHE_TTL_MS) {
             List<PlayerData> allFromDisk = PluginDataStorage.getAllPlayerData();
+            Map<String, PlayerData> merged = new java.util.HashMap<>();
             for (PlayerData d : allFromDisk) {
-                playerDatabase.putIfAbsent(d.getUUID(), d);
+                merged.put(d.getUUID(), d);
             }
-            List<PlayerData> sorted = new ArrayList<>(playerDatabase.values());
+            for (Map.Entry<String, PlayerData> e : playerDatabase.entrySet()) {
+                merged.put(e.getKey(), e.getValue());
+            }
+            List<PlayerData> sorted = new ArrayList<>(merged.values());
             sorted.sort((a, b) -> b.getElo() - a.getElo());
             cachedTop = sorted;
             topCacheBuiltAt = now;

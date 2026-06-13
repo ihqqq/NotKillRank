@@ -59,20 +59,21 @@ public final class NotKillRank extends JavaPlugin {
         registerCommands();
         registerTasks();
 
+        boolean papiEnabled = false;
         if (Settings.MODULE_PLACEHOLDERAPI
                 && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholderAPISupport().register();
-            MessageUtil.log("PlaceholderAPI detected — expansion registered.");
+            papiEnabled = true;
         }
 
-        MessageUtil.log("NotKillRank v" + getDescription().getVersion() + " loaded successfully!");
+        printEnableBanner(papiEnabled);
     }
 
     @Override
     public void onDisable() {
+        printDisableBanner();
         PluginDataManager.saveAllDatabase();
         PluginDataStorage.close();
-        MessageUtil.log("NotKillRank disabled. All data saved.");
     }
 
     public static void reload() {
@@ -85,7 +86,78 @@ public final class NotKillRank extends JavaPlugin {
         if (StreakManager.getInstance() != null) StreakManager.getInstance().invalidateMilestoneCache();
         TopInventory.invalidateTitleCache();
         PluginDataManager.invalidateTopCache();
-        MessageUtil.log("NotKillRank config reloaded.");
+        printReloadBanner();
+    }
+
+    private void printEnableBanner(boolean papiRegistered) {
+        String ver     = getDescription().getVersion();
+        String authors = String.join(", ", getDescription().getAuthors());
+        String storage = Settings.STORAGE_TYPE.name();
+
+        String papiStatus = papiRegistered
+                ? "&aHoạt động &8(expansion đã đăng ký)"
+                : "&7Không tìm thấy &8(bỏ qua)";
+
+        String sep = "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+
+        MessageUtil.log(sep);
+        MessageUtil.log("&r");
+        MessageUtil.log("&r    &b&lNotKill&3&lRank  &8» &7v" + ver);
+        MessageUtil.log("&r    &6Phát triển cho &e&lNotMC &8| &7Tác giả&8: &a" + authors);
+        MessageUtil.log("&r");
+        MessageUtil.log(sep);
+        MessageUtil.log("&r");
+        MessageUtil.log("&r  &8» &7Lưu trữ        &8: &b" + storage);
+        MessageUtil.log("&r  &8» &7PlaceholderAPI  &8: " + papiStatus);
+        MessageUtil.log("&r");
+        MessageUtil.log("&r  &8» &bModules&8:");
+
+        for (ModuleManager.Module m : ModuleManager.Module.values()) {
+            String label  = formatModuleName(m.name());
+            String status = m.isEnabled() ? "&a BẬT" : "&c TẮT";
+            MessageUtil.log("&r     &7" + label + " &8— " + status);
+        }
+
+        MessageUtil.log("&r");
+        MessageUtil.log(sep);
+        MessageUtil.log("&r  &a NotKillRank đã khởi động thành công!");
+        MessageUtil.log(sep);
+    }
+
+    private static void printDisableBanner() {
+        String sep = "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+        MessageUtil.log(sep);
+        MessageUtil.log("&r  &c✘ NotKillRank đang tắt...");
+        MessageUtil.log("&r  &7Đang lưu dữ liệu người chơi...");
+        MessageUtil.log(sep);
+    }
+
+    private static void printReloadBanner() {
+        String sep = "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+        MessageUtil.log(sep);
+        MessageUtil.log("&r  &e↺  NotKillRank — Tải lại cấu hình");
+        MessageUtil.log("&r");
+        for (ModuleManager.Module m : ModuleManager.Module.values()) {
+            String label  = formatModuleName(m.name());
+            String status = m.isEnabled() ? "&a✔ BẬT" : "&c✘ TẮT";
+            MessageUtil.log("&r     &7" + label + " &8— " + status);
+        }
+        MessageUtil.log("&r");
+        MessageUtil.log("&r  &aHoàn tất!");
+        MessageUtil.log(sep);
+    }
+
+    private static String formatModuleName(String enumName) {
+        return switch (enumName) {
+            case "ANTI_FARM"    -> "Anti-Farm      ";
+            case "BOUNTY"       -> "Bounty         ";
+            case "DECAY"        -> "Elo Decay      ";
+            case "PROTECTION"   -> "Bảo vệ người mới";
+            case "STREAKS"      -> "Kill Streaks   ";
+            case "VOSONG"       -> "Vô Song        ";
+            case "PLACEHOLDERAPI" -> "PlaceholderAPI ";
+            default             -> enumName;
+        };
     }
 
     private static void initFileClasses() {

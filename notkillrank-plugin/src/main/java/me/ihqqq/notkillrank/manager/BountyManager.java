@@ -1,9 +1,11 @@
 package me.ihqqq.notkillrank.manager;
 
+import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class BountyManager {
@@ -52,8 +54,11 @@ public class BountyManager {
         int current = targetData.getBounties().getOrDefault(placer.getUniqueId().toString(), 0);
         targetData.getBounties().put(placer.getUniqueId().toString(), current + actualAmount);
 
-        PluginDataManager.savePlayerDatabaseToStorage(placer.getUniqueId().toString());
-        PluginDataManager.savePlayerDatabaseToStorage(targetUUID);
+        final String placerUuid = placer.getUniqueId().toString();
+        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+            PluginDataManager.savePlayerDatabaseToStorage(placerUuid);
+            PluginDataManager.savePlayerDatabaseToStorage(targetUUID);
+        });
 
         String msg = MessageUtil.getMessage("bounty-placed",
                         "<gold>[Bounty] <white>{placer} <white>đã đặt truy nã <green>{amount} elo "

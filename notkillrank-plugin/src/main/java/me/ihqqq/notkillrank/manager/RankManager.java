@@ -11,7 +11,7 @@ import java.util.List;
 public class RankManager {
 
     private static RankManager instance;
-    private final List<RankTier> tiers = new ArrayList<>();
+    private volatile List<RankTier> tiers = new ArrayList<>();
 
     public RankManager() {
         instance = this;
@@ -24,27 +24,30 @@ public class RankManager {
 
     public static void reload() {
         if (instance == null) return;
-        instance.tiers.clear();
         List<?> rankList = RanksFile.get().getList("ranks");
-        if (rankList == null) return;
-        for (Object obj : rankList) {
-            if (obj instanceof java.util.Map<?, ?> rawMap) {
-                @SuppressWarnings("unchecked")
-                java.util.Map<String, Object> map = (java.util.Map<String, Object>) rawMap;
-                int min = toInt(map.getOrDefault("min", 0));
-                int max = toInt(map.getOrDefault("max", 999));
-                String tag = String.valueOf(map.getOrDefault("tag", "<gray>[?]"));
-                instance.tiers.add(new RankTier(min, max, tag));
+        List<RankTier> newTiers = new ArrayList<>();
+        if (rankList != null) {
+            for (Object obj : rankList) {
+                if (obj instanceof java.util.Map<?, ?> rawMap) {
+                    @SuppressWarnings("unchecked")
+                    java.util.Map<String, Object> map = (java.util.Map<String, Object>) rawMap;
+                    int min = toInt(map.getOrDefault("min", 0));
+                    int max = toInt(map.getOrDefault("max", 999));
+                    String tag = String.valueOf(map.getOrDefault("tag", "<gray>[?]"));
+                    newTiers.add(new RankTier(min, max, tag));
+                }
             }
         }
+        instance.tiers = newTiers;
     }
 
     public String getRankTag(int elo) {
-        for (int i = tiers.size() - 1; i >= 0; i--) {
-            RankTier tier = tiers.get(i);
+        List<RankTier> snapshot = tiers;
+        for (int i = snapshot.size() - 1; i >= 0; i--) {
+            RankTier tier = snapshot.get(i);
             if (elo >= tier.min) return tier.tag;
         }
-        return tiers.isEmpty() ? "" : tiers.get(0).tag;
+        return snapshot.isEmpty() ? "" : snapshot.get(0).tag;
     }
 
     public String getStreakTag(PlayerData data) {

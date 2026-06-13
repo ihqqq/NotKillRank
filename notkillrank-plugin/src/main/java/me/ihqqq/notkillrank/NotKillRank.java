@@ -156,10 +156,10 @@ public final class NotKillRank extends JavaPlugin {
             case "ANTI_FARM"    -> "Anti-Farm      ";
             case "BOUNTY"       -> "Bounty         ";
             case "DECAY"        -> "Elo Decay      ";
-            case "PROTECTION"   -> "Bảo vệ người mới";
+            case "PROTECTION"   -> "Protect Newbie ";
             case "STREAKS"      -> "Kill Streaks   ";
             case "VOSONG"       -> "Vô Song        ";
-            case "PLACEHOLDERAPI" -> "PlaceholderAPI ";
+            case "PLACEHOLDERAPI" -> "PlaceholderAPI";
             case "WEBHOOK"      -> "Webhook        ";
             default             -> enumName;
         };

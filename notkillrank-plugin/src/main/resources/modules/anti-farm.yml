@@ -1,7 +1,5 @@
-# ============================================================
 # NotKillRank - Module: Chống Farm Elo
-# ============================================================
 
 # Số lần tối đa được giết cùng 1 người trong 1 giờ mà vẫn nhận elo
-# Vượt quá giới hạn này → kill không nhận elo (nhưng vẫn cộng K/D)
+# Vượt quá giới hạn → kill vẫn tính K/D nhưng không nhận elo
 limit-kills-per-hour: 3

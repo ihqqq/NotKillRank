@@ -1,52 +1,53 @@
-# ============================================================
 # NotKillRank - Cấu hình chính
-# Các cài đặt chi tiết của từng module nằm trong modules/
-# ============================================================
+# Cài đặt chi tiết từng module nằm trong thư mục modules/
 
-# ────────────────────────────────────────────────
-# CẤU HÌNH LƯU TRỮ DỮ LIỆU
-# ────────────────────────────────────────────────
+# Loại lưu trữ dữ liệu người chơi
+# Hỗ trợ: YAML, SQLITE, H2
+# Khuyên dùng: H2 (nhanh, không cần cài thêm)
 storage:
-  # Loại lưu trữ: YAML, SQLITE, H2
   type: H2
   sqlite:
+    # Tên file SQLite — không cần đuôi .db
     file: playerdata
   h2:
+    # Tên file H2 — không cần đuôi .mv.db
     file: playerdata
 
-# ────────────────────────────────────────────────
-# BẬT / TẮT MODULE
-# true = bật  |  false = tắt
-# Sau khi thay đổi, dùng /nkr reload để áp dụng
-# ────────────────────────────────────────────────
+# Bật/tắt từng module — true = bật, false = tắt
+# Áp dụng sau khi dùng /nkr reload
 modules:
   enabled:
-    # Chống farm elo (giới hạn số lần giết cùng người / giờ)
+    # Chống farm elo (giới hạn số lần giết cùng người trong 1 giờ)
     anti-farm: true
-
-    # Hệ thống truy nã (bounty)
+    # Hệ thống truy nã
     bounty: true
-
     # Suy giảm elo khi offline lâu
     decay: true
-
-    # Bảo vệ người mới (newbie protection)
+    # Bảo vệ người mới
     protection: true
-
-    # Kill streak, death streak, [Kẻ yếu], [Kẻ sống sót], milestone
+    # Kill streak, death streak, cột mốc chuỗi giết
     streaks: true
-
     # Tag [Vô song] cho người giữ top 1 liên tiếp
     vosong: true
-
-    # PlaceholderAPI expansion (tắt nếu không dùng PAPI)
+    # Tích hợp PlaceholderAPI — tắt nếu server không cài PAPI
+    # Dùng trong scoreboard, tab, chat formatter và bất kỳ plugin hỗ trợ PAPI:
+    #   %notkillrank_elo%            — elo hiện tại
+    #   %notkillrank_rank%           — tag hạng (MiniMessage)
+    #   %notkillrank_rank_with_tag%  — tag hạng + tag chuỗi ([Kẻ yếu] / [Kẻ sống sót] / ...)
+    #   %notkillrank_streak_tag%     — chỉ tag chuỗi hiện tại
+    #   %notkillrank_kills%          — tổng số kill
+    #   %notkillrank_deaths%         — tổng số lần chết
+    #   %notkillrank_kd%             — tỷ lệ K/D (2 chữ số thập phân)
+    #   %notkillrank_kill_streak%    — chuỗi kill đang có
+    #   %notkillrank_death_streak%   — chuỗi chết đang có
+    #   %notkillrank_highest_streak% — chuỗi kill cao nhất từ trước đến nay
+    #   %notkillrank_peak_elo%       — elo đỉnh cao nhất đạt được
+    #   %notkillrank_is_weak%        — true nếu đang mang trạng thái [Kẻ yếu]
+    #   %notkillrank_bounty%         — tổng elo bounty trên đầu người chơi
     placeholderapi: true
 
-# ────────────────────────────────────────────────
-# TỰ ĐỘNG LƯU DỮ LIỆU
-# ────────────────────────────────────────────────
+# Tự động lưu dữ liệu người chơi định kỳ
 auto-save:
-  # Bật/tắt tự động lưu định kỳ
   enabled: true
-  # Chu kỳ lưu (giây) — mặc định 300 = 5 phút
+  # Chu kỳ lưu tính bằng giây — 300 = 5 phút
   interval-seconds: 300

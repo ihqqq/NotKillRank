@@ -15,6 +15,8 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
             new TypeToken<Map<String, List<Long>>>() {}.getType();
     private static final Type BOUNTIES_TYPE =
             new TypeToken<Map<String, Integer>>() {}.getType();
+    private static final Type BOUNTY_TIMESTAMPS_TYPE =
+            new TypeToken<Map<String, Long>>() {}.getType();
 
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS nkr_players (
@@ -37,6 +39,7 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
               no_death_start      BIGINT       DEFAULT 0,
               kill_log            TEXT         DEFAULT '{}',
               bounties            TEXT         DEFAULT '{}',
+              bounty_timestamps   TEXT         DEFAULT '{}',
               top1_since          BIGINT       DEFAULT 0
             )
             """;
@@ -50,8 +53,8 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
               uuid, name, elo, kills, deaths, kill_streak, death_streak,
               highest_kill_streak, peak_elo, last_killer_uuid, last_killed_time,
               last_online, first_join_time, session_start, daily_online_ms,
-              current_day, no_death_start, kill_log, bounties, top1_since
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+              current_day, no_death_start, kill_log, bounties, bounty_timestamps, top1_since
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """;
 
     protected Connection connection;
@@ -62,6 +65,12 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
         connection = openConnection();
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(CREATE_TABLE);
+        }
+        // Migration: add bounty_timestamps column to existing databases
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("ALTER TABLE nkr_players ADD COLUMN bounty_timestamps TEXT DEFAULT '{}'");
+        } catch (SQLException ignored) {
+            // Column already exists — safe to ignore
         }
     }
 
@@ -128,7 +137,8 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
                     ins.setLong(17,   data.getNoDeathStart());
                     ins.setString(18, GSON.toJson(data.getKillLog()));
                     ins.setString(19, GSON.toJson(data.getBounties()));
-                    ins.setLong(20,   data.getTop1Since());
+                    ins.setString(20, GSON.toJson(data.getBountyTimestamps()));
+                    ins.setLong(21,   data.getTop1Since());
                     ins.executeUpdate();
                 }
                 conn.commit();
@@ -167,8 +177,12 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
     private PlayerData fromRow(ResultSet rs) throws SQLException {
         Map<String, List<Long>> killLog = GSON.fromJson(rs.getString("kill_log"), KILL_LOG_TYPE);
         Map<String, Integer> bounties   = GSON.fromJson(rs.getString("bounties"), BOUNTIES_TYPE);
+        String btJson = rs.getString("bounty_timestamps");
+        Map<String, Long> bountyTimestamps = btJson != null
+                ? GSON.fromJson(btJson, BOUNTY_TIMESTAMPS_TYPE) : null;
         if (killLog == null) killLog = new HashMap<>();
         if (bounties == null) bounties = new HashMap<>();
+        if (bountyTimestamps == null) bountyTimestamps = new HashMap<>();
         return new PlayerData(
                 rs.getString("uuid"),
                 rs.getString("name"),
@@ -189,6 +203,7 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
                 rs.getLong("no_death_start"),
                 killLog,
                 bounties,
+                bountyTimestamps,
                 rs.getLong("top1_since")
         );
     }

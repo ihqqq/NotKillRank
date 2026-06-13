@@ -1,6 +1,8 @@
 package me.ihqqq.notkillrank.listener;
 
 import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.Settings;
+import me.ihqqq.notkillrank.manager.BountyManager;
 import me.ihqqq.notkillrank.manager.EloManager;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
@@ -28,6 +30,10 @@ public class PlayerJoinListener implements Listener {
             PlayerData data = PluginDataManager.getOrCreate(player);
 
             EloManager.getInstance().applyEloDecay(data);
+
+            if (Settings.MODULE_BOUNTY) {
+                BountyManager.getInstance().expireBounties(data, player.getName());
+            }
 
             String today = LocalDate.now().toString();
             if (!today.equals(data.getCurrentDay())) {

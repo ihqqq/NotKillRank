@@ -28,6 +28,7 @@ public class PlayerData implements IPlayerData {
 
     private final Map<String, List<Long>> killLog;
     private final Map<String, Integer> bounties;
+    private final Map<String, Long> bountyTimestamps;
 
     private volatile long top1Since;
 
@@ -51,6 +52,7 @@ public class PlayerData implements IPlayerData {
         this.noDeathStart = System.currentTimeMillis();
         this.killLog = new ConcurrentHashMap<>();
         this.bounties = new ConcurrentHashMap<>();
+        this.bountyTimestamps = new ConcurrentHashMap<>();
         this.top1Since = 0;
     }
 
@@ -60,6 +62,7 @@ public class PlayerData implements IPlayerData {
                       long firstJoinTime, long sessionStart, long dailyOnlineMs,
                       String currentDay, long noDeathStart,
                       Map<String, List<Long>> killLog, Map<String, Integer> bounties,
+                      Map<String, Long> bountyTimestamps,
                       long top1Since) {
         this.uuid = uuid;
         this.name = name;
@@ -87,6 +90,7 @@ public class PlayerData implements IPlayerData {
             }
         }
         this.bounties = new ConcurrentHashMap<>(bounties != null ? bounties : Collections.emptyMap());
+        this.bountyTimestamps = new ConcurrentHashMap<>(bountyTimestamps != null ? bountyTimestamps : Collections.emptyMap());
     }
 
 
@@ -96,6 +100,7 @@ public class PlayerData implements IPlayerData {
             killLogCopy.put(e.getKey(), new ArrayList<>(e.getValue()));
         }
         Map<String, Integer> bountiesCopy = new HashMap<>(bounties);
+        Map<String, Long> bountyTimestampsCopy = new HashMap<>(bountyTimestamps);
 
         return new PlayerData(
                 uuid, name, elo, kills, deaths,
@@ -103,7 +108,7 @@ public class PlayerData implements IPlayerData {
                 lastKillerUUID, lastKilledTime, lastOnline,
                 firstJoinTime, sessionStart, dailyOnlineMs,
                 currentDay, noDeathStart,
-                killLogCopy, bountiesCopy,
+                killLogCopy, bountiesCopy, bountyTimestampsCopy,
                 top1Since
         );
     }
@@ -145,6 +150,7 @@ public class PlayerData implements IPlayerData {
 
     @Override public Map<String, List<Long>> getKillLog() { return killLog; }
     @Override public Map<String, Integer> getBounties() { return bounties; }
+    @Override public Map<String, Long> getBountyTimestamps() { return bountyTimestamps; }
     @Override public long getTop1Since() { return top1Since; }
     @Override public void setTop1Since(long time) { this.top1Since = time; }
 

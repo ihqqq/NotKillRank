@@ -1,6 +1,8 @@
-# ============================================================
 # NotKillRank - Module: Bounty (Hệ thống Truy Nã)
-# ============================================================
 
-# Số elo tối thiểu để đặt một bounty
+# Số elo tối thiểu để đặt một lệnh truy nã
 min-amount: 100
+
+# Thời gian hết hạn của bounty (giờ) — 0 = không bao giờ hết hạn
+# Khi hết hạn, elo sẽ được hoàn trả về người đã đặt bounty
+expire-hours: 24

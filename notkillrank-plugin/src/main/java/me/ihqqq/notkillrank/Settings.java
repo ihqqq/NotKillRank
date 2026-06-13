@@ -36,7 +36,10 @@ public class Settings {
     public static int DECAY_DAILY_PERCENT;
     public static int DECAY_MAX_PERCENT;
 
+    public static boolean STREAKS_RESET_ON_LOGOUT;
+
     public static int BOUNTY_MIN_AMOUNT;
+    public static int BOUNTY_EXPIRE_HOURS;
 
     public static int VOSONG_DAYS_REQUIRED;
 
@@ -76,7 +79,10 @@ public class Settings {
         DECAY_DAILY_PERCENT = DecayFile.get().getInt("daily-percent", 1);
         DECAY_MAX_PERCENT   = DecayFile.get().getInt("max-percent", 10);
 
-        BOUNTY_MIN_AMOUNT   = BountyFile.get().getInt("min-amount", 100);
+        STREAKS_RESET_ON_LOGOUT = StreaksFile.get().getBoolean("reset-on-logout", true);
+
+        BOUNTY_MIN_AMOUNT    = BountyFile.get().getInt("min-amount", 100);
+        BOUNTY_EXPIRE_HOURS  = BountyFile.get().getInt("expire-hours", 24);
         VOSONG_DAYS_REQUIRED = VoSongFile.get().getInt("days-required", 3);
     }
 }

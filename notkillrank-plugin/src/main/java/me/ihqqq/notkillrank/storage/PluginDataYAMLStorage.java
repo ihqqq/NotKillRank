@@ -70,6 +70,9 @@ public class PluginDataYAMLStorage implements PluginStorage {
         for (Map.Entry<String, Integer> e : data.getBounties().entrySet()) {
             cfg.set("bounties." + e.getKey(), e.getValue());
         }
+        for (Map.Entry<String, Long> e : data.getBountyTimestamps().entrySet()) {
+            cfg.set("bounty-timestamps." + e.getKey(), e.getValue());
+        }
 
         try {
             cfg.save(file);
@@ -120,6 +123,14 @@ public class PluginDataYAMLStorage implements PluginStorage {
             }
         }
 
+        Map<String, Long> bountyTimestamps = new HashMap<>();
+        ConfigurationSection btSection = cfg.getConfigurationSection("bounty-timestamps");
+        if (btSection != null) {
+            for (String k : btSection.getKeys(false)) {
+                bountyTimestamps.put(k, btSection.getLong(k, 0));
+            }
+        }
+
         int elo = cfg.getInt("elo", startElo);
         return new PlayerData(
                 uuid,
@@ -141,6 +152,7 @@ public class PluginDataYAMLStorage implements PluginStorage {
                 cfg.getLong("no-death-start", System.currentTimeMillis()),
                 killLog,
                 bounties,
+                bountyTimestamps,
                 cfg.getLong("top1-since", 0)
         );
     }

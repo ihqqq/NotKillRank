@@ -15,6 +15,7 @@ import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.storage.PluginDataStorage;
 import me.ihqqq.notkillrank.support.PlaceholderAPISupport;
 import me.ihqqq.notkillrank.task.AutoSaveTask;
+import me.ihqqq.notkillrank.task.BountyExpireTask;
 import me.ihqqq.notkillrank.task.EloDecayTask;
 import me.ihqqq.notkillrank.task.NewbieProtectionTask;
 import me.ihqqq.notkillrank.util.MessageUtil;
@@ -103,24 +104,24 @@ public final class NotKillRank extends JavaPlugin {
         MessageUtil.log(sep);
         MessageUtil.log("&r");
         MessageUtil.log("&r    &b&lNotKill&3&lRank  &8» &7v" + ver);
-        MessageUtil.log("&r    &6Phát triển cho &e&lNotMC &8| &7Tác giả&8: &a" + authors);
+        MessageUtil.log("&r    &7Plugin thuộc sở hữu của &e&lNotMC &8| &7Tác giả&8: &a" + authors);
         MessageUtil.log("&r");
         MessageUtil.log(sep);
         MessageUtil.log("&r");
         MessageUtil.log("&r  &8» &7Lưu trữ        &8: &b" + storage);
         MessageUtil.log("&r  &8» &7PlaceholderAPI  &8: " + papiStatus);
         MessageUtil.log("&r");
-        MessageUtil.log("&r  &8» &bModules&8:");
+        MessageUtil.log("&r  &8» &7Modules&8:");
 
         for (ModuleManager.Module m : ModuleManager.Module.values()) {
             String label  = formatModuleName(m.name());
-            String status = m.isEnabled() ? "&a BẬT" : "&c TẮT";
+            String status = m.isEnabled() ? "&a BẬT" : "& TẮT";
             MessageUtil.log("&r     &7" + label + " &8— " + status);
         }
 
         MessageUtil.log("&r");
         MessageUtil.log(sep);
-        MessageUtil.log("&r  &a NotKillRank đã khởi động thành công!");
+        MessageUtil.log("&r  &a✔ NotKillRank đã khởi động thành công!");
         MessageUtil.log(sep);
     }
 
@@ -129,6 +130,7 @@ public final class NotKillRank extends JavaPlugin {
         MessageUtil.log(sep);
         MessageUtil.log("&r  &c✘ NotKillRank đang tắt...");
         MessageUtil.log("&r  &7Đang lưu dữ liệu người chơi...");
+        MessageUtil.log("&r  &8Plugin thuộc sở hữu của &eNotMC &8— Leak = chó rách!");
         MessageUtil.log(sep);
     }
 
@@ -192,6 +194,7 @@ public final class NotKillRank extends JavaPlugin {
         new AutoSaveTask();
         new EloDecayTask();
         new NewbieProtectionTask();
+        new BountyExpireTask();
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(this,
                 PluginDataManager::updateTop1Status, 20L * 60 * 5, 20L * 60 * 5);

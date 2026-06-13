@@ -4,9 +4,15 @@ import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.storage.PluginDataManager;
+import me.ihqqq.notkillrank.storage.PluginDataStorage;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class BountyManager {
 
@@ -46,15 +52,16 @@ public class BountyManager {
             return false;
         }
 
+        String placerUuid = placer.getUniqueId().toString();
         String targetUUID = target.getUniqueId().toString();
         PlayerData targetData = PluginDataManager.getOrCreate(target);
 
         placerData.setElo(currentElo - actualAmount);
 
-        int current = targetData.getBounties().getOrDefault(placer.getUniqueId().toString(), 0);
-        targetData.getBounties().put(placer.getUniqueId().toString(), current + actualAmount);
+        int current = targetData.getBounties().getOrDefault(placerUuid, 0);
+        targetData.getBounties().put(placerUuid, current + actualAmount);
+        targetData.getBountyTimestamps().put(placerUuid, System.currentTimeMillis());
 
-        final String placerUuid = placer.getUniqueId().toString();
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
             PluginDataManager.savePlayerDatabaseToStorage(placerUuid);
             PluginDataManager.savePlayerDatabaseToStorage(targetUUID);
@@ -68,6 +75,80 @@ public class BountyManager {
                 .replace("{target}", target.getName());
         MessageUtil.sendBroadcast(msg);
         return true;
+    }
+
+    public void expireBounties(PlayerData targetData, String targetName) {
+        if (Settings.BOUNTY_EXPIRE_HOURS <= 0) return;
+
+        long expireMs = (long) Settings.BOUNTY_EXPIRE_HOURS * 60 * 60 * 1000;
+        long now = System.currentTimeMillis();
+
+        List<String> expired = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : targetData.getBountyTimestamps().entrySet()) {
+            String placerUuid = entry.getKey();
+            long placedAt = entry.getValue();
+            if (now - placedAt >= expireMs && targetData.getBounties().containsKey(placerUuid)) {
+                expired.add(placerUuid);
+            }
+        }
+
+        if (expired.isEmpty()) return;
+
+        for (String placerUuid : expired) {
+            int refundAmount = targetData.getBounties().getOrDefault(placerUuid, 0);
+            if (refundAmount <= 0) continue;
+
+            targetData.getBounties().remove(placerUuid);
+            targetData.getBountyTimestamps().remove(placerUuid);
+
+            refundToPlacer(placerUuid, refundAmount, targetName);
+        }
+
+        // Lưu dữ liệu của người bị bounty (bounty đã bị xóa)
+        final String targetUuid = targetData.getUUID();
+        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin,
+                () -> PluginDataManager.savePlayerDatabaseToStorage(targetUuid));
+    }
+
+    private void refundToPlacer(String placerUuid, int amount, String targetName) {
+        String expiredMsg = MessageUtil.getMessage("bounty-expired",
+                        "<gold>[Bounty] <gray>Bounty <green>{amount} elo <gray>lên đầu <red>{target} "
+                                + "<gray>đã hết hạn — elo đã được hoàn trả")
+                .replace("{amount}", String.valueOf(amount))
+                .replace("{target}", targetName);
+
+        Player onlinePlacer;
+        try {
+            onlinePlacer = Bukkit.getPlayer(UUID.fromString(placerUuid));
+        } catch (IllegalArgumentException e) {
+            onlinePlacer = null;
+        }
+
+        if (onlinePlacer != null) {
+            PlayerData placerData = PluginDataManager.getPlayerDatabase(placerUuid);
+            if (placerData != null) {
+                placerData.setElo(placerData.getElo() + amount);
+                if (placerData.getElo() > placerData.getPeakElo()) {
+                    placerData.setPeakElo(placerData.getElo());
+                }
+                final Player finalPlacer = onlinePlacer;
+                Bukkit.getScheduler().runTask(NotKillRank.plugin,
+                        () -> MessageUtil.sendMessage(finalPlacer, expiredMsg));
+                Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin,
+                        () -> PluginDataManager.savePlayerDatabaseToStorage(placerUuid));
+            }
+        } else {
+            Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+                PlayerData diskData = PluginDataStorage.getPlayerData(placerUuid);
+                if (diskData != null) {
+                    diskData.setElo(diskData.getElo() + amount);
+                    if (diskData.getElo() > diskData.getPeakElo()) {
+                        diskData.setPeakElo(diskData.getElo());
+                    }
+                    PluginDataStorage.savePlayerData(placerUuid, diskData);
+                }
+            });
+        }
     }
 
     public int getTotalBounty(PlayerData data) {
@@ -88,6 +169,7 @@ public class BountyManager {
         }
 
         targetData.getBounties().clear();
+        targetData.getBountyTimestamps().clear();
 
         String msg = MessageUtil.getMessage("bounty-claimed",
                         "<gold>[Bounty] <white>{claimer} <white>đã nhận thưởng <green>{amount} elo "

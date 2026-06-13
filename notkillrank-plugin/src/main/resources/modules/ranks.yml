@@ -1,105 +1,123 @@
-# ============================================================
-# NotKillRank - Module: Bảng Hạng
-# Điểm mốc và tag đều có thể tùy chỉnh
-# tag: dùng MiniMessage format
-#
-# Placeholders thông báo lên hạng:
-#   {player}    - tên người chơi
-#   {rank}      - tag hạng mới (vd: [Sát thủ])
-#   {old_rank}  - tag hạng cũ
-#   {elo}       - elo hiện tại
-# ============================================================
+# NotKillRank - Module: Bảng Hạng (MCTiers style)
+# tag: dùng MiniMessage format — https://docs.advntr.dev/minimessage/format.html
+# Hệ tier theo MCTiers: HT1 > HT2 > HT3 > HT4 > LT1 > LT2 > LT3 > LT4 > Unranked
 
-# -------------------------------------------------------
-# Cài đặt mặc định cho thông báo lên hạng
-# (Áp dụng cho tất cả hạng trừ khi override riêng)
-# -------------------------------------------------------
+# Cài đặt mặc định cho thông báo khi người chơi lên hạng mới
+# Áp dụng cho tất cả hạng, trừ những hạng có override riêng trong phần ranks bên dưới
+# Placeholder: {player}, {rank} (tag hạng mới), {old_rank} (tag hạng cũ), {elo}
 rankup-defaults:
-  # --- Chat message gửi cho người chơi ---
+  # Tin nhắn chat gửi riêng cho người chơi
   message-enabled: true
-  message-text: "<gold>✦ <white>Chúc mừng <yellow>{player}<white>! Bạn vừa lên hạng {rank}<white>!"
+  message-text: "<gray>✦ <white>Chúc mừng <yellow>{player}<white>! Bạn vừa lên hạng {rank}<white>!"
 
-  # --- Actionbar hiển thị trên màn hình ---
+  # Actionbar hiển thị trên màn hình
   actionbar-enabled: true
-  actionbar-text: "<gold><bold>✦ LÊN HẠNG: <reset>{rank} <gold><bold>✦"
+  actionbar-text: "<yellow><bold>✦ LÊN HẠNG: <reset>{rank} <yellow><bold>✦"
 
-  # --- Title hiển thị giữa màn hình ---
+  # Title hiển thị giữa màn hình
   title-enabled: true
-  title-text: "<gold><bold>LÊN HẠNG!"
+  title-text: "<yellow><bold>LÊN HẠNG!"
   subtitle-text: "<white>Hạng mới: {rank}"
   title-fade-in-ms: 500
   title-stay-ms: 3000
   title-fade-out-ms: 1000
 
-  # --- Broadcast toàn server ---
+  # Broadcast toàn server — mặc định tắt với hạng thấp
   broadcast-enabled: false
-  broadcast-text: "<gold>✦ <yellow>{player} <white>vừa đạt hạng {rank}<white>!"
+  broadcast-text: "<gray>✦ <yellow>{player} <white>vừa đạt hạng {rank}<white>!"
 
-  # --- Âm thanh phát cho người chơi khi lên hạng ---
+  # Âm thanh phát cho người chơi khi lên hạng
+  # Tên sound: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   sound-enabled: true
   sound-name: ENTITY_PLAYER_LEVELUP
   sound-volume: 1.0
   sound-pitch: 1.0
 
-# -------------------------------------------------------
-# Danh sách hạng
-# rankup.sound-name: tên Sound Bukkit (viết hoa, dùng dấu _)
-#   Xem danh sách: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
-# -------------------------------------------------------
+# Danh sách hạng — min/max là khoảng elo, tag là tên hiển thị
+# Thứ tự từ thấp lên cao: Unranked → LT4 → LT3 → LT2 → LT1 → HT4 → HT3 → HT2 → HT1
 ranks:
+
   - min: 0
     max: 999
-    tag: "<gray>[Óc]"
-    # Hạng thấp nhất — không có thông báo lên hạng
+    tag: "<dark_gray>[Unranked]"
 
   - min: 1000
-    max: 1999
-    tag: "<yellow>[Gà]"
+    max: 1399
+    tag: "<gray>[LT4]"
     rankup:
       sound-name: ENTITY_PLAYER_LEVELUP
       sound-pitch: 1.0
 
-  - min: 2000
-    max: 3999
-    tag: "<green>[Non]"
+  - min: 1400
+    max: 1799
+    tag: "<white>[LT3]"
     rankup:
       sound-name: ENTITY_PLAYER_LEVELUP
       sound-pitch: 1.1
 
-  - min: 4000
-    max: 5999
-    tag: "<aqua>[Biết chút]"
+  - min: 1800
+    max: 2299
+    tag: "<#5B8DD9>[LT2]"
     rankup:
       sound-name: ENTITY_PLAYER_LEVELUP
       sound-pitch: 1.2
 
-  - min: 6000
-    max: 9999
-    tag: "<dark_aqua>[Đáng nể]"
+  - min: 2300
+    max: 2999
+    tag: "<#43A047>[LT1]"
     rankup:
+      broadcast-enabled: true
+      broadcast-text: "<dark_gray>[<#43A047>LT1<dark_gray>] <white>{player} <gray>vừa leo lên <#43A047>[LT1]<white>!"
       sound-name: ENTITY_PLAYER_LEVELUP
       sound-pitch: 1.3
 
-  - min: 10000
-    max: 19999
-    tag: "<red>[Sát thủ]"
+  - min: 3000
+    max: 3999
+    tag: "<#F9A825>[HT4]"
     rankup:
+      title-text: "<#F9A825><bold>HIGH TIER!"
+      subtitle-text: "<white>Hạng mới: {rank}"
+      broadcast-enabled: true
+      broadcast-text: "<dark_gray>[<#F9A825>HT4<dark_gray>] <white>{player} <gray>vừa leo lên <#F9A825>[HT4]<white>!"
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 1.0
 
-  - min: 20000
-    max: 49999
-    tag: "<dark_red>[Ác thần]"
+  - min: 4000
+    max: 5499
+    tag: "<#FB8C00>[HT3]"
     rankup:
+      title-text: "<#FB8C00><bold>HIGH TIER!"
+      subtitle-text: "<white>Hạng mới: {rank}"
+      broadcast-enabled: true
+      broadcast-text: "<dark_gray>[<#FB8C00>HT3<dark_gray>] <white>{player} <gray>vừa leo lên <#FB8C00>[HT3]<white>!"
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
-      sound-pitch: 0.9
+      sound-pitch: 1.1
 
-  - min: 50000
-    max: 999999999
-    tag: "<light_purple>[Huyền thoại]"
+  - min: 5500
+    max: 7499
+    tag: "<#E53935>[HT2]"
     rankup:
+      title-text: "<#E53935><bold>HIGH TIER!"
+      subtitle-text: "<white>Hạng mới: {rank}"
+      broadcast-enabled: true
+      broadcast-text: "<dark_gray>[<#E53935>HT2<dark_gray>] <white>{player} <gray>vừa leo lên <#E53935>[HT2]<white>!"
+      sound-name: UI_TOAST_CHALLENGE_COMPLETE
+      sound-volume: 1.0
+      sound-pitch: 1.2
+
+  # Hạng cao nhất — broadcast toàn server, âm thanh đặc biệt
+  - min: 7500
+    max: 99999
+    tag: "<gradient:#FFD700:#FFA000>[HT1]</gradient>"
+    rankup:
+      message-text: "<gradient:#FFD700:#FFA000>✦ ĐỈNH CAO ✦ <white>{player} <white>đã đạt hạng {rank}<white>! Cực kỳ ấn tượng!"
+      actionbar-text: "<gradient:#FFD700:#FFA000><bold>✦ HIGH TIER 1 ✦</bold></gradient>"
+      title-text: "<gradient:#FFD700:#FFA000><bold>HIGH TIER 1!</bold></gradient>"
+      subtitle-text: "<white>Chúc mừng <yellow>{player}<white>!"
+      broadcast-enabled: true
+      broadcast-text: "<gradient:#FFD700:#FFA000>✦ HT1 ✦ <white>{player} <yellow>vừa đạt <gradient:#FFD700:#FFA000>[HT1]<white>! Hạng cao nhất server!"
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 0.8

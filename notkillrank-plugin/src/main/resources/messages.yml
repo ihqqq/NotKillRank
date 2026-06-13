@@ -1,60 +1,71 @@
-# ============================================================
 # NotKillRank - Tin nhắn hệ thống
-# Tất cả đều dùng MiniMessage format
-# https://docs.advntr.dev/minimessage/format.html
+# Tất cả dùng MiniMessage format: https://docs.advntr.dev/minimessage/format.html
 #
-# Mỗi key có thể là:
-#   - Một dòng đơn:  key: '<gray>Nội dung'
-#   - Nhiều dòng:    key:
-#                      - '<gray>Dòng 1'
-#                      - '<gray>Dòng 2'
-# ============================================================
+# Mỗi key có thể là một dòng hoặc nhiều dòng:
+#   key: '<gray>Nội dung'
+#   key:
+#     - '<gray>Dòng 1'
+#     - '<gray>Dòng 2'
 
-# Tiền tố hiển thị trước các thông báo của plugin
+# Tiền tố hiển thị trước thông báo của plugin
 prefix: '<gray>[<gradient:#FFD700:#FFA500>ɴᴏᴛᴋɪʟʟʀᴀɴᴋ</gradient>]<gray> '
 
-# Thông báo chào mừng khi người chơi vào server — {prefix}, {player}, {rank}, {streak}, {elo}
+# Thông báo chào mừng khi vào server
+# Placeholder: {prefix}, {player}, {rank}, {streak}, {elo}
 welcome: '{prefix}<white>Chào mừng <yellow>{player} <white>| Hạng: {rank}{streak} <white>| Elo: <green>{elo}'
 
-# Thông báo khi có kill thông thường (có thay đổi elo)
-# {rank_killer}, {killer}, {elo_gained}, {rank_victim}, {victim}, {elo_lost}
+# Thông báo khi kill có thay đổi elo
+# Placeholder: {rank_killer}, {killer}, {elo_gained_detail}, {rank_victim}, {victim}, {elo_lost_detail}
 kill-broadcast: '<gray>{rank_killer} <white>{killer} <green>+{elo_gained_detail} <dark_gray>→ <white>đã hạ {rank_victim} <white>{victim} <red>-{elo_lost_detail}'
 
-# Thông báo khi kill nhưng không có thay đổi elo (người mới)
+# Thông báo khi kill nhưng không đổi elo vì người mới được bảo vệ
+# Placeholder: {rank_killer}, {killer}, {rank_victim}, {victim}
 kill-no-elo: '<gray>{rank_killer} <white>{killer} <dark_gray>→ <white>đã hạ {rank_victim} <white>{victim} <gray>[Bảo vệ người mới]'
 
 # Thông báo toàn server khi phá chuỗi kill của người khác
-# {breaker}, {streak}, {victim}, {elo}
+# Placeholder: {breaker}, {streak}, {victim}, {elo}
 streak-break: '<gold>⚡ <white>{breaker} <gray>đã chấm dứt chuỗi <red>{streak} kill <gray>của <white>{victim}<gray>! <green>+{elo} elo'
 
-# Thông báo khi thực hiện kill báo thù
+# Thông báo khi kill báo thù (giết lại người vừa giết mình)
+# Placeholder: {player}, {target}
 revenge-kill: '<gold>⚔ <white>{player} <gray>đã báo thù <red>{target}<gray>!'
 
-# Thông báo khi người chơi mang trạng thái [Kẻ yếu]
+# Thông báo toàn server khi người chơi mang trạng thái [Kẻ yếu]
+# Placeholder: {player}
 weak-status: '<red>⚠ <white>{player} <gray>đang mang trạng thái <red>[Kẻ yếu]'
 
-# Thông báo khi đặt bounty — {placer}, {amount}, {target}
+# Thông báo toàn server khi đặt bounty
+# Placeholder: {placer}, {amount}, {target}
 bounty-placed: '<gold>💰 <white>{placer} <gray>đặt truy nã <green>{amount} elo <gray>lên đầu <red>{target}'
 
-# Thông báo khi nhận thưởng bounty — {claimer}, {amount}, {target}
+# Thông báo toàn server khi nhận thưởng bounty
+# Placeholder: {claimer}, {amount}, {target}
 bounty-claimed: '<gold>💰 <white>{claimer} <gray>nhận <green>{amount} elo <gray>từ truy nã của <red>{target}'
 
-# Thông báo khi cố đặt bounty lên người đang được bảo vệ người mới
+# Thông báo khi bounty hết hạn — gửi riêng cho người đặt (nếu đang online)
+# Placeholder: {amount}, {target}
+bounty-expired: '<gold>💰 <gray>Bounty <green>{amount} elo <gray>lên đầu <red>{target} <gray>đã hết hạn — elo đã được hoàn trả'
+
+# Thông báo khi đặt bounty lên người đang được bảo vệ người mới
 bounty-target-protected: '<red>⚠ Không thể đặt truy nã lên người chơi đang được bảo vệ'
 
-# Thông báo riêng cho người giết khi bị chặn anti-farm — {victim}, {limit}
+# Thông báo riêng cho người giết khi bị chặn anti-farm
+# Placeholder: {victim}, {limit}
 anti-farm: '<gray>⚠ Không nhận elo — Đã giết {victim} quá {limit} lần/giờ'
 
-# Thông báo không có quyền
+# Thông báo thiếu quyền
 no-permission: '<red>⚠ Bạn không có quyền sử dụng lệnh này'
 
-# Thông báo không tìm thấy người chơi — {player}
+# Thông báo không tìm thấy người chơi
+# Placeholder: {player}
 player-not-found: '<red>⚠ Không tìm thấy người chơi <white>{player}'
 
-# Kết quả lệnh /elo — {player}, {elo}, {rank}
+# Kết quả lệnh /elo
+# Placeholder: {player}, {elo}, {rank}
 elo-info: '<white>{player} <dark_gray>│ <gray>Elo: <green>{elo} <dark_gray>│ <gray>Hạng: {rank}'
 
-# Toàn bộ khối /stats — {player}, {elo}, {rank}, {kd}, {kills}, {deaths}, {streak}, {peak}
+# Kết quả lệnh /stats — hỗ trợ nhiều dòng
+# Placeholder: {player}, {elo}, {rank}, {kd}, {kills}, {deaths}, {streak}, {peak}
 stats:
   - '<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
   - '<gray>├ <white>Elo: <green>{elo} <dark_gray>│ <gray>Hạng: {rank}'
@@ -62,10 +73,9 @@ stats:
   - '<gray>├ <white>Chuỗi kill cao nhất: <red>{streak}'
   - '<gray>└ <white>Elo đỉnh: <gold>{peak}'
 
-# Khối /top dành cho console — dòng đầu là header, dòng 2 là template mỗi entry
-# Placeholders entry: {pos}, {rank}, {player}, {elo}
+# Kết quả lệnh /top (hiển thị trong chat và console)
+# Dòng đầu là header, dòng thứ hai là template cho mỗi người trong top
+# Placeholder dòng entry: {pos}, {rank}, {player}, {elo}
 top:
   - '<gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
   - '<gray>{pos}. {rank} <white>{player} <dark_gray>─ <green>{elo} elo'
-
-

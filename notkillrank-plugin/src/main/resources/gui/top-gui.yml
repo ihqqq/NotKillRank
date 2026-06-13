@@ -1,39 +1,27 @@
-# ============================================================
-# NotKillRank - Cấu hình GUI Bảng Xếp Hạng Top 10
-# Hỗ trợ MiniMessage (https://docs.advntr.dev/minimessage/format.html)
-# ============================================================
+# NotKillRank - GUI Bảng Xếp Hạng Top 10
+# Dùng MiniMessage: https://docs.advntr.dev/minimessage/format.html
 #
-# ── HƯỚNG DẪN CẤU HÌNH ICON ──────────────────────────────
-#
-# Loại icon thông thường (bất kỳ tên Material hợp lệ):
-#   icon:
-#     type: GRAY_STAINED_GLASS_PANE
-#
-# Đầu tùy chỉnh bằng texture base64 (CUSTOM_HEAD hoặc PLAYER_HEAD + texture):
-#   icon:
-#     type: CUSTOM_HEAD
-#     texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvIn19fQ=="
-#
-#   Lấy chuỗi base64 tại: https://minecraft-heads.com
-#   (Vào trang head, chọn tab "Other", copy giá trị "Value")
-#
-# ─────────────────────────────────────────────────────────
+# Cấu hình icon:
+#   - Vật phẩm thông thường: type: GRAY_STAINED_GLASS_PANE
+#   - Đầu custom (texture base64):
+#       type: CUSTOM_HEAD
+#       texture: "eyJ0ZXh0dXJlcy..."
+#     Lấy giá trị base64 tại https://minecraft-heads.com → tab "Other" → copy "Value"
 
-# Tên giao diện
+# Tên cửa sổ GUI
 name: <white><sprite:"minecraft:items":item/copper_sword> <dark_gray>ᴛᴏᴘ ᴇʟᴏ
 
-# Số hàng của giao diện (tối đa 6)
+# Số hàng của GUI — tối đa 6
 rows: 6
 
-# Tô nền cho Menu
-# Nền sẽ được fill trước tiên, các button khác sẽ được đặt lên nền
+# Nền của GUI — được fill trước, các slot khác đặt lên trên
 background:
   icon:
     type: GRAY_STAINED_GLASS_PANE
-  # Uncomment để dùng custom head texture thay cho glass pane:
+  # Nếu muốn dùng custom head, uncomment và điền texture:
   #type: CUSTOM_HEAD
   #texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTNlYjYzNDNhOGVmNWFlZTdmZjA2YmM2Nzg1MmE2ZTZjYjJiN2UxYzI4MDIwYjkzZTdkMjdjMDRiZjBjYjU3MyJ9fX0="
-  # Mỗi hàng phải có đúng 9 ký tự — 'x' = fill ô đó, ' ' (khoảng trắng) = bỏ trống
+  # Mỗi hàng phải đúng 9 ký tự — 'x' = có nền, ' ' = bỏ trống
   fill:
     - xxxxxxxxx
     - x       x
@@ -42,7 +30,7 @@ background:
     - x       x
     - xxxxxxxxx
 
-# Vị trí slot cho top 1 → top 10 (theo thứ tự hạng, index từ 0)
+# Vị trí slot hiển thị đầu từng người trong top (index từ 0, theo thứ tự top 1 → top 10)
 player-slots:
   - 13
   - 21
@@ -55,7 +43,7 @@ player-slots:
   - 41
   - 42
 
-# Hiển thị đầu người chơi trong bảng xếp hạng
+# Thông tin hiển thị trên đầu mỗi người trong bảng xếp hạng
 # Placeholder: {medal}, {player}, {rank}, {elo}, {kills}, {deaths}, {kd}, {highest_streak}, {peak_elo}, {bounty}
 player-head:
   name: '{medal} <white>{player}'
@@ -68,12 +56,12 @@ player-head:
     cao nhất: <red>{highest_streak}'
     - ' <white><sprite:"minecraft:items":item/lime_candle> <gray>Peak elo: <gold>{peak_elo}'
     - ''
-  # Dòng lore bổ sung hiển thị khi người chơi có bounty
+  # Dòng lore thêm vào khi người chơi có bounty — Placeholder: {bounty}
   bounty-lore:
     - ''
     - '<gold>Bounty: <red>{bounty} elo'
 
-# Huy hiệu cho từng vị trí xếp hạng (MiniMessage)
+# Huy hiệu theo vị trí xếp hạng — Placeholder trong medals: {pos}
 medals:
   '1': <dark_gray>[<gold>#1<dark_gray>]
   '2': <dark_gray>[<blue>#2<dark_gray>]

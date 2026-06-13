@@ -1,6 +1,7 @@
 package me.ihqqq.notkillrank.listener;
 
 import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.storage.PluginDataStorage;
@@ -28,6 +29,11 @@ public class PlayerQuitListener implements Listener {
         long sessionMs = sessionStart > 0 ? System.currentTimeMillis() - sessionStart : 0;
         data.setDailyOnlineMs(data.getDailyOnlineMs() + sessionMs);
         data.setLastOnline(System.currentTimeMillis());
+
+        if (Settings.MODULE_STREAKS && Settings.STREAKS_RESET_ON_LOGOUT) {
+            data.setKillStreak(0);
+            data.setDeathStreak(0);
+        }
 
         PlayerData snapshot = data.snapshot();
 

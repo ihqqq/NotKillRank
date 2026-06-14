@@ -17,9 +17,12 @@ public class PlayerQuitListener implements Listener {
         Bukkit.getPluginManager().registerEvents(this, NotKillRank.plugin);
     }
 
-    @EventHandler
+    @EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+
+        if (player.hasMetadata("NPC")) return;
+
         String uuid = player.getUniqueId().toString();
 
         PlayerData data = PluginDataManager.getPlayerDatabase(uuid);

@@ -1,6 +1,8 @@
 package me.ihqqq.notkillrank.listener;
 
 import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.Settings;
+import me.ihqqq.notkillrank.hook.PvPManagerHook;
 import me.ihqqq.notkillrank.manager.EloManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,6 +23,16 @@ public class CombatListener implements Listener {
         Player killer = victim.getKiller();
 
         if (killer == null || killer.equals(victim)) return;
+
+        if (victim.hasMetadata("NPC")) return;
+
+        if (Settings.MODULE_PVPMANAGER) {
+            PvPManagerHook hook = PvPManagerHook.getInstance();
+            if (hook != null) {
+                if (hook.shouldSkipElo(victim)) return;
+                if (hook.isCombatLogging(victim)) return;
+            }
+        }
 
         EloManager.getInstance().processKill(killer, victim);
     }

@@ -1,0 +1,55 @@
+# NotKillRank - Module: Tích hợp PvPManager
+# Module này chỉ hoạt động khi PvPManager được cài trên server.
+# Bật/tắt toàn module qua: config.yml → modules.enabled.pvpmanager
+
+#  BỎ QUA ELO KHI NẠN NHÂN CÓ /PVP OFF
+#  Nếu nạn nhân đang tắt PvP của mình (/pvp off trong PvPManager),
+#  hệ thống sẽ bỏ qua toàn bộ tính toán ELO cho lần kill đó.
+
+# true  → không trừ/cộng elo nếu victim đang /pvp off
+# false → vẫn tính elo bình thường dù victim tắt PvP
+skip-elo-if-victim-pvp-off: true
+
+#  CHẶN ĐÁNH KHI NẠN NHÂN ĐANG ĐƯỢC BẢO VỆ NGƯỜI MỚI
+#  Khi người chơi có bảo vệ người mới (modules.protection),
+#  PvPManager sẽ chặn toàn bộ sát thương PvP vào người đó.
+#  Áp dụng cả đánh tay trực tiếp và tên/đạn từ xa.
+
+# true  → chặn vật lý — victim không nhận damage (không thể chết)
+# false → chỉ bỏ qua elo, victim vẫn nhận damage bình thường
+block-attack-if-victim-protected: true
+
+#  PHẠT COMBAT LOG
+#  Kích hoạt khi người chơi thoát game trong khi đang bị
+#  PvPManager tag combat với người khác.
+combat-log:
+
+  # Hệ số nhân ELO bị trừ so với một kill bình thường.
+  # Công thức: elo_mất = floor(victim_elo × kill-percent%) × hệ-số-này
+  # Ví dụ: 2.0 → mất gấp đôi so với bình thường
+  elo-loss-multiplier: 2.0
+
+  # Người tấn công cuối cùng có nhận được elo không?
+  # Trong chế độ NPC: elo được trao cho người tiêu diệt NPC.
+  # true  → có nhận elo
+  # false → chỉ trừ người thoát, không ai nhận
+  attacker-gains-elo: true
+
+  # Phát thông báo toàn server khi có người combat log.
+  broadcast: true
+
+  # NPC COMBAT LOG
+  # Khi bật, một Zombie NPC sẽ xuất hiện tại vị trí người thoát
+  # và mang toàn bộ trang bị của họ. ELO thưởng được giữ lại
+  # cho đến khi người chơi tiêu diệt NPC đó.
+  #
+  # Nếu NPC không bị tiêu diệt trong npc-timeout-seconds giây,
+  # nó sẽ biến mất và không ai nhận được elo thưởng.
+
+  # true  → spawn Zombie NPC; elo thưởng chờ đến khi NPC bị giết
+  # false → chế độ thường; elo trao ngay cho kẻ tấn công nếu online
+  spawn-npc: false
+
+  # Thời gian (giây) NPC tồn tại trước khi tự biến mất.
+  # Chỉ có hiệu lực khi spawn-npc: true
+  npc-timeout-seconds: 30

@@ -15,6 +15,8 @@ public class PluginDataManager {
     private static volatile long topCacheBuiltAt = 0;
     private static final long TOP_CACHE_TTL_MS = 30_000L;
 
+    private static final Set<String> npcExcludedUUIDs = ConcurrentHashMap.newKeySet();
+
     public static void loadAllDatabase() {
         MessageUtil.log("&a[PluginDataManager] Khởi tạo bộ nhớ đệm dữ liệu người chơi.");
     }
@@ -90,16 +92,31 @@ public class PluginDataManager {
         playerDatabase.remove(uuid);
     }
 
+    public static void excludeFromTop(String uuid) {
+        npcExcludedUUIDs.add(uuid);
+        playerDatabase.remove(uuid);
+    }
+
+    public static void unexcludeFromTop(String uuid) {
+        npcExcludedUUIDs.remove(uuid);
+        playerDatabase.remove(uuid);
+    }
+
+
     public static List<PlayerData> getTopPlayers(int limit) {
         long now = System.currentTimeMillis();
         if (cachedTop == null || (now - topCacheBuiltAt) > TOP_CACHE_TTL_MS) {
             List<PlayerData> allFromDisk = PluginDataStorage.getAllPlayerData();
             Map<String, PlayerData> merged = new java.util.HashMap<>();
             for (PlayerData d : allFromDisk) {
-                merged.put(d.getUUID(), d);
+                if (!npcExcludedUUIDs.contains(d.getUUID())) {
+                    merged.put(d.getUUID(), d);
+                }
             }
             for (Map.Entry<String, PlayerData> e : playerDatabase.entrySet()) {
-                merged.put(e.getKey(), e.getValue());
+                if (!npcExcludedUUIDs.contains(e.getKey())) {
+                    merged.put(e.getKey(), e.getValue());
+                }
             }
             List<PlayerData> sorted = new ArrayList<>(merged.values());
             sorted.sort((a, b) -> b.getElo() - a.getElo());

@@ -3,6 +3,7 @@ package me.ihqqq.notkillrank;
 import com.tchristofferson.configupdater.ConfigUpdater;
 import me.ihqqq.notkillrank.command.*;
 import me.ihqqq.notkillrank.file.module.*;
+import me.ihqqq.notkillrank.hook.PvPManagerHook;
 import me.ihqqq.notkillrank.webhook.SkinUtil;
 import me.ihqqq.notkillrank.webhook.WebhookManager;
 import me.ihqqq.notkillrank.inventory.TopInventory;
@@ -58,6 +59,10 @@ public final class NotKillRank extends JavaPlugin {
         new WebhookManager();
         SkinUtil.init();
 
+        if (Settings.MODULE_PVPMANAGER) {
+            new PvPManagerHook();
+        }
+
         registerListeners();
         registerCommands();
         registerTasks();
@@ -97,6 +102,9 @@ public final class NotKillRank extends JavaPlugin {
         String authors = String.join(", ", getDescription().getAuthors());
         String storage = Settings.STORAGE_TYPE.name();
 
+        String pvpmStatus = (PvPManagerHook.getInstance() != null && PvPManagerHook.getInstance().isHooked())
+                ? "&aHoạt động"
+                : (Settings.MODULE_PVPMANAGER ? "&eBật &8(PvPManager chưa cài)" : "&cTắt");
         String papiStatus = papiRegistered
                 ? "&aHoạt động &8(expansion đã đăng ký)"
                 : "&7Không tìm thấy &8(bỏ qua)";
@@ -111,6 +119,7 @@ public final class NotKillRank extends JavaPlugin {
         MessageUtil.log(sep);
         MessageUtil.log("&r");
         MessageUtil.log("&r  &8» &7Lưu trữ        &8: &b" + storage);
+        MessageUtil.log("&r  &8» &7PvPManager      &8: " + pvpmStatus);
         MessageUtil.log("&r  &8» &7PlaceholderAPI  &8: " + papiStatus);
         MessageUtil.log("&r");
         MessageUtil.log("&r  &8» &7Modules&8:");
@@ -160,6 +169,7 @@ public final class NotKillRank extends JavaPlugin {
             case "STREAKS"      -> "Kill Streaks   ";
             case "PLACEHOLDERAPI" -> "PlaceholderAPI ";
             case "WEBHOOK"      -> "Webhook        ";
+            case "PVPMANAGER"   -> "PvPManager     ";
             default             -> enumName;
         };
     }
@@ -175,6 +185,7 @@ public final class NotKillRank extends JavaPlugin {
         RanksFile.init();
         StreaksFile.init();
         WebhookFile.init();
+        PvPManagerFile.init();
     }
 
     private void registerListeners() {

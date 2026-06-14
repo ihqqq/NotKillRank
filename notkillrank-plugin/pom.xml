@@ -91,6 +91,12 @@
 
   <dependencies>
     <dependency>
+      <groupId>me.chancesd.pvpmanager</groupId>
+      <artifactId>pvpmanager</artifactId>
+      <version>4.0.9</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>me.ihqqq.notkillrank</groupId>
       <artifactId>notkillrank-api</artifactId>
       <version>${project.version}</version>

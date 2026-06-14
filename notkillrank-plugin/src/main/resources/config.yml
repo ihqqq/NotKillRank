@@ -24,11 +24,14 @@ modules:
     # Suy giảm elo khi offline lâu
     decay: true
     # Bảo vệ người mới
-    protection: true
+    protection: false
     # Kill streak, death streak, cột mốc chuỗi giết
-    streaks: true
+    streaks: false
     # Gửi thông tin /stats lên Discord qua webhook (cấu hình chi tiết trong modules/webhook.yml)
     webhook: false
+    # Tích hợp PvPManager — phạt ELO khi combat log (thoát game lúc đang combat)
+    # Yêu cầu cài PvPManager trên server, bỏ qua nếu không tìm thấy
+    pvpmanager: true
     # Tích hợp PlaceholderAPI — tắt nếu server không cài PAPI
     # Dùng trong scoreboard, tab, chat formatter và bất kỳ plugin hỗ trợ PAPI:
     #   %notkillrank_elo%            — elo hiện tại

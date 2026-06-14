@@ -18,6 +18,7 @@ public class Settings {
     public static boolean MODULE_STREAKS;
     public static boolean MODULE_PLACEHOLDERAPI;
     public static boolean MODULE_WEBHOOK;
+    public static boolean MODULE_PVPMANAGER;
 
     public static int ELO_START;
     public static int ELO_KILL_PERCENT;
@@ -58,6 +59,7 @@ public class Settings {
         MODULE_STREAKS      = main.getBoolean("modules.enabled.streaks", true);
         MODULE_PLACEHOLDERAPI = main.getBoolean("modules.enabled.placeholderapi", true);
         MODULE_WEBHOOK      = main.getBoolean("modules.enabled.webhook", false);
+        MODULE_PVPMANAGER   = main.getBoolean("modules.enabled.pvpmanager", true);
 
         var elo = EloFile.get();
         ELO_START                = elo.getInt("start-elo", 1000);

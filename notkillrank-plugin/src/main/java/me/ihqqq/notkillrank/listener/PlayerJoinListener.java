@@ -26,6 +26,8 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
+        if (player.hasMetadata("NPC")) return;
+
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
             PlayerData data = PluginDataManager.getOrCreate(player);
 

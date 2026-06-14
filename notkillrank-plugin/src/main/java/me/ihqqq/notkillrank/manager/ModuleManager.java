@@ -14,7 +14,8 @@ public class ModuleManager {
         PROTECTION,
         STREAKS,
         PLACEHOLDERAPI,
-        WEBHOOK;
+        WEBHOOK,
+        PVPMANAGER;
 
         public boolean isEnabled() {
             return switch (this) {
@@ -25,6 +26,7 @@ public class ModuleManager {
                 case STREAKS        -> Settings.MODULE_STREAKS;
                 case PLACEHOLDERAPI -> Settings.MODULE_PLACEHOLDERAPI;
                 case WEBHOOK        -> Settings.MODULE_WEBHOOK;
+                case PVPMANAGER     -> Settings.MODULE_PVPMANAGER;
             };
         }
     }

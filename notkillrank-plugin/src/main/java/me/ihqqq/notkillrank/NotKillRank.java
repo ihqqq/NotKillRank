@@ -156,10 +156,9 @@ public final class NotKillRank extends JavaPlugin {
             case "ANTI_FARM"    -> "Anti-Farm      ";
             case "BOUNTY"       -> "Bounty         ";
             case "DECAY"        -> "Elo Decay      ";
-            case "PROTECTION"   -> "Protect Newbie ";
+            case "PROTECTION"   -> "Bảo vệ người mới";
             case "STREAKS"      -> "Kill Streaks   ";
-            case "VOSONG"       -> "Vô Song        ";
-            case "PLACEHOLDERAPI" -> "PlaceholderAPI";
+            case "PLACEHOLDERAPI" -> "PlaceholderAPI ";
             case "WEBHOOK"      -> "Webhook        ";
             default             -> enumName;
         };
@@ -175,7 +174,6 @@ public final class NotKillRank extends JavaPlugin {
         ProtectionFile.init();
         RanksFile.init();
         StreaksFile.init();
-        VoSongFile.init();
         WebhookFile.init();
     }
 
@@ -200,7 +198,5 @@ public final class NotKillRank extends JavaPlugin {
         new NewbieProtectionTask();
         new BountyExpireTask();
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this,
-                PluginDataManager::updateTop1Status, 20L * 60 * 5, 20L * 60 * 5);
     }
 }

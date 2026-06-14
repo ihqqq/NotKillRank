@@ -13,7 +13,6 @@ public class ModuleManager {
         DECAY,
         PROTECTION,
         STREAKS,
-        VOSONG,
         PLACEHOLDERAPI,
         WEBHOOK;
 
@@ -24,7 +23,6 @@ public class ModuleManager {
                 case DECAY          -> Settings.MODULE_DECAY;
                 case PROTECTION     -> Settings.MODULE_PROTECTION;
                 case STREAKS        -> Settings.MODULE_STREAKS;
-                case VOSONG         -> Settings.MODULE_VOSONG;
                 case PLACEHOLDERAPI -> Settings.MODULE_PLACEHOLDERAPI;
                 case WEBHOOK        -> Settings.MODULE_WEBHOOK;
             };

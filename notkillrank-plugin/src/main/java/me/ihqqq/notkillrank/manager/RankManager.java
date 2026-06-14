@@ -118,21 +118,12 @@ public class RankManager {
     }
 
     public String getStreakTag(PlayerData data) {
-        if (Settings.MODULE_VOSONG && isVoSong(data)) return "<light_purple>[Vô song]";
-
         if (Settings.MODULE_STREAKS) {
             if (data.getKillStreak() >= 10) return "<red>[Sát thần " + data.getKillStreak() + "x]";
             if (isSongSot(data)) return "<green>[Kẻ sống sót]";
             if (isWeak(data)) return "<red>[Kẻ yếu]";
         }
         return "";
-    }
-
-    public boolean isVoSong(PlayerData data) {
-        if (!Settings.MODULE_VOSONG) return false;
-        if (data.getTop1Since() <= 0) return false;
-        long msRequired = (long) Settings.VOSONG_DAYS_REQUIRED * 24 * 60 * 60 * 1000;
-        return (System.currentTimeMillis() - data.getTop1Since()) >= msRequired;
     }
 
     public boolean isSongSot(PlayerData data) {

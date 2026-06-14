@@ -30,8 +30,6 @@ public class PlayerData implements IPlayerData {
     private final Map<String, Integer> bounties;
     private final Map<String, Long> bountyTimestamps;
 
-    private volatile long top1Since;
-
     public PlayerData(String uuid, String name, int startElo) {
         this.uuid = uuid;
         this.name = name;
@@ -53,7 +51,6 @@ public class PlayerData implements IPlayerData {
         this.killLog = new ConcurrentHashMap<>();
         this.bounties = new ConcurrentHashMap<>();
         this.bountyTimestamps = new ConcurrentHashMap<>();
-        this.top1Since = 0;
     }
 
     public PlayerData(String uuid, String name, int elo, int kills, int deaths,
@@ -62,8 +59,7 @@ public class PlayerData implements IPlayerData {
                       long firstJoinTime, long sessionStart, long dailyOnlineMs,
                       String currentDay, long noDeathStart,
                       Map<String, List<Long>> killLog, Map<String, Integer> bounties,
-                      Map<String, Long> bountyTimestamps,
-                      long top1Since) {
+                      Map<String, Long> bountyTimestamps) {
         this.uuid = uuid;
         this.name = name;
         this.elo = elo;
@@ -81,7 +77,6 @@ public class PlayerData implements IPlayerData {
         this.dailyOnlineMs = dailyOnlineMs;
         this.currentDay = currentDay;
         this.noDeathStart = noDeathStart;
-        this.top1Since = top1Since;
 
         this.killLog = new ConcurrentHashMap<>();
         if (killLog != null) {
@@ -108,8 +103,7 @@ public class PlayerData implements IPlayerData {
                 lastKillerUUID, lastKilledTime, lastOnline,
                 firstJoinTime, sessionStart, dailyOnlineMs,
                 currentDay, noDeathStart,
-                killLogCopy, bountiesCopy, bountyTimestampsCopy,
-                top1Since
+                killLogCopy, bountiesCopy, bountyTimestampsCopy
         );
     }
 
@@ -151,8 +145,6 @@ public class PlayerData implements IPlayerData {
     @Override public Map<String, List<Long>> getKillLog() { return killLog; }
     @Override public Map<String, Integer> getBounties() { return bounties; }
     @Override public Map<String, Long> getBountyTimestamps() { return bountyTimestamps; }
-    @Override public long getTop1Since() { return top1Since; }
-    @Override public void setTop1Since(long time) { this.top1Since = time; }
 
 
     public List<Long> getOrCreateKillTimestamps(String victimUUID) {

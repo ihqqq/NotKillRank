@@ -62,7 +62,6 @@ public class PluginDataYAMLStorage implements PluginStorage {
         cfg.set("daily-online-ms",     data.getDailyOnlineMs());
         cfg.set("current-day",         data.getCurrentDay());
         cfg.set("no-death-start",      data.getNoDeathStart());
-        cfg.set("top1-since",          data.getTop1Since());
 
         for (Map.Entry<String, List<Long>> e : data.getKillLog().entrySet()) {
             cfg.set("kill-log." + e.getKey(), e.getValue());
@@ -152,8 +151,7 @@ public class PluginDataYAMLStorage implements PluginStorage {
                 cfg.getLong("no-death-start", System.currentTimeMillis()),
                 killLog,
                 bounties,
-                bountyTimestamps,
-                cfg.getLong("top1-since", 0)
+                bountyTimestamps
         );
     }
 }

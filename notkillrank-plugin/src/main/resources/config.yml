@@ -27,8 +27,6 @@ modules:
     protection: true
     # Kill streak, death streak, cột mốc chuỗi giết
     streaks: true
-    # Tag [Vô song] cho người giữ top 1 liên tiếp
-    vosong: true
     # Gửi thông tin /stats lên Discord qua webhook (cấu hình chi tiết trong modules/webhook.yml)
     webhook: false
     # Tích hợp PlaceholderAPI — tắt nếu server không cài PAPI

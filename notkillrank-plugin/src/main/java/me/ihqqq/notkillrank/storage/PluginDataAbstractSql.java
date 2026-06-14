@@ -39,8 +39,7 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
               no_death_start      BIGINT       DEFAULT 0,
               kill_log            TEXT         DEFAULT '{}',
               bounties            TEXT         DEFAULT '{}',
-              bounty_timestamps   TEXT         DEFAULT '{}',
-              top1_since          BIGINT       DEFAULT 0
+              bounty_timestamps   TEXT         DEFAULT '{}'
             )
             """;
 
@@ -53,8 +52,8 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
               uuid, name, elo, kills, deaths, kill_streak, death_streak,
               highest_kill_streak, peak_elo, last_killer_uuid, last_killed_time,
               last_online, first_join_time, session_start, daily_online_ms,
-              current_day, no_death_start, kill_log, bounties, bounty_timestamps, top1_since
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+              current_day, no_death_start, kill_log, bounties, bounty_timestamps
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """;
 
     protected Connection connection;
@@ -136,7 +135,6 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
                     ins.setString(18, GSON.toJson(data.getKillLog()));
                     ins.setString(19, GSON.toJson(data.getBounties()));
                     ins.setString(20, GSON.toJson(data.getBountyTimestamps()));
-                    ins.setLong(21,   data.getTop1Since());
                     ins.executeUpdate();
                 }
                 conn.commit();
@@ -201,8 +199,7 @@ public abstract class PluginDataAbstractSql implements PluginStorage {
                 rs.getLong("no_death_start"),
                 killLog,
                 bounties,
-                bountyTimestamps,
-                rs.getLong("top1_since")
+                bountyTimestamps
         );
     }
 }

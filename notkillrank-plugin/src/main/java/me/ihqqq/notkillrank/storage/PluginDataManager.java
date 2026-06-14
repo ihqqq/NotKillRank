@@ -1,6 +1,5 @@
 package me.ihqqq.notkillrank.storage;
 
-import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.Settings;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.entity.Player;
@@ -115,28 +114,4 @@ public class PluginDataManager {
         topCacheBuiltAt = 0;
     }
 
-    public static void updateTop1Status() {
-        if (!Settings.MODULE_VOSONG) return;
-        List<PlayerData> top = getTopPlayers(1);
-        if (top.isEmpty()) return;
-        PlayerData top1 = top.get(0);
-
-        for (PlayerData data : playerDatabase.values()) {
-            if (data.getUUID().equals(top1.getUUID())) {
-                if (top1.getTop1Since() <= 0) {
-                    top1.setTop1Since(System.currentTimeMillis());
-                    final String uuid = top1.getUUID();
-                    org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(
-                            NotKillRank.plugin, () -> savePlayerDatabaseToStorage(uuid));
-                }
-            } else {
-                if (data.getTop1Since() > 0) {
-                    data.setTop1Since(0);
-                    final String uuid = data.getUUID();
-                    org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(
-                            NotKillRank.plugin, () -> savePlayerDatabaseToStorage(uuid));
-                }
-            }
-        }
-    }
 }

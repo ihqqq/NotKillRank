@@ -16,7 +16,6 @@ public class Settings {
     public static boolean MODULE_DECAY;
     public static boolean MODULE_PROTECTION;
     public static boolean MODULE_STREAKS;
-    public static boolean MODULE_VOSONG;
     public static boolean MODULE_PLACEHOLDERAPI;
     public static boolean MODULE_WEBHOOK;
 
@@ -42,8 +41,6 @@ public class Settings {
     public static int BOUNTY_MIN_AMOUNT;
     public static int BOUNTY_EXPIRE_HOURS;
 
-    public static int VOSONG_DAYS_REQUIRED;
-
     public static void setupValue() {
         var main = NotKillRank.plugin.getConfig();
 
@@ -59,7 +56,6 @@ public class Settings {
         MODULE_DECAY        = main.getBoolean("modules.enabled.decay", true);
         MODULE_PROTECTION   = main.getBoolean("modules.enabled.protection", true);
         MODULE_STREAKS      = main.getBoolean("modules.enabled.streaks", true);
-        MODULE_VOSONG       = main.getBoolean("modules.enabled.vosong", true);
         MODULE_PLACEHOLDERAPI = main.getBoolean("modules.enabled.placeholderapi", true);
         MODULE_WEBHOOK      = main.getBoolean("modules.enabled.webhook", false);
 
@@ -85,6 +81,5 @@ public class Settings {
 
         BOUNTY_MIN_AMOUNT    = BountyFile.get().getInt("min-amount", 100);
         BOUNTY_EXPIRE_HOURS  = BountyFile.get().getInt("expire-hours", 24);
-        VOSONG_DAYS_REQUIRED = VoSongFile.get().getInt("days-required", 3);
     }
 }

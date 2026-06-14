@@ -8,7 +8,7 @@ min-elo: 100
 
 # Phần trăm elo của nạn nhân mà người giết nhận được
 # Ví dụ: 10 → giết người có 500 elo → nhận 50 elo
-kill-percent: 10
+kill-percent: 5
 
 # Hệ số nhân khi giết người có elo cao hơn mình
 # Ví dụ: 1.5 → nhận thêm 50% elo so với bình thường

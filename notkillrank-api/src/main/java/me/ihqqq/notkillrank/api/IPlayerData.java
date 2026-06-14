@@ -59,7 +59,4 @@ public interface IPlayerData {
     Map<String, Integer> getBounties();
 
     Map<String, Long> getBountyTimestamps();
-
-    long getTop1Since();
-    void setTop1Since(long time);
 }

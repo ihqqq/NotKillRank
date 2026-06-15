@@ -12,6 +12,7 @@ public class ModuleManager {
         BOUNTY,
         DECAY,
         PROTECTION,
+        REVENGER,
         STREAKS,
         PLACEHOLDERAPI,
         WEBHOOK,
@@ -23,6 +24,7 @@ public class ModuleManager {
                 case BOUNTY         -> Settings.MODULE_BOUNTY;
                 case DECAY          -> Settings.MODULE_DECAY;
                 case PROTECTION     -> Settings.MODULE_PROTECTION;
+                case REVENGER       -> Settings.MODULE_REVENGER;
                 case STREAKS        -> Settings.MODULE_STREAKS;
                 case PLACEHOLDERAPI -> Settings.MODULE_PLACEHOLDERAPI;
                 case WEBHOOK        -> Settings.MODULE_WEBHOOK;

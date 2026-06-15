@@ -20,8 +20,7 @@ player-not-found: '<red>⚠ Không tìm thấy người chơi <white>{player}'
 #  CHIẾN ĐẤU
 # Thông báo toàn server khi kill và thay đổi elo
 # Placeholder: {rank_killer}, {killer}, {elo_gained_detail}, {rank_victim}, {victim}, {elo_lost_detail}
-kill-broadcast: '<gray>{rank_killer} <white>{killer} <green>{elo_gained_detail} <dark_gray>→ <white>đã hạ {rank_victim} <white>{victim} <red>{elo_lost_detail}'
-
+kill-broadcast: '<gray>{rank_killer} <white>{killer} <green>+{elo_gained} elo <dark_gray>→ <white>đã hạ {rank_victim} <white>{victim} <red>-{elo_lost} elo'
 # Thông báo khi kill nhưng không đổi elo (nạn nhân đang được bảo vệ người mới)
 # Placeholder: {rank_killer}, {killer}, {rank_victim}, {victim}
 kill-no-elo: '<gray>{rank_killer} <white>{killer} <dark_gray>→ <white>đã hạ {rank_victim} <white>{victim} <gray>[Bảo vệ người mới]'
@@ -42,21 +41,50 @@ weak-status: '<red>⚠ <white>{player} <gray>đang mang trạng thái <red>[Kẻ
 # Placeholder: {victim}, {limit}
 anti-farm: '<gray>⚠ Không nhận elo — Đã giết {victim} quá {limit} lần/giờ'
 
+
 #  TRUY NÃ (BOUNTY)
 # Thông báo toàn server khi đặt bounty lên người khác
 # Placeholder: {placer}, {amount}, {target}
-bounty-placed: '<gold>💰 <white>{placer} <gray>đặt truy nã <green>{amount} elo <gray>lên đầu <red>{target}'
+bounty-placed: '<gold>💰 <white>{placer} <gray>đặt truy nã <yellow>{amount} elo <gray>lên đầu <red>{target}'
 
 # Thông báo toàn server khi nhận thưởng bounty
 # Placeholder: {claimer}, {amount}, {target}
-bounty-claimed: '<gold>💰 <white>{claimer} <gray>nhận <green>{amount} elo <gray>từ truy nã của <red>{target}'
+bounty-claimed: '<gold>💰 <white>{claimer} <gray>nhận <green>+{amount} elo <gray>từ truy nã của <red>{target}'
 
 # Gửi riêng cho người đặt khi bounty hết hạn và được hoàn trả elo
 # Placeholder: {amount}, {target}
-bounty-expired: '<gold>💰 <gray>Bounty <green>{amount} elo <gray>lên đầu <red>{target} <gray>đã hết hạn — elo đã được hoàn trả'
+bounty-expired: '<gold>💰 <gray>Bounty <green>+{amount} elo <gray>lên đầu <red>{target} <gray>đã hết hạn — elo đã được hoàn trả'
 
 # Thông báo khi cố đặt bounty lên người đang được bảo vệ người mới
 bounty-target-protected: '<red>⚠ Không thể đặt truy nã lên người chơi đang được bảo vệ'
+
+# Số elo bounty tối thiểu không đủ
+# Placeholder: {min}
+bounty-min-amount: '<red>⚠ Số elo bounty tối thiểu là <yellow>{min}<red>!'
+
+# Elo người đặt bounty bằng hoặc dưới mức tối thiểu
+# Placeholder: {elo}
+bounty-no-elo: '<red>⚠ Bạn không đủ elo để đặt bounty! Elo hiện tại: <yellow>{elo}'
+
+# Elo không đủ sau khi tính toán thực tế
+# Placeholder: {required}, {min}, {elo}
+bounty-not-enough-elo: '<red>⚠ Bạn không đủ elo! Cần ít nhất <yellow>{required} elo <red>để đặt bounty tối thiểu <yellow>{min}<red>. Elo hiện tại: <yellow>{elo}'
+
+# Lệnh /bounty chỉ dành cho người chơi
+bounty-player-only: '<red>⚠ Chỉ có người chơi mới dùng được lệnh /bounty'
+
+# Module bounty đang tắt
+bounty-module-disabled: '<red>⚠ Hệ thống Bounty hiện đang bị tắt!'
+
+# Hướng dẫn dùng lệnh /bounty
+bounty-usage: '<yellow>Cách dùng: <white>/bounty <player> <elo>'
+
+# Tự đặt bounty lên mình
+bounty-self: '<red>⚠ Bạn không thể đặt bounty lên chính mình!'
+
+# Số elo không hợp lệ trong /bounty
+bounty-invalid-amount: '<red>⚠ Số lượng elo không hợp lệ! Phải là số nguyên dương.'
+
 
 #  PVPMANAGER
 # Tấn công người đang được bảo vệ người mới — gửi riêng cho kẻ tấn công
@@ -65,31 +93,69 @@ pvpmanager-protection-block: '<red>⚔ <white>{victim} <gray>đang được bả
 
 # Thông báo toàn server khi combat-log — không có kẻ tấn công trực tuyến
 # Placeholder: {logger}, {elo_loss}
-pvpmanager-combat-log: '<red>☠ <white>{logger} <gray>thoát game trong combat! <red>{elo_loss} elo<gray>.'
+pvpmanager-combat-log: '<red>☠ <white>{logger} <gray>thoát game trong combat! <red>-{elo_loss} elo<gray>.'
 
 # Thông báo toàn server khi combat-log — có kẻ tấn công trực tuyến nhận elo
 # Placeholder: {logger}, {elo_loss}, {rank_attacker}, {attacker}, {elo_gain}
-pvpmanager-combat-log-with-attacker: '<red>☠ <white>{logger} <gray>thoát game trong combat! <red>{elo_loss} elo<gray>. {rank_attacker}<white>{attacker} <gray>nhận <green>{elo_gain} elo<gray>.'
+pvpmanager-combat-log-with-attacker: '<red>☠ <white>{logger} <gray>thoát game trong combat! <red>-{elo_loss} elo<gray>. {rank_attacker}<white>{attacker} <gray>nhận <green>+{elo_gain} elo<gray>.'
 
 # Gửi riêng cho kẻ tấn công khi nhận elo từ combat-log
 # Placeholder: {elo_gain}, {logger}
-pvpmanager-combat-log-notify: '<green>{elo_gain} elo <gray>— <white>{logger} <gray>đã thoát game trong combat!'
+pvpmanager-combat-log-notify: '<green>+{elo_gain} elo <gray>— <white>{logger} <gray>đã thoát game trong combat!'
 
-# Thông báo toàn server khi combat-log (NPC mode) — NPC vừa xuất hiện
-# Placeholder: {logger}, {elo_loss}, {seconds}
-pvpmanager-combat-log-npc: '<red>☠ <white>{logger} <gray>thoát game trong combat! <red>{elo_loss} elo<gray>. <yellow>NPC xuất hiện — tiêu diệt trong {seconds}s!'
 
-# Thông báo toàn server khi NPC bị tiêu diệt và có elo thưởng
-# Placeholder: {rank_killer}, {killer}, {logger}, {elo_gain}
-pvpmanager-npc-killed: '<gold>⚔ {rank_killer}<white>{killer} <gray>tiêu diệt NPC của <white>{logger}<gray>! <green>{elo_gain} elo<gray>.'
+#  ADMIN (lệnh /notkillrank)
 
-# Thông báo toàn server khi NPC bị tiêu diệt nhưng không có elo thưởng
-# Placeholder: {killer}, {logger}
-pvpmanager-npc-killed-no-elo: '<gold>⚔ <white>{killer} <gray>tiêu diệt NPC của <white>{logger}<gray>!'
+# Thông báo khi tải lại config thành công
+admin-reload: '<green>✔ Cấu hình và trạng thái module đã được tải lại!'
 
-# Thông báo toàn server khi NPC hết giờ và tự biến mất
-# Placeholder: {logger}, {seconds}
-pvpmanager-npc-timeout: '<gray>☠ NPC của <white>{logger} <gray>đã biến mất sau {seconds}s!'
+# Hướng dẫn cú pháp từng lệnh admin
+admin-usage-reset: '<yellow>Cách dùng: <white>/nkr reset <player>'
+admin-usage-setelo: '<yellow>Cách dùng: <white>/nkr setelo <player> <elo>'
+admin-usage-give: '<yellow>Cách dùng: <white>/nkr give <player> <elo>'
+admin-usage-take: '<yellow>Cách dùng: <white>/nkr take <player> <elo>'
+admin-usage-info: '<yellow>Cách dùng: <white>/nkr info <player>'
+
+# Lỗi giá trị elo không hợp lệ
+admin-invalid-elo: '<red>⚠ Elo không hợp lệ! Phải là số nguyên không âm.'
+admin-invalid-amount: '<red>⚠ Số lượng elo không hợp lệ! Phải là số nguyên dương.'
+
+# Thông báo kết quả thành công — Placeholder: {player}
+admin-reset-done: '<green>✔ Đã reset dữ liệu của <yellow>{player}<green>!'
+
+# Placeholder: {player}, {elo}
+admin-setelo-done: '<green>✔ Đã set elo của <yellow>{player} <green>thành <gold>{elo}<green>!'
+
+# Placeholder: {player}, {amount}, {new_elo}
+admin-give-done: '<green>✔ Đã cộng <gold>+{amount} elo <green>cho <yellow>{player}<green>! (Elo mới: <gold>{new_elo}<green>)'
+
+# Placeholder: {player}, {amount}, {new_elo}
+admin-take-done: '<red>✔ Đã trừ <gold>{amount} elo <red>của <yellow>{player}<red>! (Elo mới: <gold>{new_elo}<red>)'
+
+# Thông tin chi tiết một người chơi — /nkr info
+# Placeholder: {player}, {uuid}, {elo}, {peak}, {kills}, {deaths}, {streak}, {death_streak}, {rank}
+admin-info:
+  - '<gold>--- {player} ---'
+  - '<white>UUID: <gray>{uuid}'
+  - '<white>Elo: <green>{elo} <white>| Peak: <gold>{peak}'
+  - '<white>Kills/Deaths: <yellow>{kills}<white>/<red>{deaths}'
+  - '<white>Kill Streak: <red>{streak} <white>| Death Streak: <dark_red>{death_streak}'
+  - '<white>Hạng: {rank}'
+
+# Tiêu đề và gợi ý lệnh modules
+admin-modules-header: '<gold>--- Trạng thái Module ---'
+admin-modules-hint: '<gray>Thay đổi trong <white>config.yml <gray>→ <white>/nkr reload'
+
+# Menu trợ giúp admin — hỗ trợ nhiều dòng
+admin-help:
+  - '<gold>--- NotKillRank Admin ---'
+  - '<yellow>/nkr reload <white>— Tải lại config & module'
+  - '<yellow>/nkr modules <white>— Xem trạng thái các module'
+  - '<yellow>/nkr reset <player> <white>— Reset toàn bộ dữ liệu người chơi'
+  - '<yellow>/nkr setelo <player> <elo> <white>— Set elo chính xác'
+  - '<yellow>/nkr give <player> <elo> <white>— Cộng elo cho người chơi'
+  - '<yellow>/nkr take <player> <elo> <white>— Trừ elo của người chơi'
+  - '<yellow>/nkr info <player> <white>— Xem thông tin chi tiết'
 
 
 #  LỆNH
@@ -106,6 +172,10 @@ stats:
   - '<gray>├ <white>K/D: <yellow>{kd} <dark_gray>│ <gray>Kill: <white>{kills} <dark_gray>│ <gray>Chết: <white>{deaths}'
   - '<gray>├ <white>Chuỗi kill cao nhất: <red>{streak}'
   - '<gray>└ <white>Elo đỉnh: <gold>{peak}'
+
+# Dòng bounty thêm vào /stats khi người chơi có bounty trên đầu
+# Placeholder: {bounty}
+stats-bounty: '<gray>└ <white>Bounty trên đầu: <red>{bounty} elo'
 
 # Kết quả lệnh /top (hiển thị trong chat)
 # Dòng đầu là header, dòng thứ hai là template cho mỗi người trong top

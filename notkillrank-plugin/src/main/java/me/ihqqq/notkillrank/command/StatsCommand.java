@@ -70,7 +70,9 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
 
         int totalBounty = data.getBounties().values().stream().mapToInt(Integer::intValue).sum();
         if (totalBounty > 0) {
-            MessageUtil.sendMessage(sender, "<white>Bounty trên đầu: <red>" + totalBounty + " elo");
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("stats-bounty",
+                            "<white>Bounty trên đầu: <red>{bounty} elo")
+                    .replace("{bounty}", String.valueOf(totalBounty)));
         }
 
         sendStatsWebhook(sender, data, rank + streakPart, kd, totalBounty);

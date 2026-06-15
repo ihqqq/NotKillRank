@@ -19,8 +19,6 @@ public class PvPManagerHook {
 
     private final Map<UUID, UUID> lastAttackerMap = new ConcurrentHashMap<>();
 
-    private final Map<UUID, CombatLogNpcData> npcMap = new ConcurrentHashMap<>();
-
     public PvPManagerHook() {
         instance = this;
         Plugin pvpm = Bukkit.getPluginManager().getPlugin("PvPManager");
@@ -68,21 +66,5 @@ public class PvPManagerHook {
 
     public void clearPlayer(UUID player) {
         lastAttackerMap.remove(player);
-    }
-
-    public void registerNpc(UUID entityUUID, CombatLogNpcData data) {
-        npcMap.put(entityUUID, data);
-    }
-
-    public CombatLogNpcData getNpcData(UUID entityUUID) {
-        return npcMap.get(entityUUID);
-    }
-
-    public CombatLogNpcData removeNpc(UUID entityUUID) {
-        return npcMap.remove(entityUUID);
-    }
-
-    public boolean isTrackedNpc(UUID entityUUID) {
-        return npcMap.containsKey(entityUUID);
     }
 }

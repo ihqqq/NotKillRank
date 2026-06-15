@@ -39,7 +39,7 @@ ranks:
 
   - min: 100
     max: 999
-    tag: "<dark_gray>[Unranked]"
+    tag: "<dark_gray>[<red>✘<dark_gray>]"
 
   - min: 1000
     max: 1399
@@ -67,7 +67,7 @@ ranks:
     tag: "<#43A047>[LT1]"
     rankup:
       broadcast-enabled: true
-      broadcast-text: "<dark_gray>[<#43A047>LT1<dark_gray>] <white>{player} <gray>vừa leo lên <#43A047>[LT1]<white>!"
+      broadcast-text: "{old_rank} <white>{player} <gray>vừa leo lên <#43A047>[LT1]<white>!"
       sound-name: ENTITY_PLAYER_LEVELUP
       sound-pitch: 1.3
 
@@ -78,7 +78,7 @@ ranks:
       title-text: "<#F9A825><bold>HIGH TIER!"
       subtitle-text: "<white>Hạng mới: {rank}"
       broadcast-enabled: true
-      broadcast-text: "<dark_gray>[<#F9A825>HT4<dark_gray>] <white>{player} <gray>vừa leo lên <#F9A825>[HT4]<white>!"
+      broadcast-text: "{old_rank} <white>{player} <gray>vừa leo lên <#F9A825>[HT4]<white>!"
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 1.0
@@ -90,7 +90,7 @@ ranks:
       title-text: "<#FB8C00><bold>HIGH TIER!"
       subtitle-text: "<white>Hạng mới: {rank}"
       broadcast-enabled: true
-      broadcast-text: "<dark_gray>[<#FB8C00>HT3<dark_gray>] <white>{player} <gray>vừa leo lên <#FB8C00>[HT3]<white>!"
+      broadcast-text: "{old_rank} <white>{player} <gray>vừa leo lên <#FB8C00>[HT3]<white>!"
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 1.1
@@ -102,7 +102,7 @@ ranks:
       title-text: "<#E53935><bold>HIGH TIER!"
       subtitle-text: "<white>Hạng mới: {rank}"
       broadcast-enabled: true
-      broadcast-text: "<dark_gray>[<#E53935>HT2<dark_gray>] <white>{player} <gray>vừa leo lên <#E53935>[HT2]<white>!"
+      broadcast-text: "{old_rank} <white>{player} <gray>vừa leo lên <#E53935>[HT2]<white>!"
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 1.2
@@ -117,7 +117,7 @@ ranks:
       title-text: "<gradient:#FFD700:#FFA000><bold>HIGH TIER 1!</bold></gradient>"
       subtitle-text: "<white>Chúc mừng <yellow>{player}<white>!"
       broadcast-enabled: true
-      broadcast-text: "<gradient:#FFD700:#FFA000>✦ HT1 ✦ <white>{player} <yellow>vừa đạt <gradient:#FFD700:#FFA000>[HT1]<white>! Hạng cao nhất server!"
+      broadcast-text: "{old_rank} <white>{player} <yellow>vừa đạt <gradient:#FFD700:#FFA000>[HT1]<white>! Hạng cao nhất server!"
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 0.8

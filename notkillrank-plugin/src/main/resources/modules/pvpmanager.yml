@@ -30,26 +30,9 @@ combat-log:
   elo-loss-multiplier: 2.0
 
   # Người tấn công cuối cùng có nhận được elo không?
-  # Trong chế độ NPC: elo được trao cho người tiêu diệt NPC.
   # true  → có nhận elo
   # false → chỉ trừ người thoát, không ai nhận
   attacker-gains-elo: true
 
   # Phát thông báo toàn server khi có người combat log.
   broadcast: true
-
-  # NPC COMBAT LOG
-  # Khi bật, một Zombie NPC sẽ xuất hiện tại vị trí người thoát
-  # và mang toàn bộ trang bị của họ. ELO thưởng được giữ lại
-  # cho đến khi người chơi tiêu diệt NPC đó.
-  #
-  # Nếu NPC không bị tiêu diệt trong npc-timeout-seconds giây,
-  # nó sẽ biến mất và không ai nhận được elo thưởng.
-
-  # true  → spawn Zombie NPC; elo thưởng chờ đến khi NPC bị giết
-  # false → chế độ thường; elo trao ngay cho kẻ tấn công nếu online
-  spawn-npc: false
-
-  # Thời gian (giây) NPC tồn tại trước khi tự biến mất.
-  # Chỉ có hiệu lực khi spawn-npc: true
-  npc-timeout-seconds: 30

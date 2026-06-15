@@ -27,24 +27,28 @@ public class BountyCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Chỉ có người chơi mới dùng được lệnh /bounty");
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("bounty-player-only",
+                    "<red>⚠ Chỉ có người chơi mới dùng được lệnh /bounty"));
             return true;
         }
         if (!Settings.MODULE_BOUNTY) {
-            MessageUtil.sendMessage(sender, "<red>Hệ thống Bounty hiện đang bị tắt!");
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("bounty-module-disabled",
+                    "<red>⚠ Hệ thống Bounty hiện đang bị tắt!"));
             return true;
         }
         if (!sender.hasPermission("notkillrank.use")) {
             MessageUtil.sendMessage(sender, MessageUtil.getMessage("no-permission",
-                    "<red>Bạn không có quyền dùng lệnh này!"));
+                    "<red>⚠ Bạn không có quyền dùng lệnh này!"));
             return true;
         }
         if (args.length < 2) {
-            MessageUtil.sendMessage(sender, "<yellow>Cách dùng: <white>/bounty <player> <elo>");
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("bounty-usage",
+                    "<yellow>Cách dùng: <white>/bounty <player> <elo>"));
             return true;
         }
         if (args[0].equalsIgnoreCase(player.getName())) {
-            MessageUtil.sendMessage(sender, "<red>Bạn không thể đặt bounty lên chính mình!");
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("bounty-self",
+                    "<red>⚠ Bạn không thể đặt bounty lên chính mình!"));
             return true;
         }
         Player target = Bukkit.getPlayerExact(args[0]);
@@ -65,7 +69,8 @@ public class BountyCommand implements CommandExecutor, TabCompleter {
             amount = Integer.parseInt(args[1]);
             if (amount <= 0) throw new NumberFormatException();
         } catch (NumberFormatException e) {
-            MessageUtil.sendMessage(sender, "<red>Số lượng elo không hợp lệ!");
+            MessageUtil.sendMessage(sender, MessageUtil.getMessage("bounty-invalid-amount",
+                    "<red>⚠ Số lượng elo không hợp lệ! Phải là số nguyên dương."));
             return true;
         }
         BountyManager.getInstance().placeBounty(player, target, amount);

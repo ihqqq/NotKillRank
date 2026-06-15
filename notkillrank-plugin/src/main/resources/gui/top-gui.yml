@@ -28,7 +28,7 @@ background:
     - x       x
     - x       x
     - x       x
-    - xxxxxxxxx
+    - " xxxxxxx "
 
 # Vị trí slot hiển thị đầu từng người trong top (index từ 0, theo thứ tự top 1 → top 10)
 player-slots:
@@ -67,3 +67,35 @@ medals:
   '2': <dark_gray>[<blue>#2<dark_gray>]
   '3': <dark_gray>[<red>#3<dark_gray>]
   default: <dark_gray>[<gray>#{pos}<dark_gray>]
+
+# Các nút trong GUI
+# slot: vị trí ô (0-53 với 6 hàng)
+# click-commands: danh sách lệnh chạy sau khi đóng GUI
+#   Prefix xác định ai chạy lệnh (mặc định [player] nếu không có prefix):
+#     [player]     → chạy như người chơi bình thường
+#     [console]    → chạy bằng console (có toàn quyền)
+#     [playerasop] → chạy như người chơi nhưng tạm thời có OP
+#   Không cần dấu / trước lệnh
+#   Ví dụ:
+#     click-commands: []                          # chỉ đóng GUI
+#     click-commands: ['[player] menu']           # mở /menu
+#     click-commands: ['[console] dm open main']  # console chạy lệnh
+#     click-commands: ['[playerasop] test']       # chạy /test với quyền OP tạm thời
+#     click-commands: ['[player] spawn', '[console] say {player} về spawn'] # nhiều lệnh
+buttons:
+  back:
+    slot: 45
+    icon:
+      type: CUSTOM_HEAD
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDliMmJlZTM5YjZlZjQ3ZTE4MmQ2ZjFkY2E5ZGVhODQyZmNkNjhiZGE5YmFjYzZhNmQ2NmE4ZGNkZjNlYyJ9fX0=
+      name: '<gray>Click để quay lại'
+    click-commands:
+      - '[player] menu'
+  close:
+    slot: 53
+    type: CUSTOM_HEAD
+    texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmViNTg4YjIxYTZmOThhZDFmZjRlMDg1YzU1MmRjYjA1MGVmYzljYWI0MjdmNDYwNDhmMThmYzgwMzQ3NWY3In19fQ==
+    icon:
+      type: BARRIER
+      name: '<gray>Click để đóng'
+    click-commands: []

@@ -29,8 +29,9 @@ public class BountyManager {
     public boolean placeBounty(Player placer, Player target, int amount) {
         int minAmount = Settings.BOUNTY_MIN_AMOUNT;
         if (amount < minAmount) {
-            MessageUtil.sendMessage(placer, "<red>Số lượng elo bounty tối thiểu là <yellow>"
-                    + minAmount + "<red>!");
+            MessageUtil.sendMessage(placer, MessageUtil.getMessage("bounty-min-amount",
+                            "<red>⚠ Số elo bounty tối thiểu là <yellow>{min}<red>!")
+                    .replace("{min}", String.valueOf(minAmount)));
             return false;
         }
 
@@ -38,17 +39,20 @@ public class BountyManager {
         int currentElo = placerData.getElo();
 
         if (currentElo <= Settings.ELO_MIN) {
-            MessageUtil.sendMessage(placer, "<red>Bạn không đủ elo để đặt bounty! Elo hiện tại: <yellow>"
-                    + currentElo);
+            MessageUtil.sendMessage(placer, MessageUtil.getMessage("bounty-no-elo",
+                            "<red>⚠ Bạn không đủ elo để đặt bounty! Elo hiện tại: <yellow>{elo}")
+                    .replace("{elo}", String.valueOf(currentElo)));
             return false;
         }
 
         int actualAmount = currentElo - Math.max(Settings.ELO_MIN, currentElo - amount);
 
         if (actualAmount < minAmount) {
-            MessageUtil.sendMessage(placer, "<red>Bạn không đủ elo! Cần ít nhất <yellow>"
-                    + (Settings.ELO_MIN + minAmount) + " elo <red>để đặt bounty tối thiểu <yellow>"
-                    + minAmount + "<red>. Elo hiện tại: <yellow>" + currentElo);
+            MessageUtil.sendMessage(placer, MessageUtil.getMessage("bounty-not-enough-elo",
+                            "<red>⚠ Bạn không đủ elo! Cần ít nhất <yellow>{required} elo <red>để đặt bounty tối thiểu <yellow>{min}<red>. Elo hiện tại: <yellow>{elo}")
+                    .replace("{required}", String.valueOf(Settings.ELO_MIN + minAmount))
+                    .replace("{min}", String.valueOf(minAmount))
+                    .replace("{elo}", String.valueOf(currentElo)));
             return false;
         }
 
@@ -104,7 +108,6 @@ public class BountyManager {
             refundToPlacer(placerUuid, refundAmount, targetName);
         }
 
-        // Lưu dữ liệu của người bị bounty (bounty đã bị xóa)
         final String targetUuid = targetData.getUUID();
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin,
                 () -> PluginDataManager.savePlayerDatabaseToStorage(targetUuid));

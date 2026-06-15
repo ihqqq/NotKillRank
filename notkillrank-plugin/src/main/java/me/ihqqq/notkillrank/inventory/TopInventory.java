@@ -108,6 +108,28 @@ public class TopInventory implements NotKillRankInventoryBase {
                                 profileMap.get(top.get(i).getUUID())));
                     }
                 }
+
+                ConfigurationSection buttonsSection = gui.getConfigurationSection("buttons");
+                if (buttonsSection != null) {
+                    for (String key : buttonsSection.getKeys(false)) {
+                        ConfigurationSection btn = buttonsSection.getConfigurationSection(key);
+                        if (btn == null) continue;
+                        int slot = btn.getInt("slot", -1);
+                        if (slot < 0 || slot >= size) continue;
+                        ConfigurationSection iconSec = btn.getConfigurationSection("icon");
+                        String rawName = btn.getString("icon.name", null);
+                        String btnName = rawName != null ? "<!italic>" + rawName : null;
+                        List<String> btnLore = null;
+                        if (btn.contains("icon.lore")) {
+                            btnLore = new ArrayList<>();
+                            for (String line : btn.getStringList("icon.lore")) {
+                                btnLore.add(line.isEmpty() ? line : "<!italic>" + line);
+                            }
+                        }
+                        inv.setItem(slot, ItemBuilder.fromIconSection(iconSec, btnName, btnLore));
+                    }
+                }
+
                 player.openInventory(inv);
             });
         });
@@ -214,8 +236,58 @@ public class TopInventory implements NotKillRankInventoryBase {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getInventory().getHolder() instanceof Holder) {
-            event.setCancelled(true);
+        if (!(event.getInventory().getHolder() instanceof Holder)) return;
+        event.setCancelled(true);
+
+        int slot = event.getRawSlot();
+        FileConfiguration gui = TopGuiFile.get();
+        ConfigurationSection buttonsSection = gui.getConfigurationSection("buttons");
+        if (buttonsSection == null) return;
+
+        for (String key : buttonsSection.getKeys(false)) {
+            ConfigurationSection btn = buttonsSection.getConfigurationSection(key);
+            if (btn == null) continue;
+            if (btn.getInt("slot", -1) != slot) continue;
+
+            List<String> cmds = btn.getStringList("click-commands");
+            Player clicker = (Player) event.getWhoClicked();
+            clicker.closeInventory();
+            if (!cmds.isEmpty()) {
+                Bukkit.getScheduler().runTaskLater(NotKillRank.plugin, () -> {
+                    for (String entry : cmds) {
+                        dispatchButtonCommand(clicker, entry);
+                    }
+                }, 1L);
+            }
+            return;
+        }
+    }
+
+    private static void dispatchButtonCommand(Player player, String entry) {
+        String raw = entry.startsWith("/") ? entry.substring(1) : entry;
+        String mode = "player";
+        String cmd = raw;
+
+        if (raw.startsWith("[") && raw.contains("] ")) {
+            int end = raw.indexOf("] ");
+            mode = raw.substring(1, end).toLowerCase();
+            cmd = raw.substring(end + 2);
+        }
+
+        cmd = cmd.replace("{player}", player.getName());
+
+        switch (mode) {
+            case "console" -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+            case "playerasop" -> {
+                boolean wasOp = player.isOp();
+                try {
+                    player.setOp(true);
+                    Bukkit.dispatchCommand(player, cmd);
+                } finally {
+                    if (!wasOp) player.setOp(false);
+                }
+            }
+            default -> Bukkit.dispatchCommand(player, cmd);
         }
     }
 

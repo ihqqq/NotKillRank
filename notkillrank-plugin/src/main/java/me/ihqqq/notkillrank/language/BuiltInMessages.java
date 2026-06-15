@@ -26,8 +26,8 @@ public class BuiltInMessages {
                     + "<gray>{pos}. {rank} <white>{player} <dark_gray>─ <green>{elo} elo";
 
     public static final String KILL_BROADCAST =
-            "<reset>{rank_killer} <white>{killer} {elo_gained_detail} "
-                    + "<white>đã chọc chết {rank_victim} <white>{victim} {elo_lost_detail}";
+            "<reset>{rank_killer} <white>{killer} <green>+{elo_gained} elo "
+                    + "<white>đã chọc chết {rank_victim} <white>{victim} <red>-{elo_lost} elo";
 
     public static final String STREAK_BREAK =
             "<yellow>{breaker} <white>đã chấm dứt chuỗi <red>{streak} kill "

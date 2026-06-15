@@ -72,7 +72,7 @@ public class MessageUtil {
 
     private static Component consoleComponent(String text) {
         if (text == null) return Component.empty();
-        return LegacyComponentSerializer.legacyAmpersand().deserialize(text);
+        return MM.deserialize(text);
     }
 
     public static String getMessage(String path) {

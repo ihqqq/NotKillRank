@@ -25,11 +25,11 @@ public class PvPManagerHook {
         if (pvpm != null && pvpm.isEnabled()) {
             hooked = true;
             new PvPManagerListener();
-            MessageUtil.log("&a[PvPManager] &7Hook thành công với PvPManager v"
+            MessageUtil.log("<green>[PvPManager] <gray>Hook thành công với PvPManager v"
                     + pvpm.getDescription().getVersion());
         } else {
             hooked = false;
-            MessageUtil.log("&e[PvPManager] &7Không tìm thấy PvPManager — module bị tắt.");
+            MessageUtil.log("<yellow>[PvPManager] <gray>Không tìm thấy PvPManager — module bị tắt.");
         }
     }
 

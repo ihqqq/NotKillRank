@@ -103,60 +103,60 @@ public final class NotKillRank extends JavaPlugin {
         String storage = Settings.STORAGE_TYPE.name();
 
         String pvpmStatus = (PvPManagerHook.getInstance() != null && PvPManagerHook.getInstance().isHooked())
-                ? "&aHoạt động"
-                : (Settings.MODULE_PVPMANAGER ? "&eBật &8(PvPManager chưa cài)" : "&cTắt");
+                ? "<green>Hoạt động"
+                : (Settings.MODULE_PVPMANAGER ? "<yellow>Bật <dark_gray>(PvPManager chưa cài)" : "<red>Tắt");
         String papiStatus = papiRegistered
-                ? "&aHoạt động &8(expansion đã đăng ký)"
-                : "&7Không tìm thấy &8(bỏ qua)";
+                ? "<green>Hoạt động <dark_gray>(expansion đã đăng ký)"
+                : "<gray>Không tìm thấy <dark_gray>(bỏ qua)";
 
-        String sep = "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+        String sep = "<dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
 
         MessageUtil.log(sep);
-        MessageUtil.log("&r");
-        MessageUtil.log("&r    &b&lNotKill&3&lRank  &8» &7v" + ver);
-        MessageUtil.log("&r    &7Plugin thuộc sở hữu của &e&lNotMC &8| &7Tác giả&8: &a" + authors);
-        MessageUtil.log("&r");
+        MessageUtil.log("");
+        MessageUtil.log("    <bold><aqua>NotKill<dark_aqua>Rank</dark_aqua></bold>  <dark_gray>» <gray>v" + ver);
+        MessageUtil.log("    <gray>Plugin thuộc sở hữu của <yellow><bold>NotMC</bold></yellow> <dark_gray>| <gray>Tác giả<dark_gray>: <green>" + authors);
+        MessageUtil.log("");
         MessageUtil.log(sep);
-        MessageUtil.log("&r");
-        MessageUtil.log("&r  &8» &7Lưu trữ        &8: &b" + storage);
-        MessageUtil.log("&r  &8» &7PvPManager      &8: " + pvpmStatus);
-        MessageUtil.log("&r  &8» &7PlaceholderAPI  &8: " + papiStatus);
-        MessageUtil.log("&r");
-        MessageUtil.log("&r  &8» &7Modules&8:");
+        MessageUtil.log("");
+        MessageUtil.log("  <dark_gray>» <gray>Lưu trữ        <dark_gray>: <aqua>" + storage);
+        MessageUtil.log("  <dark_gray>» <gray>PvPManager      <dark_gray>: " + pvpmStatus);
+        MessageUtil.log("  <dark_gray>» <gray>PlaceholderAPI  <dark_gray>: " + papiStatus);
+        MessageUtil.log("");
+        MessageUtil.log("  <dark_gray>» <gray>Modules<dark_gray>:");
 
         for (ModuleManager.Module m : ModuleManager.Module.values()) {
             String label  = formatModuleName(m.name());
-            String status = m.isEnabled() ? "&a BẬT" : "&c TẮT";
-            MessageUtil.log("&r     &7" + label + " &8— " + status);
+            String status = m.isEnabled() ? "<green>BẬT" : "<red>TẮT";
+            MessageUtil.log("     <gray>" + label + " <dark_gray>— " + status);
         }
 
-        MessageUtil.log("&r");
+        MessageUtil.log("");
         MessageUtil.log(sep);
-        MessageUtil.log("&r  &a✔ NotKillRank đã khởi động thành công!");
+        MessageUtil.log("  <green>✔ NotKillRank đã khởi động thành công!");
         MessageUtil.log(sep);
     }
 
     private static void printDisableBanner() {
-        String sep = "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+        String sep = "<dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
         MessageUtil.log(sep);
-        MessageUtil.log("&r  &c✘ NotKillRank đang tắt...");
-        MessageUtil.log("&r  &7Đang lưu dữ liệu người chơi...");
-        MessageUtil.log("&r  &8Plugin thuộc sở hữu của &eNotMC &8— Leak = chó rách!");
+        MessageUtil.log("  <red>✘ NotKillRank đang tắt...");
+        MessageUtil.log("  <gray>Đang lưu dữ liệu người chơi...");
+        MessageUtil.log("  <dark_gray>Plugin thuộc sở hữu của <yellow>NotMC</yellow> <dark_gray>— Leak = chó rách!");
         MessageUtil.log(sep);
     }
 
     private static void printReloadBanner() {
-        String sep = "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+        String sep = "<dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
         MessageUtil.log(sep);
-        MessageUtil.log("&r  &e↺  NotKillRank — Tải lại cấu hình");
-        MessageUtil.log("&r");
+        MessageUtil.log("  <yellow>↺  NotKillRank — Tải lại cấu hình");
+        MessageUtil.log("");
         for (ModuleManager.Module m : ModuleManager.Module.values()) {
             String label  = formatModuleName(m.name());
-            String status = m.isEnabled() ? "&a✔ BẬT" : "&c✘ TẮT";
-            MessageUtil.log("&r     &7" + label + " &8— " + status);
+            String status = m.isEnabled() ? "<green>✔ BẬT" : "<red>✘ TẮT";
+            MessageUtil.log("     <gray>" + label + " <dark_gray>— " + status);
         }
-        MessageUtil.log("&r");
-        MessageUtil.log("&r  &aHoàn tất!");
+        MessageUtil.log("");
+        MessageUtil.log("  <green>Hoàn tất!");
         MessageUtil.log(sep);
     }
 

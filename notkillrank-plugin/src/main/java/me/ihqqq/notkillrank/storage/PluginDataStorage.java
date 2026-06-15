@@ -18,7 +18,7 @@ public class PluginDataStorage {
             case SQLITE -> STORAGE = createSQLite();
             case H2     -> STORAGE = createH2();
             default     -> {
-                MessageUtil.log("&7[Storage] Đang dùng lưu trữ YAML.");
+                MessageUtil.log("<gray>[Storage] Đang dùng lưu trữ YAML.");
                 STORAGE = new PluginDataYAMLStorage();
             }
         }
@@ -51,7 +51,7 @@ public class PluginDataStorage {
         try {
             PluginDataSQLiteStorage storage = new PluginDataSQLiteStorage(dbFile.getAbsolutePath());
             storage.init();
-            MessageUtil.log("&7[Storage] Đang dùng lưu trữ SQLite: " + dbFile.getName());
+            MessageUtil.log("<gray>[Storage] Đang dùng lưu trữ SQLite: " + dbFile.getName());
             return storage;
         } catch (SQLException e) {
             MessageUtil.warn("[Storage] Không thể khởi tạo SQLite: " + e.getMessage() + " — quay về YAML.");
@@ -68,7 +68,7 @@ public class PluginDataStorage {
         try {
             PluginDataH2Storage storage = new PluginDataH2Storage(url);
             storage.init();
-            MessageUtil.log("&7[Storage] Đang dùng lưu trữ H2: " + fileName);
+            MessageUtil.log("<gray>[Storage] Đang dùng lưu trữ H2: " + fileName);
             return storage;
         } catch (SQLException e) {
             MessageUtil.warn("[Storage] Không thể khởi tạo H2: " + e.getMessage() + " — quay về YAML.");

@@ -18,7 +18,7 @@ public class PluginDataManager {
     private static final Set<String> npcExcludedUUIDs = ConcurrentHashMap.newKeySet();
 
     public static void loadAllDatabase() {
-        MessageUtil.log("&a[PluginDataManager] Khởi tạo bộ nhớ đệm dữ liệu người chơi.");
+        MessageUtil.log("<green>[PluginDataManager] Khởi tạo bộ nhớ đệm dữ liệu người chơi.");
     }
 
     public static void saveAllDatabase() {
@@ -26,7 +26,7 @@ public class PluginDataManager {
         for (PlayerData data : snapshot) {
             PluginDataStorage.savePlayerData(data.getUUID(), data);
         }
-        MessageUtil.log("&a[PluginDataManager] Đã lưu " + snapshot.size() + " hồ sơ người chơi.");
+        MessageUtil.log("<green>[PluginDataManager] Đã lưu " + snapshot.size() + " hồ sơ người chơi.");
     }
 
     public static PlayerData getOrCreate(Player player) {

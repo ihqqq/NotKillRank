@@ -1,0 +1,14 @@
+# NotKillRank - Module: Báo thù (Revenger)
+# Thưởng bonus elo khi người chơi giết lại người vừa giết mình
+
+# Bật thông báo toàn server khi báo thù thành công
+broadcast: true
+
+# Bonus % elo nhận thêm khi báo thù
+# Ví dụ: 20 → nhận thêm 20% elo so với kill thường
+bonus-percent: 20
+
+# Thời gian cửa sổ báo thù tính bằng giây
+# Phải giết lại đối thủ trong khoảng thời gian này mới tính là báo thù
+# Ví dụ: 300 → phải báo thù trong vòng 5 phút
+window-seconds: 300

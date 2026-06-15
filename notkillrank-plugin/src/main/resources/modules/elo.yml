@@ -21,11 +21,3 @@ low-elo-threshold: 50
 # Hệ số nhân khi giết người có elo thấp hơn ngưỡng trên
 # Ví dụ: 0.5 → chỉ nhận 50% elo so với bình thường
 low-elo-multiplier: 0.5
-
-# Bonus % elo khi giết lại người vừa giết mình (báo thù)
-# Ví dụ: 20 → nhận thêm 20% elo
-revenge-bonus-percent: 20
-
-# Thời gian báo thù tính bằng giây
-# Ví dụ: 300 → phải giết lại trong vòng 5 phút để nhận bonus báo thù
-revenge-window-seconds: 300

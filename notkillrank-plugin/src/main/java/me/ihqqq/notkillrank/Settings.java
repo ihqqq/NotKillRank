@@ -15,6 +15,7 @@ public class Settings {
     public static boolean MODULE_BOUNTY;
     public static boolean MODULE_DECAY;
     public static boolean MODULE_PROTECTION;
+    public static boolean MODULE_REVENGER;
     public static boolean MODULE_STREAKS;
     public static boolean MODULE_PLACEHOLDERAPI;
     public static boolean MODULE_WEBHOOK;
@@ -56,6 +57,7 @@ public class Settings {
         MODULE_BOUNTY       = main.getBoolean("modules.enabled.bounty", true);
         MODULE_DECAY        = main.getBoolean("modules.enabled.decay", true);
         MODULE_PROTECTION   = main.getBoolean("modules.enabled.protection", true);
+        MODULE_REVENGER     = main.getBoolean("modules.enabled.revenger", true);
         MODULE_STREAKS      = main.getBoolean("modules.enabled.streaks", true);
         MODULE_PLACEHOLDERAPI = main.getBoolean("modules.enabled.placeholderapi", true);
         MODULE_WEBHOOK      = main.getBoolean("modules.enabled.webhook", false);
@@ -67,8 +69,9 @@ public class Settings {
         ELO_MIN                  = elo.getInt("min-elo", 0);
         ELO_HIGH_MULTIPLIER      = elo.getDouble("high-elo-multiplier", 1.5);
         ELO_LOW_MULTIPLIER       = elo.getDouble("low-elo-multiplier", 0.5);
-        ELO_REVENGE_WINDOW_SECONDS = elo.getInt("revenge-window-seconds", 300);
-        ELO_REVENGE_BONUS_PERCENT  = elo.getInt("revenge-bonus-percent", 20);
+        var rev = RevengerFile.get();
+        ELO_REVENGE_WINDOW_SECONDS = rev.getInt("window-seconds", 300);
+        ELO_REVENGE_BONUS_PERCENT  = rev.getInt("bonus-percent", 20);
 
         ANTI_FARM_LIMIT_KILLS_PER_HOUR = AntiFarmFile.get().getInt("limit-kills-per-hour", 3);
 

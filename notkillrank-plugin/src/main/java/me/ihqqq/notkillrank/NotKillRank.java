@@ -53,6 +53,7 @@ public final class NotKillRank extends JavaPlugin {
 
         new ModuleManager();
         new EloManager();
+        new RevengerManager();
         new RankManager();
         new StreakManager();
         new BountyManager();
@@ -166,6 +167,7 @@ public final class NotKillRank extends JavaPlugin {
             case "BOUNTY"       -> "Bounty         ";
             case "DECAY"        -> "Elo Decay      ";
             case "PROTECTION"   -> "Bảo vệ người mới";
+            case "REVENGER"     -> "Báo thù        ";
             case "STREAKS"      -> "Kill Streaks   ";
             case "PLACEHOLDERAPI" -> "PlaceholderAPI ";
             case "WEBHOOK"      -> "Webhook        ";
@@ -178,6 +180,7 @@ public final class NotKillRank extends JavaPlugin {
         MessagesFile.init();
         TopGuiFile.init();
         EloFile.init();
+        RevengerFile.init();
         AntiFarmFile.init();
         BountyFile.init();
         DecayFile.init();

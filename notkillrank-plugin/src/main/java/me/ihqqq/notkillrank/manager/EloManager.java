@@ -121,11 +121,7 @@ public class EloManager {
         sendKillBroadcast(killer, killerData, victim, victimData, breakdown);
 
         if (breakdown.revengeBonusPct > 0) {
-            String revengeMsg = MessageUtil.getMessage("revenge-kill",
-                            "<gold>[Báo thù] <white>{player} <white>đã trả thù <red>{target}<white>!")
-                    .replace("{player}", killer.getName())
-                    .replace("{target}", victim.getName());
-            MessageUtil.sendBroadcast(revengeMsg);
+            RevengerManager.getInstance().broadcastRevenge(killer, victim);
         }
 
         if (streakModuleEnabled && RankManager.getInstance().isWeak(victimData)) {
@@ -162,7 +158,7 @@ public class EloManager {
             }
         }
 
-        boolean isRevenge = isRevenge(killer, victimData);
+        boolean isRevenge = RevengerManager.getInstance().isRevenge(killerData, victimData.getUUID());
         int revengeBonusPct = isRevenge ? Settings.ELO_REVENGE_BONUS_PERCENT : 0;
         double revengeMultiplier = 1.0 + (revengeBonusPct / 100.0);
 
@@ -259,10 +255,4 @@ public class EloManager {
         killerData.getOrCreateKillTimestamps(victimUUID).add(System.currentTimeMillis());
     }
 
-    private boolean isRevenge(Player killer, PlayerData victimData) {
-        if (victimData.getLastKillerUUID() == null) return false;
-        if (!victimData.getLastKillerUUID().equals(killer.getUniqueId().toString())) return false;
-        long elapsed = System.currentTimeMillis() - victimData.getLastKilledTime();
-        return elapsed <= (long) Settings.ELO_REVENGE_WINDOW_SECONDS * 1000;
-    }
 }

@@ -121,12 +121,13 @@ public class PvPManagerListener implements Listener {
             if (attackerGains && actualLoss > 0) {
                 String loggerUuidStr = logger.getUniqueId().toString();
                 boolean antiFarm = Settings.MODULE_ANTI_FARM
-                        && EloManager.getInstance().isAntiFarm(attackerData, loggerUuidStr);
+                        && EloManager.getInstance().isAntiFarm(attacker, attackerData, loggerUuidStr);
                 if (antiFarm) {
+                    int effectiveLimit = EloManager.getInstance().resolveAntiFarmLimit(attacker);
                     String antiMsg = MessageUtil.getMessage("anti-farm",
                                     "<gray>(Không nhận elo — Đã giết {victim} quá {limit} lần/giờ)")
                             .replace("{victim}", logger.getName())
-                            .replace("{limit}", String.valueOf(Settings.ANTI_FARM_LIMIT_KILLS_PER_HOUR));
+                            .replace("{limit}", String.valueOf(effectiveLimit));
                     MessageUtil.sendMessage(attacker, antiMsg);
                 } else {
                     eloGain = actualLoss;

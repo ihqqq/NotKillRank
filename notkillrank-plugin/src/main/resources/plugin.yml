@@ -33,3 +33,18 @@ permissions:
   notkillrank.admin:
     description: Cho phép dùng lệnh admin
     default: op
+  notkillrank.antifarm.max.5:
+    description: Giới hạn anti-farm 5 kill/giờ trên cùng 1 người
+    default: false
+  notkillrank.antifarm.max.10:
+    description: Giới hạn anti-farm 10 kill/giờ trên cùng 1 người
+    default: false
+  notkillrank.antifarm.max.15:
+    description: Giới hạn anti-farm 15 kill/giờ trên cùng 1 người
+    default: false
+  notkillrank.antifarm.max.20:
+    description: Giới hạn anti-farm 20 kill/giờ trên cùng 1 người
+    default: false
+  notkillrank.antifarm.bypass:
+    description: Bypass hoàn toàn giới hạn anti-farm
+    default: false

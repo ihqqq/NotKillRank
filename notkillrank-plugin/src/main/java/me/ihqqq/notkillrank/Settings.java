@@ -2,6 +2,10 @@ package me.ihqqq.notkillrank;
 
 import me.ihqqq.notkillrank.enums.StorageType;
 import me.ihqqq.notkillrank.file.module.*;
+import org.bukkit.configuration.ConfigurationSection;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Settings {
     public static StorageType STORAGE_TYPE;
@@ -30,6 +34,9 @@ public class Settings {
     public static int ELO_REVENGE_BONUS_PERCENT;
 
     public static int ANTI_FARM_LIMIT_KILLS_PER_HOUR;
+    public static List<AntiFarmPermEntry> ANTI_FARM_PERM_ENTRIES;
+
+    public record AntiFarmPermEntry(String permission, int limit) {}
 
     public static int PROTECTION_NEWBIE_HOURS;
     public static int PROTECTION_NEWBIE_ELO;
@@ -74,6 +81,20 @@ public class Settings {
         ELO_REVENGE_BONUS_PERCENT  = rev.getInt("bonus-percent", 20);
 
         ANTI_FARM_LIMIT_KILLS_PER_HOUR = AntiFarmFile.get().getInt("limit-kills-per-hour", 3);
+
+        ANTI_FARM_PERM_ENTRIES = new ArrayList<>();
+        List<?> permList = AntiFarmFile.get().getList("permissions");
+        if (permList != null) {
+            for (Object entry : permList) {
+                if (entry instanceof ConfigurationSection sec) {
+                    String perm = sec.getString("permission");
+                    int limit = sec.getInt("limit", 3);
+                    if (perm != null && !perm.isEmpty()) {
+                        ANTI_FARM_PERM_ENTRIES.add(new AntiFarmPermEntry(perm, limit));
+                    }
+                }
+            }
+        }
 
         PROTECTION_NEWBIE_HOURS = ProtectionFile.get().getInt("newbie-hours", 10);
         PROTECTION_NEWBIE_ELO   = ProtectionFile.get().getInt("newbie-protect-elo", 100);

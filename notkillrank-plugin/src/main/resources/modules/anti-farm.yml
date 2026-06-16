@@ -3,3 +3,19 @@
 # Số lần tối đa được giết cùng 1 người trong 1 giờ mà vẫn nhận elo
 # Vượt quá giới hạn → kill vẫn tính K/D nhưng không nhận elo
 limit-kills-per-hour: 3
+
+# Danh sách permission cho phép tăng giới hạn kill anti-farm
+# Plugin duyệt từ trên xuống, áp dụng limit của permission đầu tiên mà người chơi có
+# limit: -1 = bypass hoàn toàn anti-farm
+# Nếu không có permission nào khớp → dùng limit-kills-per-hour ở trên
+permissions:
+  - permission: notkillrank.antifarm.max.5
+    limit: 5
+  - permission: notkillrank.antifarm.max.10
+    limit: 10
+  - permission: notkillrank.antifarm.max.15
+    limit: 15
+  - permission: notkillrank.antifarm.max.20
+    limit: 20
+  - permission: notkillrank.antifarm.bypass
+    limit: -1

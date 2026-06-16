@@ -57,11 +57,12 @@ public class EloManager {
         }
 
         boolean antiFarmEnabled = Settings.MODULE_ANTI_FARM;
-        if (antiFarmEnabled && isAntiFarm(killerData, victim.getUniqueId().toString())) {
+        if (antiFarmEnabled && isAntiFarm(killer, killerData, victim.getUniqueId().toString())) {
+            int effectiveLimit = resolveAntiFarmLimit(killer);
             String anti = MessageUtil.getMessage("anti-farm",
                             "<gray>(Không nhận elo — Đã giết {victim} quá {limit} lần/giờ)")
                     .replace("{victim}", victim.getName())
-                    .replace("{limit}", String.valueOf(Settings.ANTI_FARM_LIMIT_KILLS_PER_HOUR));
+                    .replace("{limit}", String.valueOf(effectiveLimit));
             MessageUtil.sendMessage(killer, anti);
 
             killerData.setKills(killerData.getKills() + 1);
@@ -108,7 +109,7 @@ public class EloManager {
         victimData.setLastKilledTime(System.currentTimeMillis());
         victimData.setNoDeathStart(System.currentTimeMillis());
 
-        if (antiFarmEnabled) logKill(killerData, victim.getUniqueId().toString());
+        if (antiFarmEnabled && resolveAntiFarmLimit(killer) != -1) logKill(killerData, victim.getUniqueId().toString());
 
         if (streakModuleEnabled) StreakManager.getInstance().checkMilestone(killer, killerData);
 
@@ -240,7 +241,19 @@ public class EloManager {
         victimData.setKillStreak(0);
     }
 
-    public boolean isAntiFarm(PlayerData killerData, String victimUUID) {
+    public int resolveAntiFarmLimit(Player killer) {
+        for (Settings.AntiFarmPermEntry entry : Settings.ANTI_FARM_PERM_ENTRIES) {
+            if (killer.hasPermission(entry.permission())) {
+                return entry.limit();
+            }
+        }
+        return Settings.ANTI_FARM_LIMIT_KILLS_PER_HOUR;
+    }
+
+    public boolean isAntiFarm(Player killer, PlayerData killerData, String victimUUID) {
+        int limit = resolveAntiFarmLimit(killer);
+        if (limit == -1) return false;
+
         long now = System.currentTimeMillis();
         long oneHour = 60L * 60 * 1000;
         List<Long> timestamps = killerData.getOrCreateKillTimestamps(victimUUID);
@@ -248,7 +261,7 @@ public class EloManager {
         if (timestamps.isEmpty()) {
             killerData.getKillLog().remove(victimUUID);
         }
-        return timestamps.size() >= Settings.ANTI_FARM_LIMIT_KILLS_PER_HOUR;
+        return timestamps.size() >= limit;
     }
 
     public void logKill(PlayerData killerData, String victimUUID) {

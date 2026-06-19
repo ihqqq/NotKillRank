@@ -9,15 +9,25 @@ import me.ihqqq.notkillrank.storage.PluginDataStorage;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class EloDecayTask extends BukkitRunnable {
 
-    public EloDecayTask() {
-        long intervalTicks = 20L * 60 * 60 * 12;
-        runTaskTimerAsynchronously(NotKillRank.plugin, intervalTicks, intervalTicks);
+    private static final long INTERVAL_TICKS = 20L * 60 * 60 * 12;
+    private static BukkitTask currentTask;
+
+    public static void scheduleOrRestart() {
+        if (currentTask != null) {
+            try { currentTask.cancel(); } catch (Exception ignored) {}
+            currentTask = null;
+        }
+        currentTask = new EloDecayTask()
+                .runTaskTimerAsynchronously(NotKillRank.plugin, INTERVAL_TICKS, INTERVAL_TICKS);
     }
 
     @Override
@@ -25,7 +35,9 @@ public class EloDecayTask extends BukkitRunnable {
         if (!Settings.MODULE_DECAY) return;
 
         List<PlayerData> allFromDisk = PluginDataStorage.getAllPlayerData();
-        int decayed = 0;
+
+        List<String> onlineUuids = new ArrayList<>();
+        List<PlayerData> offlinePlayers = new ArrayList<>();
 
         for (PlayerData diskData : allFromDisk) {
             UUID uuid;
@@ -34,27 +46,40 @@ public class EloDecayTask extends BukkitRunnable {
             } catch (IllegalArgumentException e) {
                 continue;
             }
-
             if (Bukkit.getPlayer(uuid) != null) {
-                PlayerData cacheData = PluginDataManager.getPlayerDatabase(diskData.getUUID());
-                if (cacheData != null) {
+                onlineUuids.add(diskData.getUUID());
+            } else {
+                offlinePlayers.add(diskData);
+            }
+        }
+
+        AtomicInteger decayed = new AtomicInteger(0);
+
+        if (!onlineUuids.isEmpty()) {
+            Bukkit.getScheduler().runTask(NotKillRank.plugin, () -> {
+                for (String uuid : onlineUuids) {
+                    PlayerData cacheData = PluginDataManager.getPlayerDatabase(uuid);
+                    if (cacheData == null) continue;
                     int before = cacheData.getElo();
                     EloManager.getInstance().applyEloDecay(cacheData);
-                    if (cacheData.getElo() < before) decayed++;
+                    if (cacheData.getElo() < before) decayed.incrementAndGet();
                 }
-                continue;
-            }
+            });
+        }
 
+        for (PlayerData diskData : offlinePlayers) {
             int before = diskData.getElo();
             EloManager.getInstance().applyEloDecay(diskData);
             if (diskData.getElo() < before) {
                 PluginDataStorage.savePlayerData(diskData.getUUID(), diskData);
-                decayed++;
+                decayed.incrementAndGet();
             }
         }
 
-        if (decayed > 0) {
-            MessageUtil.log("[EloDecay] Applied decay to " + decayed + " player(s).");
-        }
+        Bukkit.getScheduler().runTaskLater(NotKillRank.plugin, () -> {
+            if (decayed.get() > 0) {
+                MessageUtil.log("[EloDecay] Applied decay to " + decayed.get() + " player(s).");
+            }
+        }, 2L);
     }
 }

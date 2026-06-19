@@ -3,17 +3,23 @@ package me.ihqqq.notkillrank.webhook;
 import com.google.gson.Gson;
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.file.module.WebhookFile;
+import me.ihqqq.notkillrank.manager.RankManager;
+import me.ihqqq.notkillrank.storage.PlayerData;
+import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.util.MessageUtil;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class WebhookManager {
 
@@ -26,6 +32,76 @@ public class WebhookManager {
 
     public WebhookManager() {
         instance = this;
+    }
+
+    public void sendTopElo() {
+        var cfg = WebhookFile.get();
+        if (cfg == null) return;
+        if (!cfg.getBoolean("top-elo.enabled", false)) return;
+
+        String url = cfg.getString("top-elo.url", "");
+        if (url == null || url.isBlank() || url.equals("https://discord.com/api/webhooks/YOUR_WEBHOOK_URL")) return;
+
+        ConfigurationSection payloadSection = cfg.getConfigurationSection("top-elo.payload");
+        if (payloadSection == null) return;
+
+        int limit = Math.max(1, Math.min(10, cfg.getInt("top-elo.limit", 10)));
+        String entryFormat = cfg.getString("top-elo.entry-format", "#{pos} {player} » {elo} ({rank})");
+        boolean showThumbnail = cfg.getBoolean("top-elo.show-thumbnail", true);
+
+        Map<String, Object> payloadTemplate = sectionToMap(payloadSection);
+
+        NotKillRank.plugin.getServer().getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+            try {
+                List<PlayerData> topPlayers = PluginDataManager.getTopPlayers(limit);
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < topPlayers.size(); i++) {
+                    PlayerData data = topPlayers.get(i);
+                    String rawRank = RankManager.getInstance().getRankTag(data.getElo());
+                    String plainRank = MiniMessage.miniMessage().stripTags(rawRank);
+                    String kd = data.getDeaths() == 0
+                            ? String.valueOf(data.getKills())
+                            : String.format("%.2f", (double) data.getKills() / data.getDeaths());
+
+                    String line = entryFormat
+                            .replace("{pos}", String.valueOf(i + 1))
+                            .replace("{player}", data.getName())
+                            .replace("{elo}", String.valueOf(data.getElo()))
+                            .replace("{rank}", plainRank)
+                            .replace("{kills}", String.valueOf(data.getKills()))
+                            .replace("{deaths}", String.valueOf(data.getDeaths()))
+                            .replace("{kd}", kd)
+                            .replace("{peak_elo}", String.valueOf(data.getPeakElo()));
+                    if (i > 0) sb.append("\n");
+                    sb.append(line);
+                }
+
+                String top1Avatar = "";
+                if (!topPlayers.isEmpty() && showThumbnail) {
+                    PlayerData top1 = topPlayers.get(0);
+                    try {
+                        top1Avatar = SkinUtil.getAvatarUrl(top1.getName(), UUID.fromString(top1.getUUID()));
+                    } catch (Exception ignored) {}
+                }
+
+                String serverName = NotKillRank.plugin.getServer().getName();
+                String date = LocalDate.now().toString();
+
+                Map<String, String> replacements = new LinkedHashMap<>();
+                replacements.put("top_list", sb.toString());
+                replacements.put("top1_avatar", top1Avatar);
+                replacements.put("date", date);
+                replacements.put("server_name", serverName);
+
+                Map<String, Object> processed = applyReplacements(payloadTemplate, replacements);
+                stripEmptyUrlObjects(processed);
+                String json = GSON.toJson(processed);
+                post(url, json);
+            } catch (Exception e) {
+                MessageUtil.warn("[Webhook] Gửi top-elo webhook thất bại: " + e.getMessage());
+            }
+        });
     }
 
     public void sendStats(Map<String, String> replacements) {

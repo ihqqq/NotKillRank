@@ -38,24 +38,42 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        PlayerData data;
         if (args.length == 0) {
             if (!(sender instanceof Player player)) {
                 sender.sendMessage("Usage: /stats <player>");
                 return true;
             }
-            data = PluginDataManager.getOrCreate(player);
-        } else {
-            data = PluginDataManager.getPlayerDatabaseByName(args[0]);
-            if (data == null) {
-                MessageUtil.sendMessage(sender, MessageUtil.getMessage("player-not-found",
-                                "<red>Không tìm thấy người chơi <yellow>{player}<red>!")
-                        .replace("{player}", args[0]));
-                return true;
-            }
+            PlayerData data = PluginDataManager.getOrCreate(player);
+            sendStats(sender, data);
+            return true;
         }
 
-        String rank     = RankManager.getInstance().getRankTag(data.getElo());
+        final String targetName = args[0];
+
+        PlayerData cached = PluginDataManager.getPlayerDatabaseByNameNoIO(targetName);
+        if (cached != null) {
+            sendStats(sender, cached);
+            return true;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
+            PlayerData data = PluginDataManager.getPlayerDatabaseByName(targetName);
+            Bukkit.getScheduler().runTask(NotKillRank.plugin, () -> {
+                if (data == null) {
+                    MessageUtil.sendMessage(sender, MessageUtil.getMessage("player-not-found",
+                                    "<red>Không tìm thấy người chơi <yellow>{player}<red>!")
+                            .replace("{player}", targetName));
+                    return;
+                }
+                sendStats(sender, data);
+            });
+        });
+
+        return true;
+    }
+
+    private void sendStats(CommandSender sender, PlayerData data) {
+        String rank      = RankManager.getInstance().getRankTag(data.getElo());
         String streakTag = RankManager.getInstance().getStreakTag(data);
         String streakPart = streakTag.isEmpty() ? "" : " " + streakTag;
         String kd = data.getDeaths() == 0
@@ -86,7 +104,6 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
         }
 
         sendStatsWebhook(sender, data, rank + streakPart, kd, totalBounty);
-        return true;
     }
 
     private void sendStatsWebhook(CommandSender requester, PlayerData data, String rank, String kd, int totalBounty) {

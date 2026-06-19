@@ -127,19 +127,20 @@ public class BountyManager {
             onlinePlacer = null;
         }
 
-        if (onlinePlacer != null) {
-            PlayerData placerData = PluginDataManager.getPlayerDatabase(placerUuid);
-            if (placerData != null) {
-                placerData.setElo(placerData.getElo() + amount);
-                if (placerData.getElo() > placerData.getPeakElo()) {
-                    placerData.setPeakElo(placerData.getElo());
+        if (onlinePlacer != null && onlinePlacer.isOnline()) {
+            final Player finalPlacer = onlinePlacer;
+            Bukkit.getScheduler().runTask(NotKillRank.plugin, () -> {
+                PlayerData placerData = PluginDataManager.getPlayerDatabase(placerUuid);
+                if (placerData != null) {
+                    placerData.setElo(placerData.getElo() + amount);
+                    if (placerData.getElo() > placerData.getPeakElo()) {
+                        placerData.setPeakElo(placerData.getElo());
+                    }
+                    MessageUtil.sendMessage(finalPlacer, expiredMsg);
+                    Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin,
+                            () -> PluginDataManager.savePlayerDatabaseToStorage(placerUuid));
                 }
-                final Player finalPlacer = onlinePlacer;
-                Bukkit.getScheduler().runTask(NotKillRank.plugin,
-                        () -> MessageUtil.sendMessage(finalPlacer, expiredMsg));
-                Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin,
-                        () -> PluginDataManager.savePlayerDatabaseToStorage(placerUuid));
-            }
+            });
         } else {
             Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
                 PlayerData diskData = PluginDataStorage.getPlayerData(placerUuid);

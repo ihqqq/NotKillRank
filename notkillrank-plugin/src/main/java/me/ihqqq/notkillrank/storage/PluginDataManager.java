@@ -23,10 +23,13 @@ public class PluginDataManager {
 
     public static void saveAllDatabase() {
         List<PlayerData> snapshot = new ArrayList<>(playerDatabase.values());
+        int count = 0;
         for (PlayerData data : snapshot) {
-            PluginDataStorage.savePlayerData(data.getUUID(), data);
+            PlayerData snap = data.snapshot();
+            PluginDataStorage.savePlayerData(snap.getUUID(), snap);
+            count++;
         }
-        MessageUtil.log("<green>[PluginDataManager] Đã lưu " + snapshot.size() + " hồ sơ người chơi.");
+        MessageUtil.log("<green>[PluginDataManager] Đã lưu " + count + " hồ sơ người chơi.");
     }
 
     public static PlayerData getOrCreate(Player player) {
@@ -58,10 +61,16 @@ public class PluginDataManager {
         return null;
     }
 
-    public static PlayerData getPlayerDatabaseByName(String name) {
+    public static PlayerData getPlayerDatabaseByNameNoIO(String name) {
         for (PlayerData data : playerDatabase.values()) {
             if (data.getName().equalsIgnoreCase(name)) return data;
         }
+        return null;
+    }
+
+    public static PlayerData getPlayerDatabaseByName(String name) {
+        PlayerData fast = getPlayerDatabaseByNameNoIO(name);
+        if (fast != null) return fast;
         PlayerData loaded = PluginDataStorage.getPlayerDataByName(name);
         if (loaded != null) {
             playerDatabase.putIfAbsent(loaded.getUUID(), loaded);
@@ -72,7 +81,10 @@ public class PluginDataManager {
 
     public static void savePlayerDatabaseToStorage(String uuid) {
         PlayerData data = playerDatabase.get(uuid);
-        if (data != null) PluginDataStorage.savePlayerData(uuid, data);
+        if (data != null) {
+            PlayerData snap = data.snapshot();
+            PluginDataStorage.savePlayerData(uuid, snap);
+        }
     }
 
     public static void savePlayerDatabaseToStorage(String uuid, PlayerData data) {
@@ -85,7 +97,10 @@ public class PluginDataManager {
 
     public static void clearPlayerDatabase(String uuid) {
         PlayerData data = playerDatabase.remove(uuid);
-        if (data != null) PluginDataStorage.savePlayerData(uuid, data);
+        if (data != null) {
+            PlayerData snap = data.snapshot();
+            PluginDataStorage.savePlayerData(uuid, snap);
+        }
     }
 
     public static void evictPlayerDatabase(String uuid) {

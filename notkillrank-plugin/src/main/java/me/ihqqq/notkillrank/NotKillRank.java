@@ -20,6 +20,7 @@ import me.ihqqq.notkillrank.task.AutoSaveTask;
 import me.ihqqq.notkillrank.task.BountyExpireTask;
 import me.ihqqq.notkillrank.task.EloDecayTask;
 import me.ihqqq.notkillrank.task.NewbieProtectionTask;
+import me.ihqqq.notkillrank.task.TopEloWebhookTask;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -96,6 +97,10 @@ public final class NotKillRank extends JavaPlugin {
         if (StreakManager.getInstance() != null) StreakManager.getInstance().invalidateMilestoneCache();
         TopInventory.invalidateTitleCache();
         PluginDataManager.invalidateTopCache();
+        AutoSaveTask.scheduleOrRestart();
+        BountyExpireTask.scheduleOrRestart();
+        EloDecayTask.scheduleOrRestart();
+        TopEloWebhookTask.scheduleOrRestart();
         printReloadBanner();
     }
 
@@ -210,10 +215,10 @@ public final class NotKillRank extends JavaPlugin {
     }
 
     private void registerTasks() {
-        new AutoSaveTask();
-        new EloDecayTask();
+        AutoSaveTask.scheduleOrRestart();
+        EloDecayTask.scheduleOrRestart();
         new NewbieProtectionTask();
-        new BountyExpireTask();
-
+        BountyExpireTask.scheduleOrRestart();
+        TopEloWebhookTask.scheduleOrRestart();
     }
 }

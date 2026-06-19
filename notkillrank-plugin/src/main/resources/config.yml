@@ -39,6 +39,8 @@ modules:
     #   %notkillrank_elo%            — elo hiện tại
     #   %notkillrank_rank%           — tag hạng (MiniMessage)
     #   %notkillrank_rank_with_tag%  — tag hạng + tag chuỗi ([Kẻ yếu] / [Kẻ sống sót] / ...)
+    #   %notkillrank_next_rank%      — rank tiếp theo sẽ mở khóa
+    #   %notkillrank_next_needed%    — số elo cần để mở khóa rank kế tiếp
     #   %notkillrank_streak_tag%     — chỉ tag chuỗi hiện tại
     #   %notkillrank_kills%          — tổng số kill
     #   %notkillrank_deaths%         — tổng số lần chết

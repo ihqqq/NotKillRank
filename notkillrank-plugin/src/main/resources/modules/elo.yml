@@ -21,3 +21,4 @@ low-elo-threshold: 50
 # Hệ số nhân khi giết người có elo thấp hơn ngưỡng trên
 # Ví dụ: 0.5 → chỉ nhận 50% elo so với bình thường
 low-elo-multiplier: 0.5
+  

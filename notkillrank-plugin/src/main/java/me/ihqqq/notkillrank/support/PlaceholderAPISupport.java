@@ -50,6 +50,8 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
             case "is_weak" -> RankManager.getInstance().isWeak(data) ? "true" : "false";
             case "bounty"  -> String.valueOf(
                     data.getBounties().values().stream().mapToInt(Integer::intValue).sum());
+            case "next_rank"   -> mm2legacy(RankManager.getInstance().getNextRankTag(data.getElo()));
+            case "next_needed" -> String.valueOf(RankManager.getInstance().getNextRankNeeded(data.getElo()));
             default -> null;
         };
     }

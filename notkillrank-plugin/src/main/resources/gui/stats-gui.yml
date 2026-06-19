@@ -1,0 +1,112 @@
+# NotKillRank - GUI Thống Kê Người Chơi (phân trang)
+# Dùng MiniMessage: https://docs.advntr.dev/minimessage/format.html
+#
+# Cấu hình icon:
+#   - Vật phẩm thông thường: type: GRAY_STAINED_GLASS_PANE
+#   - Đầu custom (texture base64):
+#       type: CUSTOM_HEAD
+#       texture: "eyJ0ZXh0dXJlcy..."
+
+# Tên cửa sổ GUI — Placeholder: {page} (trang hiện tại), {total} (tổng số trang)
+name: <white><sprite:"minecraft:items":item/writable_book> <dark_gray>ꜱᴛᴀᴛꜱ <gray>— <white>{page}<gray>/<white>{total}
+
+# Số hàng của GUI — tối đa 6
+rows: 6
+
+# Số người chơi hiển thị tối đa trên mỗi trang
+players-per-page: 28
+
+# Nền của GUI — được fill trước, các slot khác đặt lên trên
+background:
+  icon:
+    type: GRAY_STAINED_GLASS_PANE
+  # Mỗi hàng phải đúng 9 ký tự — 'x' = có nền, ' ' = bỏ trống
+  fill:
+    - xxxxxxxxx
+    - x       x
+    - x       x
+    - x       x
+    - x       x
+    - xxxxxxxxx
+
+# Vị trí slot hiển thị đầu từng người chơi trong trang hiện tại (theo thứ tự)
+player-slots:
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+
+# Thông tin hiển thị trên đầu mỗi người chơi
+# Placeholder: {medal}, {player}, {rank}, {pos}, {elo}, {kills}, {deaths}, {kd},
+#              {kill_streak}, {death_streak}, {highest_streak}, {peak_elo}, {bounty}
+player-head:
+  name: '{medal} <white>{player}'
+  lore:
+    - ''
+    - ' <white><sprite:"minecraft:items":item/totem_of_undying> <gray>Hạng: {rank}'
+    - ' <white><sprite:"minecraft:items":item/amethyst_shard> <gray>Elo: <green>{elo}'
+    - ' <white><sprite:"minecraft:items":item/diamond_sword> <gray>K/D: <yellow>{kd}
+      <dark_gray>(<white>{kills}<dark_gray>/<white>{deaths}<dark_gray>)'
+    - ' <white><sprite:"minecraft:items":item/creeper_banner_pattern> <gray>Chuỗi kill
+      cao nhất: <red>{highest_streak}'
+    - ' <white><sprite:"minecraft:items":item/lime_candle> <gray>Peak elo: <gold>{peak_elo}'
+    - ''
+  # Dòng lore thêm vào khi người chơi có bounty — Placeholder: {bounty}
+  bounty-lore:
+    - ''
+    - '<gold>Bounty: <red>{bounty} elo'
+
+# Huy hiệu theo thứ hạng toàn server (không chỉ trong trang) — Placeholder: {pos}
+medals:
+  '1': <dark_gray>[<gold>#1<dark_gray>]
+  '2': <dark_gray>[<blue>#2<dark_gray>]
+  '3': <dark_gray>[<red>#3<dark_gray>]
+  default: <dark_gray>[<gray>#{pos}<dark_gray>]
+
+# Điều hướng phân trang
+navigation:
+  prev:
+    slot: 45
+    icon:
+      type: CUSTOM_HEAD
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDliMmJlZTM5YjZlZjQ3ZTE4MmQ2ZjFkY2E5ZGVhODQyZmNkNjhiZGE5YmFjYzZhNmQ2NmE4ZGNkZjNlYyJ9fX0=
+      name: '<yellow>◀ Trang trước'
+  next:
+    slot: 53
+    icon:
+      type: CUSTOM_HEAD
+      texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmViNTg4YjIxYTZmOThhZDFmZjRlMDg1YzU1MmRjYjA1MGVmYzljYWI0MjdmNDYwNDhmMThmYzgwMzQ3NWY3In19fQ==
+      name: '<yellow>Trang tiếp ▶'
+  page-indicator:
+    slot: 49
+    icon:
+      type: PAPER
+      name: '<gray>Trang <white>{page}<gray>/<white>{total}'
+
+# Các nút bổ sung (tùy chọn) — slot không được trùng với navigation
+# click-commands hỗ trợ prefix [player] / [console] / [playerasop]
+buttons: {}

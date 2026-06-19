@@ -66,6 +66,27 @@ public class RankManager {
         return snapshot.isEmpty() ? "" : snapshot.get(0).tag;
     }
 
+    private RankTier getNextTier(int elo) {
+        List<RankTier> snapshot = tiers;
+        RankTier next = null;
+        for (RankTier tier : snapshot) {
+            if (tier.min <= elo) continue;
+            if (next == null || tier.min < next.min) next = tier;
+        }
+        return next;
+    }
+
+    public String getNextRankTag(int elo) {
+        RankTier next = getNextTier(elo);
+        return next != null ? next.tag : "";
+    }
+
+    public int getNextRankNeeded(int elo) {
+        RankTier next = getNextTier(elo);
+        if (next == null) return 0;
+        return Math.max(0, next.min - elo);
+    }
+
     public void checkRankUp(Player player, PlayerData data, int oldElo, int newElo) {
         if (newElo <= oldElo) return;
 

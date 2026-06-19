@@ -6,6 +6,7 @@ import me.ihqqq.notkillrank.file.module.*;
 import me.ihqqq.notkillrank.hook.PvPManagerHook;
 import me.ihqqq.notkillrank.webhook.SkinUtil;
 import me.ihqqq.notkillrank.webhook.WebhookManager;
+import me.ihqqq.notkillrank.inventory.StatsInventory;
 import me.ihqqq.notkillrank.inventory.TopInventory;
 import me.ihqqq.notkillrank.language.Messages;
 import me.ihqqq.notkillrank.listener.CombatListener;
@@ -179,6 +180,7 @@ public final class NotKillRank extends JavaPlugin {
     private static void initFileClasses() {
         MessagesFile.init();
         TopGuiFile.init();
+        StatsGuiFile.init();
         EloFile.init();
         RevengerFile.init();
         AntiFarmFile.init();
@@ -196,6 +198,7 @@ public final class NotKillRank extends JavaPlugin {
         new PlayerJoinListener();
         new PlayerQuitListener();
         new TopInventory();
+        new StatsInventory();
     }
 
     private void registerCommands() {

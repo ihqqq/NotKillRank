@@ -1,6 +1,7 @@
 package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
+import me.ihqqq.notkillrank.inventory.StatsInventory;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.storage.PluginDataManager;
@@ -28,6 +29,15 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (args.length >= 1 && (args[0].equalsIgnoreCase("gui") || args[0].equalsIgnoreCase("menu"))) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage("Lệnh này chỉ dùng được trong game.");
+                return true;
+            }
+            StatsInventory.open(player, 0);
+            return true;
+        }
+
         PlayerData data;
         if (args.length == 0) {
             if (!(sender instanceof Player player)) {
@@ -113,6 +123,7 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         List<String> completions = new ArrayList<>();
         if (args.length == 1) {
+            completions.add("gui");
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.getName().toLowerCase().startsWith(args[0].toLowerCase()))
                     completions.add(p.getName());

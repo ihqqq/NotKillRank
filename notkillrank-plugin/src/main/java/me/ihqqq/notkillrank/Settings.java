@@ -2,10 +2,10 @@ package me.ihqqq.notkillrank;
 
 import me.ihqqq.notkillrank.enums.StorageType;
 import me.ihqqq.notkillrank.file.module.*;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Settings {
     public static StorageType STORAGE_TYPE;
@@ -86,9 +86,11 @@ public class Settings {
         List<?> permList = AntiFarmFile.get().getList("permissions");
         if (permList != null) {
             for (Object entry : permList) {
-                if (entry instanceof ConfigurationSection sec) {
-                    String perm = sec.getString("permission");
-                    int limit = sec.getInt("limit", 3);
+                if (entry instanceof Map<?, ?> map) {
+                    Object permObj = map.get("permission");
+                    Object limitObj = map.get("limit");
+                    String perm = permObj != null ? permObj.toString() : null;
+                    int limit = limitObj instanceof Number n ? n.intValue() : 3;
                     if (perm != null && !perm.isEmpty()) {
                         ANTI_FARM_PERM_ENTRIES.add(new AntiFarmPermEntry(perm, limit));
                     }

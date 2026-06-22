@@ -118,16 +118,16 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
         final String name = data.getName();
 
         Map<String, String> replacements = new LinkedHashMap<>();
-        replacements.put("player",     name);
+        replacements.put("player",     WebhookManager.escapeDiscordMarkdown(name));
         replacements.put("elo",        String.valueOf(data.getElo()));
-        replacements.put("rank",       MessageUtil.stripTags(rank));
+        replacements.put("rank",       WebhookManager.escapeDiscordMarkdown(MessageUtil.stripTags(rank)));
         replacements.put("kd",         kd);
         replacements.put("kills",      String.valueOf(data.getKills()));
         replacements.put("deaths",     String.valueOf(data.getDeaths()));
         replacements.put("streak",     String.valueOf(data.getHighestKillStreak()));
         replacements.put("peak",       String.valueOf(data.getPeakElo()));
         replacements.put("bounty",     String.valueOf(totalBounty));
-        replacements.put("requester",  requester.getName());
+        replacements.put("requester",  WebhookManager.escapeDiscordMarkdown(requester.getName()));
 
         replacements.put("avatar_url",    SkinUtil.getAvatarUrl(name, finalUuid));
         replacements.put("texture_url",   SkinUtil.getTextureUrl(name, finalUuid));

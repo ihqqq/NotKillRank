@@ -1,6 +1,8 @@
 package me.ihqqq.notkillrank;
 
 import com.tchristofferson.configupdater.ConfigUpdater;
+import me.ihqqq.notkillrank.api.NotKillRankApiImpl;
+import me.ihqqq.notkillrank.api.NKRProvider;
 import me.ihqqq.notkillrank.command.*;
 import me.ihqqq.notkillrank.file.module.*;
 import me.ihqqq.notkillrank.hook.PvPManagerHook;
@@ -77,11 +79,14 @@ public final class NotKillRank extends JavaPlugin {
             papiEnabled = true;
         }
 
+        NKRProvider.register(new NotKillRankApiImpl());
+
         printEnableBanner(papiEnabled);
     }
 
     @Override
     public void onDisable() {
+        NKRProvider.unregister();
         printDisableBanner();
         PluginDataManager.saveAllDatabase();
         PluginDataStorage.close();

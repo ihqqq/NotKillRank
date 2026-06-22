@@ -1,12 +1,14 @@
 package me.ihqqq.notkillrank.manager;
 
 import me.ihqqq.notkillrank.Settings;
+import me.ihqqq.notkillrank.api.event.NKRRankUpEvent;
 import me.ihqqq.notkillrank.file.module.RanksFile;
 import me.ihqqq.notkillrank.file.module.StreaksFile;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -97,9 +99,15 @@ public class RankManager {
         RankTier newTier = getTierFor(newElo);
         if (newTier == null || newTier.rankup == null) return;
 
-        RankUpConfig cfg = newTier.rankup;
-        String rankStripped = MiniMessage.miniMessage().stripTags(newTag);
+        String oldName = MiniMessage.miniMessage().stripTags(oldTag);
+        String newName = MiniMessage.miniMessage().stripTags(newTag);
 
+        NKRRankUpEvent rankUpEvent = new NKRRankUpEvent(
+                player, data, oldTag, newTag, oldName, newName, oldElo, newElo);
+        Bukkit.getPluginManager().callEvent(rankUpEvent);
+        if (rankUpEvent.isCancelled()) return;
+
+        RankUpConfig cfg = newTier.rankup;
         String playerName = player.getName();
 
         if (cfg.messageEnabled && cfg.messageText != null && !cfg.messageText.isEmpty()) {
@@ -195,7 +203,6 @@ public class RankManager {
         }
     }
 
-
     private static RankUpConfig parseDefaults(FileConfiguration cfg) {
         ConfigurationSection sec = cfg.getConfigurationSection("rankup-defaults");
         if (sec == null) return RankUpConfig.fallback();
@@ -284,10 +291,8 @@ public class RankManager {
         public final RankUpConfig rankup;
 
         public RankTier(int min, int max, String tag, RankUpConfig rankup) {
-            this.min = min;
-            this.max = max;
-            this.tag = tag;
-            this.rankup = rankup;
+            this.min = min; this.max = max;
+            this.tag = tag; this.rankup = rankup;
         }
     }
 

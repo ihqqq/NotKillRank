@@ -2,6 +2,9 @@ package me.ihqqq.notkillrank.manager;
 
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.Settings;
+import me.ihqqq.notkillrank.api.event.NKRBountyClaimedEvent;
+import me.ihqqq.notkillrank.api.event.NKRBountyExpiredEvent;
+import me.ihqqq.notkillrank.api.event.NKRBountyPlacedEvent;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.storage.PluginDataManager;
 import me.ihqqq.notkillrank.storage.PluginDataStorage;
@@ -56,6 +59,11 @@ public class BountyManager {
             return false;
         }
 
+        NKRBountyPlacedEvent event = new NKRBountyPlacedEvent(placer, target, actualAmount);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return false;
+        actualAmount = event.getAmount();
+
         String placerUuid = placer.getUniqueId().toString();
         String targetUUID = target.getUniqueId().toString();
         PlayerData targetData = PluginDataManager.getOrCreate(target);
@@ -66,6 +74,7 @@ public class BountyManager {
         targetData.getBounties().put(placerUuid, current + actualAmount);
         targetData.getBountyTimestamps().put(placerUuid, System.currentTimeMillis());
 
+        final int finalAmount = actualAmount;
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
             PluginDataManager.savePlayerDatabaseToStorage(placerUuid);
             PluginDataManager.savePlayerDatabaseToStorage(targetUUID);
@@ -75,7 +84,7 @@ public class BountyManager {
                         "<gold>[Bounty] <white>{placer} <white>đã đặt truy nã <green>{amount} elo "
                                 + "<white>lên đầu <red>{target}<white>!")
                 .replace("{placer}", placer.getName())
-                .replace("{amount}", String.valueOf(actualAmount))
+                .replace("{amount}", String.valueOf(finalAmount))
                 .replace("{target}", target.getName());
         MessageUtil.sendBroadcast(msg);
         return true;
@@ -120,12 +129,16 @@ public class BountyManager {
                 .replace("{amount}", String.valueOf(amount))
                 .replace("{target}", targetName);
 
-        Player onlinePlacer;
+        UUID placerUUID;
         try {
-            onlinePlacer = Bukkit.getPlayer(UUID.fromString(placerUuid));
+            placerUUID = UUID.fromString(placerUuid);
         } catch (IllegalArgumentException e) {
-            onlinePlacer = null;
+            return;
         }
+
+        Bukkit.getPluginManager().callEvent(new NKRBountyExpiredEvent(placerUUID, targetName, amount));
+
+        Player onlinePlacer = Bukkit.getPlayer(placerUUID);
 
         if (onlinePlacer != null && onlinePlacer.isOnline()) {
             final Player finalPlacer = onlinePlacer;
@@ -174,6 +187,9 @@ public class BountyManager {
 
         targetData.getBounties().clear();
         targetData.getBountyTimestamps().clear();
+
+        NKRBountyClaimedEvent event = new NKRBountyClaimedEvent(claimer, targetData, total);
+        Bukkit.getPluginManager().callEvent(event);
 
         String msg = MessageUtil.getMessage("bounty-claimed",
                         "<gold>[Bounty] <white>{claimer} <white>đã nhận thưởng <green>{amount} elo "

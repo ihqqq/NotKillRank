@@ -2,6 +2,7 @@ package me.ihqqq.notkillrank.listener;
 
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.Settings;
+import me.ihqqq.notkillrank.api.event.NKRPlayerDataLoadedEvent;
 import me.ihqqq.notkillrank.manager.BountyManager;
 import me.ihqqq.notkillrank.manager.EloManager;
 import me.ihqqq.notkillrank.manager.RankManager;
@@ -31,6 +32,9 @@ public class PlayerJoinListener implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
             PlayerData data = PluginDataManager.getOrCreate(player);
 
+            boolean firstJoin = (System.currentTimeMillis() - data.getFirstJoinTime()) < 10_000L
+                    && data.getKills() == 0 && data.getDeaths() == 0;
+
             EloManager.getInstance().applyEloDecay(data);
 
             if (Settings.MODULE_BOUNTY) {
@@ -48,8 +52,12 @@ public class PlayerJoinListener implements Listener {
 
             PluginDataManager.savePlayerDatabaseToStorage(player.getUniqueId().toString());
 
+            final boolean isFirstJoin = firstJoin;
             Bukkit.getScheduler().runTask(NotKillRank.plugin, () -> {
                 if (!player.isOnline()) return;
+
+                Bukkit.getPluginManager().callEvent(new NKRPlayerDataLoadedEvent(player, data, isFirstJoin));
+
                 String rank      = RankManager.getInstance().getRankTag(data.getElo());
                 String streakTag = RankManager.getInstance().getStreakTag(data);
                 String streakPart = streakTag.isEmpty() ? "" : " " + streakTag;

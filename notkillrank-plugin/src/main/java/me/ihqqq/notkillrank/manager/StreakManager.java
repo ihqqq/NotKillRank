@@ -1,5 +1,6 @@
 package me.ihqqq.notkillrank.manager;
 
+import me.ihqqq.notkillrank.api.event.NKRStreakMilestoneEvent;
 import me.ihqqq.notkillrank.file.module.StreaksFile;
 import me.ihqqq.notkillrank.storage.PlayerData;
 import me.ihqqq.notkillrank.util.MessageUtil;
@@ -50,6 +51,10 @@ public class StreakManager {
 
         for (int m : milestones) {
             if (streak == m) {
+                NKRStreakMilestoneEvent event = new NKRStreakMilestoneEvent(killer, killerData, m);
+                Bukkit.getPluginManager().callEvent(event);
+                if (event.isCancelled()) break;
+
                 String broadcastMsg = cfg.getString("kill-streaks." + m + ".broadcast-message", "");
                 boolean doBroadcast = cfg.getBoolean("kill-streaks." + m + ".broadcast", false);
                 boolean doSound     = cfg.getBoolean("kill-streaks." + m + ".sound", false);

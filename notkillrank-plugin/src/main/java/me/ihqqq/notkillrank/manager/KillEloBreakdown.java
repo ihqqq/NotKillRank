@@ -1,42 +1,46 @@
 package me.ihqqq.notkillrank.manager;
 
-public class KillEloBreakdown {
+import me.ihqqq.notkillrank.api.IKillResult;
+
+public class KillEloBreakdown implements IKillResult {
 
     public final int baseElo;
-
     public final double multiplier;
-
     public final String multiplierLabel;
-
     public final int revengeBonusPct;
-
     public final int streakBonusPct;
-
     public final int eloGained;
-
     public final int weakPenalty;
-
     public final int totalVictimLoss;
-
     public final boolean isStreakBreak;
-
     public final int brokenStreak;
 
     public KillEloBreakdown(int baseElo, double multiplier, String multiplierLabel,
                             int revengeBonusPct, int streakBonusPct,
                             int eloGained, int weakPenalty, int totalVictimLoss,
                             boolean isStreakBreak, int brokenStreak) {
-        this.baseElo = baseElo;
-        this.multiplier = multiplier;
+        this.baseElo        = baseElo;
+        this.multiplier     = multiplier;
         this.multiplierLabel = multiplierLabel;
         this.revengeBonusPct = revengeBonusPct;
         this.streakBonusPct = streakBonusPct;
-        this.eloGained = eloGained;
-        this.weakPenalty = weakPenalty;
+        this.eloGained      = eloGained;
+        this.weakPenalty    = weakPenalty;
         this.totalVictimLoss = totalVictimLoss;
-        this.isStreakBreak = isStreakBreak;
-        this.brokenStreak = brokenStreak;
+        this.isStreakBreak  = isStreakBreak;
+        this.brokenStreak   = brokenStreak;
     }
+
+    @Override public int getBaseElo()            { return baseElo; }
+    @Override public double getMultiplier()       { return multiplier; }
+    @Override public String getMultiplierLabel()  { return multiplierLabel; }
+    @Override public int getRevengeBonusPercent() { return revengeBonusPct; }
+    @Override public int getStreakBonusPercent()  { return streakBonusPct; }
+    @Override public int getEloGained()           { return eloGained; }
+    @Override public int getWeakPenalty()         { return weakPenalty; }
+    @Override public int getTotalVictimLoss()     { return totalVictimLoss; }
+    @Override public boolean isStreakBreak()       { return isStreakBreak; }
+    @Override public int getBrokenStreak()        { return brokenStreak; }
 
     public String buildBreakdownString() {
         StringBuilder sb = new StringBuilder();
@@ -49,19 +53,11 @@ public class KillEloBreakdown {
         if (hasMultiplier || hasRevenge || hasStreak) {
             sb.append(" <dark_gray>[");
             sb.append("<white>base:").append(baseElo);
-
-            if (hasMultiplier) {
-                sb.append(" <gray>× ").append(multiplierLabel);
-            }
-            if (hasRevenge) {
-                sb.append(" <gold>+báo thù ").append(revengeBonusPct).append("%");
-            }
-            if (hasStreak) {
-                sb.append(" <red>+streak ").append(streakBonusPct).append("%");
-            }
+            if (hasMultiplier) sb.append(" <gray>× ").append(multiplierLabel);
+            if (hasRevenge)    sb.append(" <gold>+báo thù ").append(revengeBonusPct).append("%");
+            if (hasStreak)     sb.append(" <red>+streak ").append(streakBonusPct).append("%");
             sb.append("<dark_gray>]");
         }
-
         return sb.toString();
     }
 

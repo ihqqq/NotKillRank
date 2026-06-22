@@ -2,6 +2,9 @@ package me.ihqqq.notkillrank.manager;
 
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.Settings;
+import me.ihqqq.notkillrank.api.event.EloChangeReason;
+import me.ihqqq.notkillrank.api.event.NKREloChangeEvent;
+import me.ihqqq.notkillrank.api.event.NKRKillEvent;
 import me.ihqqq.notkillrank.file.module.EloFile;
 import me.ihqqq.notkillrank.file.module.StreaksFile;
 import me.ihqqq.notkillrank.storage.PlayerData;
@@ -11,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.UUID;
 
 public class EloManager {
 
@@ -24,13 +28,21 @@ public class EloManager {
         return instance;
     }
 
-
     public void processKill(Player killer, Player victim) {
         PlayerData killerData = PluginDataManager.getOrCreate(killer);
         PlayerData victimData = PluginDataManager.getOrCreate(victim);
 
         boolean killerNewbie = isNewbie(killerData);
         boolean victimNewbie = isNewbie(victimData);
+
+        KillEloBreakdown preview = null;
+        if (!killerNewbie && !victimNewbie) {
+            preview = calculateBreakdown(killer, killerData, victimData);
+        }
+
+        NKRKillEvent killEvent = new NKRKillEvent(killer, victim, killerData, victimData, preview);
+        Bukkit.getPluginManager().callEvent(killEvent);
+        if (killEvent.isCancelled()) return;
 
         if (victimNewbie || killerNewbie) {
             applyKillStats(killerData, victimData);
@@ -77,7 +89,7 @@ public class EloManager {
             return;
         }
 
-        KillEloBreakdown breakdown = calculateBreakdown(killer, killerData, victimData);
+        KillEloBreakdown breakdown = (preview != null) ? preview : calculateBreakdown(killer, killerData, victimData);
 
         boolean streakModuleEnabled = Settings.MODULE_STREAKS;
         if (streakModuleEnabled && breakdown.isStreakBreak) {
@@ -89,11 +101,28 @@ public class EloManager {
         int newKillerElo = oldKillerElo + breakdown.eloGained;
         int newVictimElo = Math.max(Settings.ELO_MIN, victimData.getElo() - breakdown.totalVictimLoss);
 
-        killerData.setElo(newKillerElo);
-        if (newKillerElo > killerData.getPeakElo()) killerData.setPeakElo(newKillerElo);
-        victimData.setElo(newVictimElo);
+        UUID killerUUID = killer.getUniqueId();
+        UUID victimUUID = victim.getUniqueId();
 
-        RankManager.getInstance().checkRankUp(killer, killerData, oldKillerElo, newKillerElo);
+        NKREloChangeEvent killerEvent = new NKREloChangeEvent(killerUUID, killer.getName(),
+                oldKillerElo, newKillerElo, EloChangeReason.KILL);
+        Bukkit.getPluginManager().callEvent(killerEvent);
+
+        NKREloChangeEvent victimEvent = new NKREloChangeEvent(victimUUID, victim.getName(),
+                victimData.getElo(), newVictimElo, EloChangeReason.DEATH);
+        Bukkit.getPluginManager().callEvent(victimEvent);
+
+        if (!killerEvent.isCancelled()) {
+            killerData.setElo(killerEvent.getNewElo());
+            if (killerEvent.getNewElo() > killerData.getPeakElo())
+                killerData.setPeakElo(killerEvent.getNewElo());
+        }
+
+        if (!victimEvent.isCancelled()) {
+            victimData.setElo(victimEvent.getNewElo());
+        }
+
+        RankManager.getInstance().checkRankUp(killer, killerData, oldKillerElo, killerData.getElo());
 
         killerData.setKills(killerData.getKills() + 1);
         killerData.setKillStreak(killerData.getKillStreak() + 1);
@@ -109,7 +138,8 @@ public class EloManager {
         victimData.setLastKilledTime(System.currentTimeMillis());
         victimData.setNoDeathStart(System.currentTimeMillis());
 
-        if (antiFarmEnabled && resolveAntiFarmLimit(killer) != -1) logKill(killerData, victim.getUniqueId().toString());
+        if (antiFarmEnabled && resolveAntiFarmLimit(killer) != -1)
+            logKill(killerData, victim.getUniqueId().toString());
 
         if (streakModuleEnabled) StreakManager.getInstance().checkMilestone(killer, killerData);
 
@@ -132,11 +162,11 @@ public class EloManager {
             MessageUtil.sendBroadcast(weakMsg);
         }
 
-        final String killerUuid = killer.getUniqueId().toString();
-        final String victimUuid = victim.getUniqueId().toString();
+        final String killerUuidStr = killer.getUniqueId().toString();
+        final String victimUuidStr = victim.getUniqueId().toString();
         Bukkit.getScheduler().runTaskAsynchronously(NotKillRank.plugin, () -> {
-            PluginDataManager.savePlayerDatabaseToStorage(killerUuid);
-            PluginDataManager.savePlayerDatabaseToStorage(victimUuid);
+            PluginDataManager.savePlayerDatabaseToStorage(killerUuidStr);
+            PluginDataManager.savePlayerDatabaseToStorage(victimUuidStr);
         });
     }
 
@@ -217,12 +247,27 @@ public class EloManager {
 
         if (offlineDaysActual > Settings.DECAY_OFFLINE_DAYS) {
             long decayDays = offlineDaysActual - Settings.DECAY_OFFLINE_DAYS;
-            double totalDecayPct = Math.min(decayDays * Settings.DECAY_DAILY_PERCENT, Settings.DECAY_MAX_PERCENT) / 100.0;
+            double totalDecayPct = Math.min(decayDays * Settings.DECAY_DAILY_PERCENT,
+                    Settings.DECAY_MAX_PERCENT) / 100.0;
             int lostElo = (int) Math.round(data.getElo() * totalDecayPct);
             int newElo = Math.max(Settings.ELO_MIN, data.getElo() - lostElo);
             if (lostElo > 0) {
-                data.setElo(newElo);
-                data.setLastOnline(System.currentTimeMillis());
+                UUID uuid;
+                try { uuid = UUID.fromString(data.getUUID()); }
+                catch (IllegalArgumentException e) { uuid = null; }
+
+                if (uuid != null) {
+                    NKREloChangeEvent event = new NKREloChangeEvent(
+                            uuid, data.getName(), data.getElo(), newElo, EloChangeReason.DECAY);
+                    Bukkit.getPluginManager().callEvent(event);
+                    if (!event.isCancelled()) {
+                        data.setElo(event.getNewElo());
+                        data.setLastOnline(System.currentTimeMillis());
+                    }
+                } else {
+                    data.setElo(newElo);
+                    data.setLastOnline(System.currentTimeMillis());
+                }
             }
         }
     }
@@ -231,7 +276,8 @@ public class EloManager {
         if (!Settings.MODULE_PROTECTION) return false;
         long onlineMs = System.currentTimeMillis() - data.getFirstJoinTime();
         long onlineHours = onlineMs / (60L * 60 * 1000);
-        return onlineHours < Settings.PROTECTION_NEWBIE_HOURS || data.getElo() < Settings.PROTECTION_NEWBIE_ELO;
+        return onlineHours < Settings.PROTECTION_NEWBIE_HOURS
+                || data.getElo() < Settings.PROTECTION_NEWBIE_ELO;
     }
 
     private void applyKillStats(PlayerData killerData, PlayerData victimData) {
@@ -243,9 +289,7 @@ public class EloManager {
 
     public int resolveAntiFarmLimit(Player killer) {
         for (Settings.AntiFarmPermEntry entry : Settings.ANTI_FARM_PERM_ENTRIES) {
-            if (killer.hasPermission(entry.permission())) {
-                return entry.limit();
-            }
+            if (killer.hasPermission(entry.permission())) return entry.limit();
         }
         return Settings.ANTI_FARM_LIMIT_KILLS_PER_HOUR;
     }
@@ -258,14 +302,11 @@ public class EloManager {
         long oneHour = 60L * 60 * 1000;
         List<Long> timestamps = killerData.getOrCreateKillTimestamps(victimUUID);
         timestamps.removeIf(t -> (now - t) > oneHour);
-        if (timestamps.isEmpty()) {
-            killerData.getKillLog().remove(victimUUID);
-        }
+        if (timestamps.isEmpty()) killerData.getKillLog().remove(victimUUID);
         return timestamps.size() >= limit;
     }
 
     public void logKill(PlayerData killerData, String victimUUID) {
         killerData.getOrCreateKillTimestamps(victimUUID).add(System.currentTimeMillis());
     }
-
 }

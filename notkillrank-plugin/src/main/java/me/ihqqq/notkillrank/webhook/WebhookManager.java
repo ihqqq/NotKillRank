@@ -66,9 +66,9 @@ public class WebhookManager {
 
                     String line = entryFormat
                             .replace("{pos}", String.valueOf(i + 1))
-                            .replace("{player}", data.getName())
+                            .replace("{player}", escapeDiscordMarkdown(data.getName()))
                             .replace("{elo}", String.valueOf(data.getElo()))
-                            .replace("{rank}", plainRank)
+                            .replace("{rank}", escapeDiscordMarkdown(plainRank))
                             .replace("{kills}", String.valueOf(data.getKills()))
                             .replace("{deaths}", String.valueOf(data.getDeaths()))
                             .replace("{kd}", kd)
@@ -243,6 +243,20 @@ public class WebhookManager {
             text = text.replace("{" + entry.getKey() + "}", entry.getValue());
         }
         return text;
+    }
+
+    public static String escapeDiscordMarkdown(String text) {
+        if (text == null) return "";
+        return text
+                .replace("\\", "\\\\")
+                .replace("_", "\\_")
+                .replace("*", "\\*")
+                .replace("~", "\\~")
+                .replace("`", "\\`")
+                .replace("|", "\\|")
+                .replace(">", "\\>")
+                .replace("[", "\\[")
+                .replace("]", "\\]");
     }
 
     private void post(String urlStr, String json) throws Exception {

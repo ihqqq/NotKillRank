@@ -1,0 +1,68 @@
+# NotBooster configuration
+# Format mau tin nhan ho tro MiniMessage (<green>, <yellow>, ...) neu server co Adventure MiniMessage.
+# Neu MiniMessage khong co san, plugin se fallback ve legacy color code (&a, &e, hoac cac tag co ban duoi dang mau legacy).
+settings:
+  locale: vi
+  check-expired-interval-seconds: 30
+
+storage:
+  # YAML da hoat dong on-disk. SQLITE/MYSQL hien co factory de scale ve sau va se fallback ve YAML neu chua implement.
+  type: YAML
+
+placeholderapi:
+  # Bat PlaceholderAPI expansion %notbooster_elo%, %notbooster_exp%, %notbooster_item%, %notbooster_effect% neu PlaceholderAPI duoc cai.
+  enabled: true
+
+gui:
+  # Bat /notbooster gui de xem/shift-click stop booster dang active.
+  enabled: true
+
+limits:
+  max-personal-boosters-per-player: 3
+  max-global-boosters: 5
+  max-duration:
+    personal: 24h
+    global: 6h
+  max-multiplier:
+    exp: 5.0
+    elo: 5.0
+    item_gained: 5.0
+    effect: 1.0
+
+stacking:
+  mode: MULTIPLY
+  cap-effective-multiplier:
+    exp: 5.0
+    elo: 5.0
+    item_gained: 5.0
+
+elo:
+  boost-only-positive-delta: true
+  apply-reasons:
+    - KILL
+
+catamines:
+  enabled: true
+  hook-mode: EVENT
+  # BLOCK_DROP = boost item tu Bukkit BlockDropItemEvent sau khi break duoc CataMines xac nhan.
+  # API_REWARD/INVENTORY_DELTA duoc de san key config cho mode tich hop sau khi can hook sau hon vao CataMines reward pipeline.
+  reward-mode: BLOCK_DROP
+  item-rounding: FLOOR_WITH_CHANCE
+
+effect-presets:
+  mining:
+    effects:
+      FAST_DIGGING:
+        amplifier: 1
+        ambient: false
+        particles: true
+      NIGHT_VISION:
+        amplifier: 0
+        ambient: false
+        particles: false
+  pvp:
+    effects:
+      SPEED:
+        amplifier: 0
+        ambient: false
+        particles: true

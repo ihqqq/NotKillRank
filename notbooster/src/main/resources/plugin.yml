@@ -1,0 +1,32 @@
+name: NotBooster
+version: '${project.version}'
+main: me.ihqqq.notbooster.NotBooster
+api-version: '1.21'
+load: POSTWORLD
+authors: [ihqqq]
+description: Booster addon for NotKillRank Elo, EXP, item gains, and effects.
+depend: [NotKillRank]
+softdepend: [CataMines, Catamines, PlaceholderAPI]
+
+commands:
+  notbooster:
+    description: Quan ly booster EXP, Elo, Item va Effect
+    usage: /notbooster <type> <personal/global> <power> <duration>
+    aliases: [nbooster, booster]
+
+permissions:
+  notbooster.use:
+    description: Cho phep xem thong tin va dung lenh NotBooster co ban
+    default: true
+  notbooster.personal:
+    description: Cho phep kich hoat booster ca nhan
+    default: true
+  notbooster.global:
+    description: Cho phep kich hoat booster toan server
+    default: op
+  notbooster.admin:
+    description: Cho phep quan tri NotBooster
+    default: op
+  notbooster.reload:
+    description: Cho phep reload NotBooster
+    default: op

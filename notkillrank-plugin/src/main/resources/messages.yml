@@ -120,6 +120,9 @@ admin-usage-info: '<yellow>Cách dùng: <white>/nkr info <player>'
 admin-invalid-elo: '<red>⚠ Elo không hợp lệ! Phải là số nguyên không âm.'
 admin-invalid-amount: '<red>⚠ Số lượng elo không hợp lệ! Phải là số nguyên dương.'
 
+# Khi một plugin khác hủy (cancel) NKREloChangeEvent — Placeholder: {player}
+admin-elo-change-cancelled: '<red>⚠ Thay đổi elo của <yellow>{player} <red>đã bị hủy bởi một plugin khác!'
+
 # Thông báo kết quả thành công — Placeholder: {player}
 admin-reset-done: '<green>✔ Đã reset dữ liệu của <yellow>{player}<green>!'
 

@@ -20,13 +20,13 @@ modules:
     # Chống farm elo (giới hạn số lần giết cùng người trong 1 giờ)
     anti-farm: true
     # Hệ thống truy nã
-    bounty: true
+    bounty: false
     # Suy giảm elo khi offline lâu
     decay: true
     # Bảo vệ người mới
     protection: false
     # Báo thù — bonus elo khi giết lại người vừa giết mình (cấu hình trong modules/revenger.yml)
-    revenger: true
+    revenger: false
     # Kill streak, death streak, cột mốc chuỗi giết
     streaks: false
     # Gửi thông tin /stats lên Discord qua webhook (cấu hình chi tiết trong modules/webhook.yml)

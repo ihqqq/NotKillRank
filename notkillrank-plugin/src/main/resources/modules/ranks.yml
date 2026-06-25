@@ -34,90 +34,140 @@ rankup-defaults:
   sound-pitch: 1.0
 
 # Danh sách hạng — min/max là khoảng elo, tag là tên hiển thị
-# Thứ tự từ thấp lên cao: Unranked → LT4 → LT3 → LT2 → LT1 → HT4 → HT3 → HT2 → HT1
+# Thứ tự từ thấp lên cao: Unranked LT5 → LT4 → LT3 → LT2 → LT1
+# -> M5 -> M4 -> M3 -> M2 -> M1 -> HT5 -> HT4 → HT3 → HT2 → HT1
 ranks:
-
   - min: 100
     max: 999
-    tag: "<dark_gray>[<red>✘<dark_gray>]"
-
+    tag: <dark_gray>[<red>✘<dark_gray>]
   - min: 1000
-    max: 1399
-    tag: "<gray>[LT4]"
+    max: 1499
+    tag: <gradient:#DCEDC8:#9CCC65>LT5</gradient>
     rankup:
       sound-name: ENTITY_PLAYER_LEVELUP
       sound-pitch: 1.0
-
-  - min: 1400
-    max: 1799
-    tag: "<white>[LT3]"
+  - min: 1500
+    max: 2049
+    tag: <gradient:#AED581:#8BC34A>LT4</gradient>
+    rankup:
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.05
+  - min: 2050
+    max: 2649
+    tag: <gradient:#9CCC65:#7CB342>LT3</gradient>
     rankup:
       sound-name: ENTITY_PLAYER_LEVELUP
       sound-pitch: 1.1
-
-  - min: 1800
-    max: 2299
-    tag: "<#5B8DD9>[LT2]"
+  - min: 2650
+    max: 3299
+    tag: <gradient:#8BC34A:#689F38>LT2</gradient>
     rankup:
       sound-name: ENTITY_PLAYER_LEVELUP
-      sound-pitch: 1.2
-
-  - min: 2300
-    max: 2999
-    tag: "<#43A047>[LT1]"
-    rankup:
-      broadcast-enabled: true
-      broadcast-text: "{old_rank} <white>{player} <gray>vừa leo lên <#43A047>[LT1]<white>!"
-      sound-name: ENTITY_PLAYER_LEVELUP
-      sound-pitch: 1.3
-
-  - min: 3000
+      sound-pitch: 1.15
+  - min: 3300
     max: 3999
-    tag: "<#F9A825>[HT4]"
+    tag: <gradient:#689F38:#43A047>LT1</gradient>
     rankup:
-      title-text: "<#F9A825><bold>HIGH TIER!"
-      subtitle-text: "<white>Hạng mới: {rank}"
       broadcast-enabled: true
-      broadcast-text: "{old_rank} <white>{player} <gray>vừa leo lên <#F9A825>[HT4]<white>!"
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.2
+  - min: 4000
+    max: 4799
+    tag: <gradient:#B3E5FC:#4FC3F7>MT5</gradient>
+    rankup:
+      broadcast-enabled: true
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.0
+  - min: 4800
+    max: 5649
+    tag: <gradient:#81D4FA:#29B6F6>MT4</gradient>
+    rankup:
+      broadcast-enabled: true
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.05
+  - min: 5650
+    max: 6549
+    tag: <gradient:#4FC3F7:#03A9F4>MT3</gradient>
+    rankup:
+      broadcast-enabled: true
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.1
+  - min: 6550
+    max: 7499
+    tag: <gradient:#29B6F6:#039BE5>MT2</gradient>
+    rankup:
+      broadcast-enabled: true
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.15
+  - min: 7500
+    max: 8499
+    tag: <gradient:#03A9F4:#0288D1>MT1</gradient>
+    rankup:
+      broadcast-enabled: true
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
+      sound-name: ENTITY_PLAYER_LEVELUP
+      sound-pitch: 1.2
+  - min: 8500
+    max: 9499
+    tag: <gradient:#FFE082:#FFB300>HT5</gradient>
+    rankup:
+      title-text: <gradient:#FFE082:#FFB300><bold>HIGH TIER!
+      subtitle-text: '<white>Hạng mới: {rank}'
+      broadcast-enabled: true
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 1.0
-
-  - min: 4000
-    max: 5499
-    tag: "<#FB8C00>[HT3]"
+  - min: 9500
+    max: 10549
+    tag: <gradient:#FFD54F:#F9A825>HT4</gradient>
     rankup:
-      title-text: "<#FB8C00><bold>HIGH TIER!"
-      subtitle-text: "<white>Hạng mới: {rank}"
+      title-text: <gradient:#FFD54F:#F9A825><bold>HIGH TIER!
+      subtitle-text: '<white>Hạng mới: {rank}'
       broadcast-enabled: true
-      broadcast-text: "{old_rank} <white>{player} <gray>vừa leo lên <#FB8C00>[HT3]<white>!"
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 1.1
-
-  - min: 5500
-    max: 7499
-    tag: "<#E53935>[HT2]"
+  - min: 10550
+    max: 11649
+    tag: <gradient:#FFB300:#FB8C00>HT3</gradient>
     rankup:
-      title-text: "<#E53935><bold>HIGH TIER!"
-      subtitle-text: "<white>Hạng mới: {rank}"
+      title-text: <gradient:#FFB300:#FB8C00><bold>HIGH TIER!
+      subtitle-text: '<white>Hạng mới: {rank}'
       broadcast-enabled: true
-      broadcast-text: "{old_rank} <white>{player} <gray>vừa leo lên <#E53935>[HT2]<white>!"
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 1.2
-
-  # Hạng cao nhất — broadcast toàn server, âm thanh đặc biệt
-  - min: 7500
-    max: 99999
-    tag: "<gradient:#FFD700:#FFA000>[HT1]</gradient>"
+  - min: 11650
+    max: 12799
+    tag: <gradient:#FB8C00:#E53935>HT2</gradient>
     rankup:
-      message-text: "<gradient:#FFD700:#FFA000>✦ ĐỈNH CAO ✦ <white>{player} <white>đã đạt hạng {rank}<white>! Cực kỳ ấn tượng!"
-      actionbar-text: "<gradient:#FFD700:#FFA000><bold>✦ HIGH TIER 1 ✦</bold></gradient>"
-      title-text: "<gradient:#FFD700:#FFA000><bold>HIGH TIER 1!</bold></gradient>"
-      subtitle-text: "<white>Chúc mừng <yellow>{player}<white>!"
+      title-text: <gradient:#FB8C00:#E53935><bold>HIGH TIER!
+      subtitle-text: '<white>Hạng mới: {rank}'
       broadcast-enabled: true
-      broadcast-text: "{old_rank} <white>{player} <yellow>vừa đạt <gradient:#FFD700:#FFA000>[HT1]<white>! Hạng cao nhất server!"
+      broadcast-text: '{old_rank} <white>{player} <gray>vừa leo lên {rank}<white>!'
+      sound-name: UI_TOAST_CHALLENGE_COMPLETE
+      sound-volume: 1.0
+      sound-pitch: 1.3
+  - min: 12800
+    max: 99999
+    tag: <gradient:#FFD700:#FFA000>HT1</gradient>
+    rankup:
+      message-text: <gradient:#FFD700:#FFA000>✦ ĐỈNH CAO ✦ <white>{player} <white>đã
+        đạt hạng {rank}<white>! Cực kỳ ấn tượng!
+      actionbar-text: <gradient:#FFD700:#FFA000><bold>✦ HIGH TIER 1 ✦</bold></gradient>
+      title-text: <gradient:#FFD700:#FFA000><bold>HIGH TIER 1!</bold></gradient>
+      subtitle-text: <white>Chúc mừng <yellow>{player}<white>!
+      broadcast-enabled: true
+      broadcast-text: '{old_rank} <white>{player} <yellow>vừa đạt {rank}<white>! Hạng
+      cao nhất server!'
       sound-name: UI_TOAST_CHALLENGE_COMPLETE
       sound-volume: 1.0
       sound-pitch: 0.8

@@ -2,6 +2,8 @@ package me.ihqqq.notkillrank.command;
 
 import me.ihqqq.notkillrank.NotKillRank;
 import me.ihqqq.notkillrank.Settings;
+import me.ihqqq.notkillrank.api.event.EloChangeReason;
+import me.ihqqq.notkillrank.api.event.NKREloChangeEvent;
 import me.ihqqq.notkillrank.manager.ModuleManager;
 import me.ihqqq.notkillrank.manager.RankManager;
 import me.ihqqq.notkillrank.storage.PlayerData;
@@ -18,6 +20,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class AdminCommand implements CommandExecutor, TabCompleter {
@@ -51,12 +54,29 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 lookupPlayerAsync(sender, args[1], data -> {
-                    data.setElo(Settings.ELO_START);
+                    int oldElo = data.getElo();
+                    int targetElo = Settings.ELO_START;
+
+                    NKREloChangeEvent event = new NKREloChangeEvent(
+                            UUID.fromString(data.getUUID()), data.getName(),
+                            oldElo, targetElo, EloChangeReason.ADMIN);
+                    Bukkit.getPluginManager().callEvent(event);
+                    if (event.isCancelled()) {
+                        MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
+                                + MessageUtil.getMessage("admin-elo-change-cancelled",
+                                        "<red>⚠ Thay đổi elo của <yellow>{player} <red>đã bị hủy bởi một plugin khác!")
+                                .replace("{player}", data.getName()));
+                        return;
+                    }
+
+                    int newElo = event.getNewElo();
+                    data.setElo(newElo);
                     data.setKills(0); data.setDeaths(0);
                     data.setKillStreak(0); data.setDeathStreak(0);
-                    data.setHighestKillStreak(0); data.setPeakElo(Settings.ELO_START);
+                    data.setHighestKillStreak(0); data.setPeakElo(newElo);
                     data.getKillLog().clear();
                     data.getBounties().clear();
+                    PluginDataManager.invalidateTopCache();
                     saveAsync(data.getUUID());
                     MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                             + MessageUtil.getMessage("admin-reset-done",
@@ -76,15 +96,30 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                         int elo = Integer.parseInt(rawElo);
                         if (elo < 0) throw new NumberFormatException();
                         int oldElo = data.getElo();
-                        data.setElo(elo);
-                        if (elo > data.getPeakElo()) data.setPeakElo(elo);
+
+                        NKREloChangeEvent event = new NKREloChangeEvent(
+                                UUID.fromString(data.getUUID()), data.getName(),
+                                oldElo, elo, EloChangeReason.ADMIN);
+                        Bukkit.getPluginManager().callEvent(event);
+                        if (event.isCancelled()) {
+                            MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
+                                    + MessageUtil.getMessage("admin-elo-change-cancelled",
+                                            "<red>⚠ Thay đổi elo của <yellow>{player} <red>đã bị hủy bởi một plugin khác!")
+                                    .replace("{player}", data.getName()));
+                            return;
+                        }
+
+                        int newElo = event.getNewElo();
+                        data.setElo(newElo);
+                        if (newElo > data.getPeakElo()) data.setPeakElo(newElo);
+                        PluginDataManager.invalidateTopCache();
                         saveAsync(data.getUUID());
-                        triggerRankUpIfOnline(data, oldElo, elo);
+                        triggerRankUpIfOnline(data, oldElo, newElo);
                         MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                                 + MessageUtil.getMessage("admin-setelo-done",
                                         "<green>✔ Đã set elo của <yellow>{player} <green>thành <gold>{elo}<green>!")
                                 .replace("{player}", data.getName())
-                                .replace("{elo}", String.valueOf(elo)));
+                                .replace("{elo}", String.valueOf(newElo)));
                     } catch (NumberFormatException e) {
                         MessageUtil.sendMessage(sender, MessageUtil.getMessage("admin-invalid-elo",
                                 "<red>⚠ Elo không hợp lệ! Phải là số nguyên không âm."));
@@ -104,8 +139,23 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                         if (amount <= 0) throw new NumberFormatException();
                         int oldElo = data.getElo();
                         int newElo = (int) Math.min((long) oldElo + amount, Integer.MAX_VALUE);
+
+                        NKREloChangeEvent event = new NKREloChangeEvent(
+                                UUID.fromString(data.getUUID()), data.getName(),
+                                oldElo, newElo, EloChangeReason.ADMIN);
+                        Bukkit.getPluginManager().callEvent(event);
+                        if (event.isCancelled()) {
+                            MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
+                                    + MessageUtil.getMessage("admin-elo-change-cancelled",
+                                            "<red>⚠ Thay đổi elo của <yellow>{player} <red>đã bị hủy bởi một plugin khác!")
+                                    .replace("{player}", data.getName()));
+                            return;
+                        }
+
+                        newElo = event.getNewElo();
                         data.setElo(newElo);
                         if (newElo > data.getPeakElo()) data.setPeakElo(newElo);
+                        PluginDataManager.invalidateTopCache();
                         saveAsync(data.getUUID());
                         triggerRankUpIfOnline(data, oldElo, newElo);
                         MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
@@ -131,9 +181,25 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     try {
                         int amount = Integer.parseInt(rawAmount);
                         if (amount <= 0) throw new NumberFormatException();
-                        int newElo = Math.max(Settings.ELO_MIN, data.getElo() - amount);
-                        int actualTaken = data.getElo() - newElo;
+                        int oldElo = data.getElo();
+                        int newElo = Math.max(Settings.ELO_MIN, oldElo - amount);
+
+                        NKREloChangeEvent event = new NKREloChangeEvent(
+                                UUID.fromString(data.getUUID()), data.getName(),
+                                oldElo, newElo, EloChangeReason.ADMIN);
+                        Bukkit.getPluginManager().callEvent(event);
+                        if (event.isCancelled()) {
+                            MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
+                                    + MessageUtil.getMessage("admin-elo-change-cancelled",
+                                            "<red>⚠ Thay đổi elo của <yellow>{player} <red>đã bị hủy bởi một plugin khác!")
+                                    .replace("{player}", data.getName()));
+                            return;
+                        }
+
+                        newElo = event.getNewElo();
+                        int actualTaken = oldElo - newElo;
                         data.setElo(newElo);
+                        PluginDataManager.invalidateTopCache();
                         saveAsync(data.getUUID());
                         MessageUtil.sendMessage(sender, MessageUtil.getPrefix()
                                 + MessageUtil.getMessage("admin-take-done",
@@ -236,7 +302,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
     }
 
     private void triggerRankUpIfOnline(PlayerData data, int oldElo, int newElo) {
-        Player target = Bukkit.getPlayer(java.util.UUID.fromString(data.getUUID()));
+        Player target = Bukkit.getPlayer(UUID.fromString(data.getUUID()));
         if (target == null || !target.isOnline()) return;
         RankManager.getInstance().checkRankUp(target, data, oldElo, newElo);
     }
